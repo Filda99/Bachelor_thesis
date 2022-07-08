@@ -37,7 +37,7 @@
  * Definitions
  ******************************************************************************/
 /* The Flextimer instance/channel used for board */
-#define BOARD_TPM_BASEADDR TPM2
+#define BOARD_TPM_BASEADDR TPM1
 #define BOARD_FIRST_TPM_CHANNEL 0U
 #define BOARD_SECOND_TPM_CHANNEL 1U
 
@@ -66,11 +66,11 @@ int main(void)
     tpm_chnl_pwm_signal_param_t tpmParam[2];
 
     /* Configure tpm params with frequency 24kHZ */
-    tpmParam[0].chnlNumber = (tpm_chnl_t)BOARD_FIRST_TPM_CHANNEL;
+    tpmParam[0].chnlNumber = kTPM_Chnl_0;
     tpmParam[0].level = kTPM_LowTrue;
     tpmParam[0].dutyCyclePercent = updatedDutycycle;
 
-    tpmParam[1].chnlNumber = (tpm_chnl_t)BOARD_SECOND_TPM_CHANNEL;
+    tpmParam[1].chnlNumber = kTPM_Chnl_1;
     tpmParam[1].level = kTPM_LowTrue;
     tpmParam[1].dutyCyclePercent = updatedDutycycle;
 
@@ -83,8 +83,6 @@ int main(void)
 
     /* Print a note to terminal */
     PRINTF("\r\nTPM example to output PWM on 2 channels\r\n");
-    PRINTF("\r\nIf an LED is connected to the TPM pin, you will see a change in LED brightness if you enter different values");
-    PRINTF("\r\nIf no LED is connected to the TPM pin, then probe the signal using an oscilloscope");
 
     /*
      * tpmInfo.prescale = kTPM_Prescale_Divide_1;
@@ -120,9 +118,9 @@ int main(void)
         updatedDutycycle = getCharValue * 10U;
 
         /* Start PWM mode with updated duty cycle */
-        TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, (tpm_chnl_t)BOARD_FIRST_TPM_CHANNEL, kTPM_EdgeAlignedPwm,
+        TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, kTPM_Chnl_0, kTPM_EdgeAlignedPwm,
                                updatedDutycycle);
-        TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, (tpm_chnl_t)BOARD_SECOND_TPM_CHANNEL, kTPM_EdgeAlignedPwm,
+        TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, kTPM_Chnl_1, kTPM_EdgeAlignedPwm,
                                updatedDutycycle);
 
         PRINTF("The duty cycle was successfully updated!\r\n");

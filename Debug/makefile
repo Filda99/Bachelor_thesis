@@ -31,7 +31,7 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := frdmkl25z_driver_examples_tpm_pwm_twochannel
+BUILD_ARTIFACT_NAME := frdmkl25z
 BUILD_ARTIFACT_EXTENSION := axf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
@@ -43,24 +43,24 @@ all:
 	+@$(MAKE) --no-print-directory main-build && $(MAKE) --no-print-directory post-build
 
 # Main-build Target
-main-build: frdmkl25z_driver_examples_tpm_pwm_twochannel.axf
+main-build: frdmkl25z.axf
 
 # Tool invocations
-frdmkl25z_driver_examples_tpm_pwm_twochannel.axf: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
+frdmkl25z.axf: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU Linker'
-	arm-none-eabi-gcc -nostdlib -Xlinker -Map="frdmkl25z_driver_examples_tpm_pwm_twochannel.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T frdmkl25z_driver_examples_tpm_pwm_twochannel_Debug.ld -o "frdmkl25z_driver_examples_tpm_pwm_twochannel.axf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -nostdlib -Xlinker -Map="frdmkl25z.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m0plus -mthumb -T "frdmkl25z_Debug.ld" -o "frdmkl25z.axf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) frdmkl25z_driver_examples_tpm_pwm_twochannel.axf
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) frdmkl25z.axf
 	-@echo ' '
 
 post-build:
 	-@echo 'Performing post-build steps'
-	-arm-none-eabi-size "frdmkl25z_driver_examples_tpm_pwm_twochannel.axf"; # arm-none-eabi-objcopy -v -O binary "frdmkl25z_driver_examples_tpm_pwm_twochannel.axf" "frdmkl25z_driver_examples_tpm_pwm_twochannel.bin" ; # checksum -p MKL25Z128xxx4 -d "frdmkl25z_driver_examples_tpm_pwm_twochannel.bin";
+	-arm-none-eabi-size "frdmkl25z.axf"; # arm-none-eabi-objcopy -v -O binary "frdmkl25z.axf" "frdmkl25z.bin" ; # checksum -p MKL25Z128xxx4 -d "frdmkl25z.bin";
 	-@echo ' '
 
 .PHONY: all clean dependents post-build
