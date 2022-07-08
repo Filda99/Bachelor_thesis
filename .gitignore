@@ -55,4 +55,5 @@ dkms.conf
 *.cproject
 *.project
 .settings
+*.mex
 Debug
