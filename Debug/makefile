@@ -11,6 +11,7 @@ RM := rm -rf
 -include utilities/subdir.mk
 -include startup/subdir.mk
 -include source/subdir.mk
+-include freertos/subdir.mk
 -include drivers/subdir.mk
 -include board/subdir.mk
 -include Motors/subdir.mk

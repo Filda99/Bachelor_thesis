@@ -18,6 +18,7 @@ CMSIS \
 Motors \
 board \
 drivers \
+freertos \
 source \
 startup \
 utilities \
