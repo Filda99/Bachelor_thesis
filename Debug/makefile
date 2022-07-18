@@ -13,6 +13,7 @@ RM := rm -rf
 -include source/subdir.mk
 -include drivers/subdir.mk
 -include board/subdir.mk
+-include Motors/subdir.mk
 -include CMSIS/subdir.mk
 -include subdir.mk
 -include objects.mk

@@ -31,6 +31,7 @@
 #include "fsl_debug_console.h"
 #include "board.h"
 #include "fsl_tpm.h"
+#include "globalio.h"
 
 #include "pin_mux.h"
 /*******************************************************************************
@@ -84,23 +85,11 @@ int main(void)
     /* Print a note to terminal */
     PRINTF("\r\nTPM example to output PWM on 2 channels\r\n");
 
-    /*
-     * tpmInfo.prescale = kTPM_Prescale_Divide_1;
-     * tpmInfo.useGlobalTimeBase = false;
-     * tpmInfo.enableDoze = false;
-     * tpmInfo.enableDebugMode = false;
-     * tpmInfo.enableReloadOnTrigger = false;
-     * tpmInfo.enableStopOnOverflow = false;
-     * tpmInfo.enableStartOnTrigger = false;
-     * tpmInfo.enablePauseOnTrigger = false;
-     * tpmInfo.triggerSelect = kTPM_Trigger_Select_0;
-     * tpmInfo.triggerSource = kTPM_TriggerSource_External;
-     */
     TPM_GetDefaultConfig(&tpmInfo);
     /* Initialize TPM module */
     TPM_Init(BOARD_TPM_BASEADDR, &tpmInfo);
 
-    TPM_SetupPwm(BOARD_TPM_BASEADDR, tpmParam, 2U, kTPM_EdgeAlignedPwm, 24000U, TPM_SOURCE_CLOCK);
+    TPM_SetupPwm(BOARD_TPM_BASEADDR, tpmParam, 2U, kTPM_EdgeAlignedPwm, 8000U, TPM_SOURCE_CLOCK);
     TPM_StartTimer(BOARD_TPM_BASEADDR, kTPM_SystemClock);
     while (1)
     {
