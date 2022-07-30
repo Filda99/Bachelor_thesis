@@ -17,8 +17,17 @@ extern "C" {
 /************************************
  * GLOBAL VARIABLES
  ************************************/
-int8_t CurrentSpeed = 0;
-int8_t CurrentRotation = 0;
+//! Current speed of car in pct - pwm duty cycle
+//	50% = stop
+//	 0% = max backwards
+// 100% = max forward
+int8_t CurrentSpeed = 50;
+
+//! Current steer of car in pct - pwm duty cycle
+//	50% = straight
+//	0%  = max right
+// 100% = max left
+int8_t CurrentSteer = 50;
 
 /************************************
  * MACROS AND DEFINES

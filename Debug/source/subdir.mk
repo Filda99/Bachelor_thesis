@@ -7,18 +7,21 @@ C_SRCS += \
 ../source/mtb.c \
 ../source/routine.c \
 ../source/semihost_hardfault.c \
+../source/startup_peripherals.c \
 ../source/tpm_pwm_twochannel.c 
 
 OBJS += \
 ./source/mtb.o \
 ./source/routine.o \
 ./source/semihost_hardfault.o \
+./source/startup_peripherals.o \
 ./source/tpm_pwm_twochannel.o 
 
 C_DEPS += \
 ./source/mtb.d \
 ./source/routine.d \
 ./source/semihost_hardfault.d \
+./source/startup_peripherals.d \
 ./source/tpm_pwm_twochannel.d 
 
 

@@ -22,7 +22,6 @@ extern int8_t CurrentSpeed;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define BOARD_TPM_BASEADDR TPM1
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -53,5 +52,4 @@ void setMotorSpeed(void)
 			kTPM_EdgeAlignedPwm, CurrentSpeed);
 	TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, kTPM_Chnl_1,
 			kTPM_EdgeAlignedPwm, CurrentSpeed);
-
 }

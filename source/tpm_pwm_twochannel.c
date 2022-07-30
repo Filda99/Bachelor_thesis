@@ -32,10 +32,7 @@
  * INCLUDES
  ************************************/
 #include "fsl_debug_console.h"
-#include "board.h"
-#include "fsl_tpm.h"
 #include "globalio.h"
-#include "pin_mux.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -45,13 +42,6 @@ extern int8_t CurrentSpeed;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-/* The Flextimer instance/channel used for board */
-#define BOARD_TPM_BASEADDR TPM1
-#define BOARD_FIRST_TPM_CHANNEL 0U
-#define BOARD_SECOND_TPM_CHANNEL 1U
-
-/* Get source clock for TPM driver */
-#define TPM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_PllFllSelClk)
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -60,8 +50,7 @@ extern int8_t CurrentSpeed;
 /************************************
  * STATIC VARIABLES
  ************************************/
-volatile uint8_t getCharValue = 0U;
-volatile uint8_t updatedDutycycle = 10U;
+static uint8_t getCharValue = 0U;
 
 /************************************
  * GLOBAL VARIABLES
@@ -82,35 +71,8 @@ volatile uint8_t updatedDutycycle = 10U;
  * @brief Main function
  */
 int main(void) {
-	tpm_config_t tpmInfo;
-	tpm_chnl_pwm_signal_param_t tpmParam[2];
+	startupPeripherals();
 
-	/* Configure tpm params with frequency 24kHZ */
-	tpmParam[0].chnlNumber = kTPM_Chnl_0;
-	tpmParam[0].level = kTPM_LowTrue;
-	tpmParam[0].dutyCyclePercent = updatedDutycycle;
-
-	tpmParam[1].chnlNumber = kTPM_Chnl_1;
-	tpmParam[1].level = kTPM_LowTrue;
-	tpmParam[1].dutyCyclePercent = updatedDutycycle;
-
-	/* Board pin, clock, debug console init */
-	BOARD_InitPins();
-	BOARD_BootClockRUN();
-	BOARD_InitDebugConsole();
-	/* Select the clock source for the TPM counter as kCLOCK_PllFllSelClk */
-	CLOCK_SetTpmClock(1U);
-
-	/* Print a note to terminal */
-	PRINTF("\r\nTPM example to output PWM on 2 channels\r\n");
-
-	TPM_GetDefaultConfig(&tpmInfo);
-	/* Initialize TPM module */
-	TPM_Init(BOARD_TPM_BASEADDR, &tpmInfo);
-
-	TPM_SetupPwm(BOARD_TPM_BASEADDR, tpmParam, 2U, kTPM_EdgeAlignedPwm, 8000U,
-			TPM_SOURCE_CLOCK);
-	TPM_StartTimer(BOARD_TPM_BASEADDR, kTPM_SystemClock);
 	while (1) {
 		do {
 			PRINTF("\r\nPlease enter a value to update the Duty cycle:\r\n");
@@ -126,6 +88,7 @@ int main(void) {
 		CurrentSpeed = getCharValue * 10U;
 
 		/* Start PWM mode with updated duty cycle */
+		routine();
 
 		PRINTF("The duty cycle was successfully updated!\r\n");
 	}
