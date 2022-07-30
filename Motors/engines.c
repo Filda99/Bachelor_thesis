@@ -48,8 +48,8 @@ extern int8_t CurrentSpeed;
  ************************************/
 void setMotorSpeed(void)
 {
-	TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, kTPM_Chnl_0,
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
 			kTPM_EdgeAlignedPwm, CurrentSpeed);
-	TPM_UpdatePwmDutycycle(BOARD_TPM_BASEADDR, kTPM_Chnl_1,
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
 			kTPM_EdgeAlignedPwm, CurrentSpeed);
 }
