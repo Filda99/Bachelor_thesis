@@ -1,14 +1,14 @@
 /**
  ********************************************************************************
- * @file    engines.h
+ * @file    startup_peripherals.h
  * @author  user
- * @date    Jul 18, 2022
+ * @date    Aug 2, 2022
  * @brief   
  ********************************************************************************
  */
 
-#ifndef ENGINES_H_
-#define ENGINES_H_
+#ifndef STARTUP_PERIPHERALS_H_
+#define STARTUP_PERIPHERALS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,10 +33,10 @@ extern "C" {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void setMotorSpeed(void);
+void startupPeripherals(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ENGINES_H_ */
+#endif 

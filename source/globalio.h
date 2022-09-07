@@ -14,27 +14,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
 /************************************
  * GLOBAL VARIABLES
  ************************************/
-//! Current speed of car in pct - pwm duty cycle
-//	50% = stop
-//	 0% = max backwards
-// 100% = max forward
-int8_t CurrentSpeed = 50;
+//! Current speed of right motor. Left motor is calculated when writing
+//! new speed.
+float RightMotorSpeed = 7.365;
 
-//! Current steer of car in pct - pwm duty cycle
-//	50% = straight
-//	0%  = max right
-// 100% = max left
-int8_t CurrentSteer = 50;
+//! Current steer of car.
+float CurrentSteer = 7.365;
 
 /************************************
  * MACROS AND DEFINES
  ************************************/
-
-
-
+#define STOP			7.365
 
 
 #ifdef __cplusplus
