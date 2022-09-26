@@ -40,15 +40,10 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern float RightMotorSpeed;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define MAX_FORWARD		8
-#define MAX_BACKWARD	5.25
-#define SLOW_FORWARD	7.565
-#define STOP			7.365000
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -93,16 +88,8 @@ int main(void)
 
 	while(1)
 	{
-		RightMotorSpeed = STOP;
-		routine();
-		wait(2000);
 
-		RightMotorSpeed = SLOW_FORWARD;
 		routine();
-		wait(25000);
 
-		RightMotorSpeed = MAX_FORWARD;
-		routine();
-		wait(5000);
 	}
 }

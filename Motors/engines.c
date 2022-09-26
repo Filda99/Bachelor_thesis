@@ -12,12 +12,11 @@
  ************************************/
 #include "engines.h"
 #include "fsl_tpm.h"
-#include "globalio.h"
+#include "global_macros.h"
 
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern float RightMotorSpeed;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -43,17 +42,19 @@ float leftMotorSpeed = 0.0;
 /************************************
  * STATIC FUNCTIONS
  ************************************/
-static void getDutyCycle(void)
+static void getDutyCycle(float RightMotorSpeed)
 {
 	// Car wants to move forwards
 	if (RightMotorSpeed > STOP)
 	{
 		leftMotorSpeed = STOP - (RightMotorSpeed - STOP);
 	}
+	// Backwards
 	else if (RightMotorSpeed < STOP)
 	{
 		leftMotorSpeed = STOP + (RightMotorSpeed - STOP);
 	}
+	// Stop state
 	else
 	{
 		leftMotorSpeed = STOP;
@@ -64,9 +65,9 @@ static void getDutyCycle(void)
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
-void setMotorSpeed(void)
+void setMotorSpeed(float RightMotorSpeed)
 {
-	getDutyCycle();
+	getDutyCycle(RightMotorSpeed);
 
 	// Set left motor duty cycle.
 	// chnl_0 == PTA13

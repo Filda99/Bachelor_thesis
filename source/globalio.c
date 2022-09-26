@@ -7,14 +7,6 @@
  ********************************************************************************
  */
 
-#ifndef GLOBALIO_H_
-#define GLOBALIO_H_
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /************************************
  * GLOBAL VARIABLES
@@ -29,11 +21,3 @@ float CurrentSteer = 7.365;
 /************************************
  * MACROS AND DEFINES
  ************************************/
-#define STOP			7.365
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* GLOBALIO_H_ */

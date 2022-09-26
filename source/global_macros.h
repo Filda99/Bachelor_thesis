@@ -1,14 +1,14 @@
 /**
  ********************************************************************************
- * @file    engines.h
+ * @file    global_macros.h
  * @author  user
- * @date    Jul 18, 2022
+ * @date    Sep 16, 2022
  * @brief   
  ********************************************************************************
  */
 
-#ifndef ENGINES_H_
-#define ENGINES_H_
+#ifndef GLOBAL_MACROS_H_
+#define GLOBAL_MACROS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +21,7 @@ extern "C" {
 /************************************
  * MACROS AND DEFINES
  ************************************/
+#define STOP			7.365
 
 /************************************
  * TYPEDEFS
@@ -33,10 +34,10 @@ extern "C" {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void setMotorSpeed(float RightMotorSpeed);
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ENGINES_H_ */
+#endif 

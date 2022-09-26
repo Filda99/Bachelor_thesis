@@ -13,7 +13,9 @@
 #include "startup_peripherals.h"
 #include "MKL25Z4.h"
 #include "fsl_tpm.h"
+#include "fsl_i2c.h"
 #include "board.h"
+#include "fsl_debug_console.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -24,6 +26,8 @@
  ************************************/
 /* Get source clock for TPM driver */
 #define TPM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_PllFllSelClk)
+
+#define I2C_MASTER_CLK_FREQ CLOCK_GetFreq(I2C0_CLK_SRC)
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -52,9 +56,11 @@ static void startupPWM(void)
 	// Configure tpm params with frequency 24kHZ
 	tpmParam[0].chnlNumber = kTPM_Chnl_0;
 	tpmParam[0].level = kTPM_HighTrue;
+	tpmParam[0].dutyCyclePercent = 7.365;
 
 	tpmParam[1].chnlNumber = kTPM_Chnl_1;
 	tpmParam[1].level = kTPM_HighTrue;
+	tpmParam[1].dutyCyclePercent = 7.365;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
@@ -69,11 +75,45 @@ static void startupPWM(void)
 	TPM_StartTimer(TPM1, kTPM_SystemClock);
 }
 
+static void startupI2C(void)
+{
+	i2c_master_config_t config;
+    i2c_master_transfer_t masterXfer;
+
+	uint8_t dataRed[2] = {0,};
+	uint8_t dataBlue[2] = {0,};
+
+
+	I2C_MasterGetDefaultConfig(&config);
+
+	uint32_t srcClk = I2C_MASTER_CLK_FREQ;
+	I2C_MasterInit(I2C0, &config, srcClk);
+
+    memset(&masterXfer, 0, sizeof(masterXfer));
+
+    // ULTRASONIC masterXfer.slaveAddress = 0x57U;
+    masterXfer.slaveAddress = 0x44U;
+	masterXfer.direction = kI2C_Read;
+	masterXfer.subaddress = 0x09;
+	masterXfer.subaddressSize = 1;
+	masterXfer.data = dataRed;
+	masterXfer.dataSize = 2U;
+	masterXfer.flags = kI2C_TransferDefaultFlag;
+	status_t status = I2C_MasterTransferBlocking(I2C0, &masterXfer);
+
+	masterXfer.subaddress = 0x0D;
+	masterXfer.data = dataBlue;
+	I2C_MasterTransferBlocking(I2C0, &masterXfer);
+
+	if(status == kStatus_Success)
+		PRINTF("%i\r\n", dataRed[0]);
+}
 
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
 void startupPeripherals(void)
 {
+	startupI2C();
 	startupPWM();
 }
