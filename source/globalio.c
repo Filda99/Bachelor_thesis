@@ -18,6 +18,10 @@ float RightMotorSpeed = 7.365;
 //! Current steer of car.
 float CurrentSteer = 7.365;
 
+//! Number of wheel rotations
+//! This is incremented every time hall sensor is in logic 0
+unsigned int noOfRotations = 0;
+
 /************************************
  * MACROS AND DEFINES
  ************************************/

@@ -16,6 +16,8 @@
 #include "fsl_i2c.h"
 #include "board.h"
 #include "fsl_debug_console.h"
+#include "peripherals/isl29125.h"
+#include "fsl_port.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -25,9 +27,12 @@
  * PRIVATE MACROS AND DEFINES
  ************************************/
 /* Get source clock for TPM driver */
-#define TPM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_PllFllSelClk)
+#define TPM_SOURCE_CLOCK 		CLOCK_GetFreq(kCLOCK_PllFllSelClk)
 
-#define I2C_MASTER_CLK_FREQ CLOCK_GetFreq(I2C0_CLK_SRC)
+#define I2C_MASTER_CLK_FREQ 	CLOCK_GetFreq(I2C0_CLK_SRC)
+
+#define GPIO_HALL 				PORTA
+#define GPIO_HALL_IRQn			PORTA_IRQn
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -77,36 +82,38 @@ static void startupPWM(void)
 
 static void startupI2C(void)
 {
+    // ULTRASONIC masterXfer.slaveAddress = 0x57U;
 	i2c_master_config_t config;
-    i2c_master_transfer_t masterXfer;
-
-	uint8_t dataRed[2] = {0,};
-	uint8_t dataBlue[2] = {0,};
-
 
 	I2C_MasterGetDefaultConfig(&config);
 
 	uint32_t srcClk = I2C_MASTER_CLK_FREQ;
 	I2C_MasterInit(I2C0, &config, srcClk);
 
-    memset(&masterXfer, 0, sizeof(masterXfer));
+	bool ColorSensor = ISL_ColorSensorInit();
 
-    // ULTRASONIC masterXfer.slaveAddress = 0x57U;
-    masterXfer.slaveAddress = 0x44U;
-	masterXfer.direction = kI2C_Read;
-	masterXfer.subaddress = 0x09;
-	masterXfer.subaddressSize = 1;
-	masterXfer.data = dataRed;
-	masterXfer.dataSize = 2U;
-	masterXfer.flags = kI2C_TransferDefaultFlag;
-	status_t status = I2C_MasterTransferBlocking(I2C0, &masterXfer);
+	if(ColorSensor)
+	{
+		uint8_t redColor[2];
+		ISL_readRed(redColor);
+		redColor[1]++;
+	}
+}
 
-	masterXfer.subaddress = 0x0D;
-	masterXfer.data = dataBlue;
-	I2C_MasterTransferBlocking(I2C0, &masterXfer);
+static void startupInterrupts(void)
+{
+	port_pin_config_t config;
+	port_interrupt_t portInterrupt;
 
-	if(status == kStatus_Success)
-		PRINTF("%i\r\n", dataRed[0]);
+	config.mux = kPORT_MuxAsGpio;
+	config.pullSelect = kPORT_PullUp;
+	portInterrupt = kPORT_InterruptLogicZero;
+
+
+	PORT_SetPinConfig(GPIO_HALL, 4, &config);
+	PORT_SetPinInterruptConfig(GPIO_HALL, 4, portInterrupt);
+
+	EnableIRQ(GPIO_HALL_IRQn);
 }
 
 /************************************
@@ -114,6 +121,7 @@ static void startupI2C(void)
  ************************************/
 void startupPeripherals(void)
 {
-	startupI2C();
-	startupPWM();
+	//startupI2C();
+	//startupPWM();
+	startupInterrupts();
 }

@@ -36,14 +36,18 @@
 #include "startup_peripherals.h"
 #include "pin_mux.h"
 #include "routine.h"
+#include "fsl_port.h"
 
 /************************************
  * EXTERN VARIABLES
  ************************************/
+extern uint32_t noOfRotations;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
+#define GPIO_HALL 				PORTA
+#define GPIO_CLEAR_IRQ_Mask		0x04
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -85,11 +89,14 @@ int main(void)
 	wait(30000);
 	startupPeripherals();
 	wait(600);
+	PRINTF("All peripherals were started.\r\n");
 
 	while(1)
 	{
 
-		routine();
-
+		//routine();
+	    PRINTF("Rotations: %i\r\n", noOfRotations);
+	    wait(100);
+		PORT_ClearPinsInterruptFlags(GPIO_HALL, PORT_ISFR_ISF_MASK);
 	}
 }

@@ -1,14 +1,14 @@
 /**
  ********************************************************************************
- * @file    engines.h
+ * @file    ultrasonic_m5stack.h
  * @author  user
- * @date    Jul 18, 2022
+ * @date    Sep 26, 2022
  * @brief   
  ********************************************************************************
  */
 
-#ifndef ENGINES_H_
-#define ENGINES_H_
+#ifndef ULTRASONIC_M5STACK_H_
+#define ULTRASONIC_M5STACK_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,22 +26,6 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 
-//! In middle position there is state for STOP.
-//! Otherwise we add/sub 0.127 for higher/slower speed.
-static float speed[11] = {
-		6.73,
-		6.857,
-		6.984,
-		7.111,
-		7.238,
-		7.365,
-		7.492,
-		7.619,
-		7.746,
-		7.873,
-		8.0
-};
-
 /************************************
  * EXPORTED VARIABLES
  ************************************/
@@ -49,10 +33,10 @@ static float speed[11] = {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void setMotorSpeed(float RightMotorSpeed);
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ENGINES_H_ */
+#endif 
