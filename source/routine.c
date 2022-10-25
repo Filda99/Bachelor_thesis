@@ -17,14 +17,10 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern float RightMotorSpeed;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define MAX_FORWARD		8
-#define MAX_BACKWARD	5.25
-#define SLOW_FORWARD	7.565
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -52,20 +48,20 @@ extern float RightMotorSpeed;
 void routine(void)
 {
 	while(1)
-		{
-			//vTaskDelay(2000);
-			RightMotorSpeed = STOP;
-			setMotorSpeed(RightMotorSpeed);
-			//vTaskDelay(2000);
+	{
+		//vTaskDelay(2000);
+		//RightMotorSpeed = STOP;
+		//setMotorSpeed(RightMotorSpeed);
+		//vTaskDelay(2000);
 
-			//RightMotorSpeed = SLOW_FORWARD;
-			//setMotorSpeed(RightMotorSpeed);
-			//vTaskDelay(2000);
+		//RightMotorSpeed = SLOW_FORWARD;
+		//setMotorSpeed(RightMotorSpeed);
+		//vTaskDelay(2000);
 
-			//RightMotorSpeed = MAX_FORWARD;
-			//setMotorSpeed(RightMotorSpeed);
-			//vTaskDelay(2000);
-		}
+		//RightMotorSpeed = MAX_FORWARD;
+		//setMotorSpeed(RightMotorSpeed);
+		//vTaskDelay(2000);
+	}
 
 
 }
