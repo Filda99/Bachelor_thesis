@@ -107,7 +107,7 @@ static void startupInterrupts(void)
 
 	config.mux = kPORT_MuxAsGpio;
 	config.pullSelect = kPORT_PullUp;
-	portInterrupt = kPORT_InterruptLogicZero;
+	portInterrupt = kPORT_InterruptFallingEdge;
 
 
 	PORT_SetPinConfig(GPIO_HALL, 4, &config);
