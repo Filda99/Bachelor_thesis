@@ -28,11 +28,9 @@
  ************************************/
 /* Get source clock for TPM driver */
 #define TPM_SOURCE_CLOCK 		CLOCK_GetFreq(kCLOCK_PllFllSelClk)
-
 #define I2C_MASTER_CLK_FREQ 	CLOCK_GetFreq(I2C0_CLK_SRC)
-
-#define GPIO_HALL 				PORTA
 #define GPIO_HALL_IRQn			PORTA_IRQn
+#define GPIO_CS_IRQn			PORTD_IRQn
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -105,15 +103,20 @@ static void startupInterrupts(void)
 	port_pin_config_t config;
 	port_interrupt_t portInterrupt;
 
+	// HALL sensors interrupt
 	config.mux = kPORT_MuxAsGpio;
 	config.pullSelect = kPORT_PullUp;
 	portInterrupt = kPORT_InterruptFallingEdge;
 
-
-	PORT_SetPinConfig(GPIO_HALL, 4, &config);
-	PORT_SetPinInterruptConfig(GPIO_HALL, 4, portInterrupt);
+	PORT_SetMultiplePinsConfig(GPIO_HALL, HALL_IRQ_MASK, &config);
+	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_IRQ_MASK, portInterrupt);
 
 	EnableIRQ(GPIO_HALL_IRQn);
+
+	// Main Color sensors interrupt
+	config.mux = kPORT_MuxAsGpio;
+	config.pullSelect = kPORT_PullUp;
+
 }
 
 /************************************
