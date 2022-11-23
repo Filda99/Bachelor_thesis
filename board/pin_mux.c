@@ -42,6 +42,8 @@ BOARD_InitPins:
   - {pin_num: '27', peripheral: UART0, signal: RX, pin_signal: TSI0_CH2/PTA1/UART0_RX/TPM2_CH0}
   - {pin_num: '32', peripheral: TPM1, signal: 'CH, 0', pin_signal: PTA12/TPM1_CH0}
   - {pin_num: '33', peripheral: TPM1, signal: 'CH, 1', pin_signal: PTA13/TPM1_CH1}
+  - {pin_num: '65', peripheral: I2C0, signal: SCL, pin_signal: CMP0_IN2/PTC8/I2C0_SCL/TPM0_CH4}
+  - {pin_num: '66', peripheral: I2C0, signal: SDA, pin_signal: CMP0_IN3/PTC9/I2C0_SDA/TPM0_CH5}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -56,6 +58,8 @@ void BOARD_InitPins(void)
 {
     /* Port A Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortA);
+    /* Port C Clock Gate Control: Clock enabled */
+    CLOCK_EnableClock(kCLOCK_PortC);
 
     /* PORTA1 (pin 27) is configured as UART0_RX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_RX_PORT, BOARD_INITPINS_DEBUG_UART_RX_PIN, kPORT_MuxAlt2);
@@ -68,6 +72,12 @@ void BOARD_InitPins(void)
 
     /* PORTA2 (pin 28) is configured as UART0_TX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_TX_PORT, BOARD_INITPINS_DEBUG_UART_TX_PIN, kPORT_MuxAlt2);
+
+    /* PORTC8 (pin 65) is configured as I2C0_SCL */
+    PORT_SetPinMux(PORTC, 8U, kPORT_MuxAlt2);
+
+    /* PORTC9 (pin 66) is configured as I2C0_SDA */
+    PORT_SetPinMux(PORTC, 9U, kPORT_MuxAlt2);
 
     SIM->SOPT4 = ((SIM->SOPT4 &
                    /* Mask bits to zero which are setting */

@@ -26,6 +26,32 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 
+//! In middle position there is state for STOP.
+//! Otherwise we add/sub 0.127 for higher/slower speed.
+static const float SpeedMap[11] = {
+		6.73,
+		6.857,
+		6.984,
+		7.111,	// ...
+		7.238,	// Backwards
+		7.365, 	// STOP motors
+		7.492,	// Forwards
+		7.619,	// ...
+		7.746,
+		7.873,
+		8.0
+};
+
+static const int SteerMap[7] = {
+		20,
+		30,
+		40,
+		50,
+		60,
+		70,
+		80
+};
+
 /************************************
  * EXPORTED VARIABLES
  ************************************/
@@ -33,10 +59,27 @@ extern "C" {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void setMotorSpeed(void);
+void setMotorSpeed(int speed);
+void setMotorSteer(int steer);
+
+void addSpeed();
+void addSpeedCustom(int speed);
+void slackUpSpeed();
+void slackUpSpeedCustom(int speed);
+void stopCar();
+
+void turnRight();
+void turnRightCustom(int steer);
+void turnLeft();
+void turnLeftCustom(int steer);
+void goDirect();
+
+
+
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif 
+#endif /* ENGINES_H_ */

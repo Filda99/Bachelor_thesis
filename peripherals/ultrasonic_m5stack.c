@@ -1,18 +1,15 @@
 /**
  ********************************************************************************
- * @file    routine.c
+ * @file    ultrasonic_m5stack.c
  * @author  user
- * @date    Jul 18, 2022
- * @brief
+ * @date    Sep 26, 2022
+ * @brief   
  ********************************************************************************
  */
 
 /************************************
  * INCLUDES
  ************************************/
-#include "routine.h"
-#include "motors/engines.h"
-#include "global_macros.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -45,24 +42,3 @@
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
-void routine(void)
-{
-	while(1)
-	{
-		//vTaskDelay(2000);
-		//RightMotorSpeed = STOP;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-
-		//RightMotorSpeed = SLOW_FORWARD;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-
-		//RightMotorSpeed = MAX_FORWARD;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-	}
-
-
-}
-

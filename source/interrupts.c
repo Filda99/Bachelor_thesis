@@ -1,26 +1,30 @@
 /**
  ********************************************************************************
- * @file    routine.c
+ * @file    interrupts.c
  * @author  user
- * @date    Jul 18, 2022
- * @brief
+ * @date    Oct 19, 2022
+ * @brief   
  ********************************************************************************
  */
 
 /************************************
  * INCLUDES
  ************************************/
-#include "routine.h"
-#include "motors/engines.h"
+#include "fsl_port.h"
 #include "global_macros.h"
 
 /************************************
  * EXTERN VARIABLES
  ************************************/
+extern uint32_t noOfRotations;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
+
+#define GPIO_HALL_IRQHandler	PORTA_IRQHandler
+#define GPIO_CS_IRQHandler		PORTC_IRQHandler
+
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -45,24 +49,13 @@
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
-void routine(void)
+void GPIO_HALL_IRQHandler()
 {
-	while(1)
-	{
-		//vTaskDelay(2000);
-		//RightMotorSpeed = STOP;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-
-		//RightMotorSpeed = SLOW_FORWARD;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-
-		//RightMotorSpeed = MAX_FORWARD;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-	}
-
-
+	noOfRotations++;
+	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 }
 
+void GPIO_CS_IRQHandler()
+{
+
+}

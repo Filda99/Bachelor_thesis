@@ -32,16 +32,22 @@
  * INCLUDES
  ************************************/
 #include "fsl_debug_console.h"
-#include "globalio.h"
+#include "board.h"
+#include "startup_peripherals.h"
+#include "pin_mux.h"
+#include "routine.h"
+#include "fsl_port.h"
 
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern int8_t CurrentSpeed;
+extern uint32_t noOfRotations;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
+#define GPIO_HALL 				PORTA
+#define GPIO_CLEAR_IRQ_Mask		0x04
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -50,7 +56,6 @@ extern int8_t CurrentSpeed;
 /************************************
  * STATIC VARIABLES
  ************************************/
-static uint8_t getCharValue = 0U;
 
 /************************************
  * GLOBAL VARIABLES
@@ -63,6 +68,11 @@ static uint8_t getCharValue = 0U;
 /************************************
  * STATIC FUNCTIONS
  ************************************/
+static void wait(int ms)
+{
+	for(volatile int i = ms * 247; i > 0; i--);
+}
+
 
 /************************************
  * GLOBAL FUNCTIONS
@@ -70,26 +80,23 @@ static uint8_t getCharValue = 0U;
 /*!
  * @brief Main function
  */
-int main(void) {
+int main(void)
+{
+	/* Board pin, clock, debug console init */
+	BOARD_InitPins();
+	BOARD_BootClockRUN();
+	BOARD_InitDebugConsole();
+	wait(30000);
 	startupPeripherals();
+	wait(600);
+	PRINTF("All peripherals were started.\r\n");
 
-	while (1) {
-		do {
-			PRINTF("\r\nPlease enter a value to update the Duty cycle:\r\n");
-			PRINTF("Note: The range of value is 0 to 9.\r\n");
-			PRINTF(
-					"For example: If enter '5', the duty cycle will be set to 50 percent.\r\n");
-			PRINTF("Value:");
-			getCharValue = GETCHAR() - 0x30U;
-			PRINTF("%d", getCharValue);
-			PRINTF("\r\n");
-		} while (getCharValue > 9U);
+	while(1)
+	{
 
-		CurrentSpeed = getCharValue * 10U;
-
-		/* Start PWM mode with updated duty cycle */
-		routine();
-
-		PRINTF("The duty cycle was successfully updated!\r\n");
+		//routine();
+	    PRINTF("Rotations: %i\r\n", noOfRotations);
+	    wait(100);
+		PORT_ClearPinsInterruptFlags(GPIO_HALL, PORT_ISFR_ISF_MASK);
 	}
 }
