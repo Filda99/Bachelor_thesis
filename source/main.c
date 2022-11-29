@@ -33,7 +33,7 @@
  ************************************/
 #include "fsl_debug_console.h"
 #include "board.h"
-#include "startup_peripherals.h"
+#include "startup_board.h"
 #include "pin_mux.h"
 #include "routine.h"
 #include "fsl_port.h"
@@ -87,7 +87,7 @@ int main(void)
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
 	wait(30000);
-	startupPeripherals();
+	startupBoard();
 	wait(600);
 	PRINTF("All peripherals were started.\r\n");
 
@@ -96,7 +96,6 @@ int main(void)
 
 		//routine();
 	    PRINTF("Rotations: %i\r\n", noOfRotations);
-	    wait(100);
-		PORT_ClearPinsInterruptFlags(GPIO_HALL, PORT_ISFR_ISF_MASK);
+	    wait(1000);
 	}
 }

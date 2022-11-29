@@ -1,19 +1,17 @@
 /**
  ********************************************************************************
- * @file    routine.c
+ * @file    pulseIn.c
  * @author  user
- * @date    Jul 18, 2022
- * @brief
+ * @date    Nov 25, 2022
+ * @brief   
  ********************************************************************************
  */
 
 /************************************
  * INCLUDES
  ************************************/
-#include "routine.h"
-#include "motors/engines.h"
-#include "global_macros.h"
-
+#include "MKL25Z4.h"
+#include "fsl_debug_console.h"
 /************************************
  * EXTERN VARIABLES
  ************************************/
@@ -41,33 +39,22 @@
 /************************************
  * STATIC FUNCTIONS
  ************************************/
-static void checkLine()
-{
-
-}
 
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
-void routine(void)
+void pulseIn(PORT_Type port, uint8_t pin)
 {
-	while(1)
-	{
-		checkLine();
-		//vTaskDelay(2000);
-		//RightMotorSpeed = STOP;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-
-		//RightMotorSpeed = SLOW_FORWARD;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-
-		//RightMotorSpeed = MAX_FORWARD;
-		//setMotorSpeed(RightMotorSpeed);
-		//vTaskDelay(2000);
-	}
-
+	/*// Pockat dokud na danem pinu nenarazime na vzestupnou hranu
+	while(!(GPIOD->PDOR & pin));
+	// Merit do te doby, dokud neni sestupna hrana
+	time_t start, end;
+	time
+	time(&start);
+	while(!(~(GPIOD->PDOR) & pin));
+	time(&end);
+	time_t res = end - start;
+	PRINTF("Time: %i\r\n", res);*/
 
 }
 
