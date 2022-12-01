@@ -1,8 +1,8 @@
 /**
  ********************************************************************************
- * @file    interrupts.c
+ * @file    pulseIn.c
  * @author  user
- * @date    Oct 19, 2022
+ * @date    Nov 25, 2022
  * @brief   
  ********************************************************************************
  */
@@ -10,21 +10,15 @@
 /************************************
  * INCLUDES
  ************************************/
-#include "fsl_port.h"
-#include "global_macros.h"
-#include "fsl_gpio.h"
 #include "MKL25Z4.h"
-
+#include "fsl_debug_console.h"
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern uint32_t noOfRotations;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define GPIO_HALL_IRQHandler	PORTA_IRQHandler
-#define GPIO_COLOR_MAIN_IRQHandler	PORTD_IRQHandler
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -33,7 +27,6 @@ extern uint32_t noOfRotations;
 /************************************
  * STATIC VARIABLES
  ************************************/
-static uint32_t timerLeftSensor = 0;
 
 /************************************
  * GLOBAL VARIABLES
@@ -50,15 +43,18 @@ static uint32_t timerLeftSensor = 0;
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
-void GPIO_HALL_IRQHandler()
+void pulseIn(PORT_Type port, uint8_t pin)
 {
-	noOfRotations++;
-	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
-}
-
-// TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
-void GPIO_COLOR_MAIN_IRQHandler()
-{
+	/*// Pockat dokud na danem pinu nenarazime na vzestupnou hranu
+	while(!(GPIOD->PDOR & pin));
+	// Merit do te doby, dokud neni sestupna hrana
+	time_t start, end;
+	time
+	time(&start);
+	while(!(~(GPIOD->PDOR) & pin));
+	time(&end);
+	time_t res = end - start;
+	PRINTF("Time: %i\r\n", res);*/
 
 }
 

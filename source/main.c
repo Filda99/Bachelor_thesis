@@ -33,7 +33,7 @@
  ************************************/
 #include "fsl_debug_console.h"
 #include "board.h"
-#include "startup_peripherals.h"
+#include "startup_board.h"
 #include "pin_mux.h"
 #include "routine.h"
 #include "fsl_port.h"
@@ -46,8 +46,6 @@ extern uint32_t noOfRotations;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define GPIO_HALL 				PORTA
-#define GPIO_CLEAR_IRQ_Mask		0x04
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -86,17 +84,16 @@ int main(void)
 	BOARD_InitPins();
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
+	PRINTF("Starting board...\r\n");
 	wait(30000);
-	startupPeripherals();
+	startupBoard();
 	wait(600);
-	PRINTF("All peripherals were started.\r\n");
+	PRINTF("All peripherals have been started.\r\n");
 
 	while(1)
 	{
-
 		//routine();
 	    PRINTF("Rotations: %i\r\n", noOfRotations);
-	    wait(100);
-		PORT_ClearPinsInterruptFlags(GPIO_HALL, PORT_ISFR_ISF_MASK);
+	    wait(1000);
 	}
 }
