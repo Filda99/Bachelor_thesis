@@ -92,12 +92,10 @@ void setMotorSpeed(int speed)
 	getDutyCycle(setSpeed);
 
 	// Set left motor duty cycle.
-	// chnl_0 == PTA13
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
 			kTPM_EdgeAlignedPwm, rightMotorSpeed);
 
 	// Set right motor duty cycle.
-	// chnl_1 == PTA12
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
 			kTPM_EdgeAlignedPwm, leftMotorSpeed);
 }
@@ -105,8 +103,7 @@ void setMotorSpeed(int speed)
 void setMotorSteer(int steer)
 {
 	float setSteer = SteerMap[steer];
-	// TODO: get right pin to connect servo to
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_2,
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_1,
 				kTPM_EdgeAlignedPwm, setSteer);
 }
 

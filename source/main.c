@@ -66,11 +66,6 @@ extern uint32_t noOfRotations;
 /************************************
  * STATIC FUNCTIONS
  ************************************/
-static void wait(int ms)
-{
-	for(volatile int i = ms * 247; i > 0; i--);
-}
-
 
 /************************************
  * GLOBAL FUNCTIONS
@@ -85,15 +80,15 @@ int main(void)
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
-	wait(30000);
+	vTaskDelay(1500);
 	startupBoard();
-	wait(600);
+	vTaskDelay(600);
 	PRINTF("All peripherals have been started.\r\n");
 
 	while(1)
 	{
-		//routine();
+			routine();
 	    PRINTF("Rotations: %i\r\n", noOfRotations);
-	    wait(1000);
+			vTaskDelay(2000);
 	}
 }
