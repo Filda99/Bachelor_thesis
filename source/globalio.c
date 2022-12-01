@@ -22,7 +22,7 @@ float CurrentSteer = 7.365;
 //! This is incremented every time hall sensor is in logic 0
 unsigned int noOfRotations = 0;
 
-//uint8_t
+uint8_t lineDetected = 0;
 
 /************************************
  * MACROS AND DEFINES

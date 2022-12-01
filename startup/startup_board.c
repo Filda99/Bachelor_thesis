@@ -107,40 +107,31 @@ static void startupInterrupts(void)
 
 	// HALL sensors interrupt
 	config.mux = kPORT_MuxAsGpio;
-	config.pullSelect = kPORT_PullDisable;
+	config.pullSelect = kPORT_PullUp;
 	portInterrupt = kPORT_InterruptFallingEdge;
 
 	PORT_SetMultiplePinsConfig(GPIO_HALL, HALL_IRQ_MASK, &config);
-	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_IRQ_MASK, portInterrupt);
+	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_LEFT, portInterrupt);
+	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_RIGHT, portInterrupt);
 
 	EnableIRQ(GPIO_HALL_IRQn);
-	// Color sensor interrupt
-	/*port_pin_config_t configSen;
-	configSen.mux = kPORT_MuxAsGpio;
-	configSen.pullSelect = kPORT_PullDown;*/
-	/*port_pin_config_t config = {
-	       kPORT_PullUp ,
-	       kPORT_PullEnable,
-	       kPORT_FastSlewRate,
-	       kPORT_PassiveFilterDisable,
-	       kPORT_OpenDrainDisable,
-	       kPORT_LowDriveStrength,
-	       kPORT_MuxAsGpio,
-	       kPORT_UnlockRegister,
-	  };
-	portInterrupt = kPORT_InterruptEitherEdge;
 
-	//PORT_SetPinConfig(GPIO_COLOR_MAIN_SEN, 0, &config);
-	PORT_SetMultiplePinsConfig(GPIO_COLOR_MAIN_SEN, COLOR_MAIN_IRQ_MASK, &configSen);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MAIN_SEN, COLOR_MAIN_IRQ_MASK, portInterrupt);
+	// Color sensor minor interrupt
+	config.mux = kPORT_MuxAsGpio;
+	config.pullSelect = kPORT_PullUp;
+	portInterrupt = kPORT_InterruptFallingEdge;
 
-	EnableIRQ(GPIO_COLOR_MAIN_IRQn);*/
+	PORT_SetMultiplePinsConfig(GPIO_COLOR_MINOR_SEN, COLOR_MINOR_IRQ_MASK, &config);
+	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, LEFT_MINOR_SEN, portInterrupt);
+	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, RIGHT_MINOR_SEN, portInterrupt);
+
+	EnableIRQ(GPIO_COLOR_MAIN_IRQn);
 }
 
 static void startupSensorCapture()
 {
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
-	/*CLOCK_SetTpmClock(1U);
+	CLOCK_SetTpmClock(1U);
 
 	tpm_config_t tpmInfo;
 
@@ -149,9 +140,9 @@ static void startupSensorCapture()
 	// Initialize TPM module
 	TPM_Init(TPM0, &tpmInfo);
 
-	TPM_SetupInputCapture(TPM0, kTPM_Chnl_0, kTPM_RiseAndFallEdge);*/
-	//TPM_SetupInputCapture(TPM0, kTPM_Chnl_2, kTPM_RiseAndFallEdge);
-	//TPM_SetupInputCapture(TPM0, kTPM_Chnl_3, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(TPM0, kTPM_Chnl_0, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(TPM0, kTPM_Chnl_1, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(TPM0, kTPM_Chnl_2, kTPM_RiseAndFallEdge);
 }
 
 /************************************
@@ -161,6 +152,6 @@ void startupBoard(void)
 {
 	//startupI2C();
 	//startupPWM();
-	//startupSensorCapture();
+	startupSensorCapture();
 	startupInterrupts();
 }

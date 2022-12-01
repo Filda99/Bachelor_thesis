@@ -46,8 +46,6 @@ extern uint32_t noOfRotations;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define GPIO_HALL 				PORTA
-#define GPIO_CLEAR_IRQ_Mask		0x04
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -86,14 +84,14 @@ int main(void)
 	BOARD_InitPins();
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
+	PRINTF("Starting board...\r\n");
 	wait(30000);
 	startupBoard();
 	wait(600);
-	PRINTF("All peripherals were started.\r\n");
+	PRINTF("All peripherals have been started.\r\n");
 
 	while(1)
 	{
-
 		//routine();
 	    PRINTF("Rotations: %i\r\n", noOfRotations);
 	    wait(1000);

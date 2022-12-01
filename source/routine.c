@@ -13,6 +13,7 @@
 #include "routine.h"
 #include "motors/engines.h"
 #include "global_macros.h"
+#include "globalio.c"
 
 /************************************
  * EXTERN VARIABLES
@@ -43,7 +44,33 @@
  ************************************/
 static void checkLine()
 {
+	static prevLine = LineNone;
+	uint16_t statusLeft = TPM0_C0V;
+	uint16_t statusRight = TPM0_C1V;
+	uint16_t statusCenter = TPM0_C2V;
 
+	int temp = 0;
+	if (statusLeft > temp)
+	{
+		lineDetected = LineLeft;
+		prevLine = LineLeft;
+	}
+	if (statusRight > temp)
+	{
+		lineDetected = LineRight;
+		prevLine = LineRight;
+	}
+	if (statusCenter > temp)
+	{
+		if (prevLine == LineLeft)
+		{
+			lineDetected = LineCenter_Left;
+		}
+		else
+		{
+			lineDetected = LineCenter_Right;
+		}
+	}
 }
 
 /************************************
