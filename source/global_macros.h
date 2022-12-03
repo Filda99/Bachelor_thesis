@@ -37,13 +37,13 @@ extern "C" {
 // Color sensors
 /*************************************/
 #define GPIO_COLOR_MAIN_SEN		PORTD
-#define LEFT_MAIN_SEN		0
-#define RIGHT_MAIN_SEN		1
-#define CENTER_MAIN_SEN		2
+#define LEFT_MAIN_SEN			0
+#define RIGHT_MAIN_SEN			1
+#define CENTER_MAIN_SEN			2
 
 #define GPIO_COLOR_MINOR_SEN	PORTA
-#define LEFT_MINOR_SEN		4
-#define RIGHT_MINOR_SEN		5
+#define LEFT_MINOR_SEN			4
+#define RIGHT_MINOR_SEN			5
 
 // Clear sensors
 #define COLOR_MAIN_IRQ_MASK		0x45

@@ -23,8 +23,9 @@ extern float distance;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define GPIO_HALL_IRQHandler	PORTA_IRQHandler
-#define GPIO_COLOR_MAIN_IRQHandler	PORTD_IRQHandler
+#define GPIO_HALL_IRQHandler		PORTD_IRQHandler
+#define GPIO_COLOR_MINOR_IRQHandler	PORTA_IRQHandler
+#define GPIO_COLOR_MAIN_IRQHandler	TPM0_IRQHandler
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -60,41 +61,17 @@ void GPIO_HALL_IRQHandler()
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 }
 
-// TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
+// TODO: Pokud se vyvola preruseni, zjisti od koho a zjisti CnV a uloz do glob. prom.
 void GPIO_COLOR_MAIN_IRQHandler()
 {
-	
-
-
-
-	/*static uint32_t riseCnt = 0;
-	static uint32_t fallCnt = 0;
-	static bool wasRising = false;
 
 	uint32_t pinInterrupt = GPIO_GetPinsInterruptFlags(PORTD);
 
+}
 
-	if(GPIO_ReadPinInput(PORTD, 0))
-	{
-		riseCnt = TPM_GetCurrentTimerCount(DEMO_TPM_BASEADDR);
-		wasRising = true;
-	}
-	else
-	{
-		if(wasRising)
-		{
-			fallCnt = TPM_GetCurrentTimerCount(DEMO_TPM_BASEADDR);
-			tpmIsrFlag = true;
-		}
-		wasRising = false;
-	}
-
-	if (tpmIsrFlag)
-	{
-		currTime = fallCnt - riseCnt;
-	}
-	tpmIsrFlag = false;
-	tpmIsrFlag = true;*/
+// TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
+void GPIO_COLOR_MINOR_IRQHandler()
+{
 
 }
 

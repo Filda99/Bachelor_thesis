@@ -156,39 +156,19 @@ static void startupSensorCapture()
 	CLOCK_SetTpmClock(1U);
 
 	TPM_GetDefaultConfig(&tpmInfo);
-	//tpmInfo.prescale = kTPM_Prescale_Divide_32;
 	// Initialize TPM module
 	TPM_Init(TPM0, &tpmInfo);
 
 	TPM_SetupInputCapture(TPM0, kTPM_Chnl_0, kTPM_RiseAndFallEdge);
-	TPM_SetupInputCapture(TPM0, kTPM_Chnl_1, kTPM_RiseAndFallEdge);
-	TPM_SetupInputCapture(TPM0, kTPM_Chnl_2, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(TPM0, kTPM_Chnl_3, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(TPM0, kTPM_Chnl_4, kTPM_RiseAndFallEdge);
 
-	TPM0->MOD = 0xFFFF;
     TPM_EnableInterrupts(TPM0, kTPM_Chnl0InterruptEnable);
-    EnableIRQ(TPM1_IRQn);
+    EnableIRQ(TPM0_IRQn);
 
 
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
-
-	// Set PTC4 to HIGH
-	portConfig.mux = kPORT_MuxAsGpio;
-	portConfig.pullSelect = kPORT_PullUp;
-	PORT_SetPinConfig(PORTC, S0S2_COLOR_SEN, &portConfig);
-
-	// Set PTC5 to LOW
-	portConfig.pullSelect = kPORT_PullDown;
-	PORT_SetPinConfig(PORTC, S1S3_COLOR_SEN, &portConfig);
-
 }
-
-/*
-static void startupClock()
-{
-	// Enable clock for all ports
-	SIM->SCGC5 |= (1UL << 9) | (1UL << 10)| (1UL << 11) | (1UL << 12) | (1UL << 13);
-}
-*/
 
 
 /************************************
