@@ -17,17 +17,11 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
+extern bool isCmdToStopCar;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define MAX_SPEED_FORWARDS	11
-#define MAX_SPEED_BACKWARDS	0
-#define MAX_STEER_LEFT		0
-#define MAX_STEER_RIGHT		7
-
-#define STOP_SPEED			5
-#define GO_DIRECT			3
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -64,16 +58,16 @@ static int currentSteer = 3;
  ************************************/
 static void getDutyCycle(float setSpeed)
 {
-	float RightMotorSpeed = setSpeed;
+	float rightMotorSpeed = setSpeed;
 	// Car wants to move forwards
-	if (RightMotorSpeed > STOP)
+	if (rightMotorSpeed > STOP)
 	{
-		leftMotorSpeed = STOP - (RightMotorSpeed - STOP);
+		leftMotorSpeed = STOP - (rightMotorSpeed - STOP);
 	}
 	// Backwards
-	else if (RightMotorSpeed < STOP)
+	else if (rightMotorSpeed < STOP)
 	{
-		leftMotorSpeed = STOP + (RightMotorSpeed - STOP);
+		leftMotorSpeed = STOP + (rightMotorSpeed - STOP);
 	}
 	// Stop state
 	else
@@ -157,6 +151,7 @@ void slackUpSpeedCustom(int speed)
 void stopCar()
 {
 	currentSpeed = STOP_SPEED;
+	isCmdToStopCar = true;
 	setMotorSpeed(currentSpeed);
 }
 

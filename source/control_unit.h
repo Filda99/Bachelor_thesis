@@ -33,7 +33,7 @@ extern "C" {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-
+void controlUnit(void);
 
 #ifdef __cplusplus
 }

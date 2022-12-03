@@ -41,7 +41,8 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern uint32_t noOfRotations;
+extern unsigned int noOfRotations;
+extern unsigned char lineDetected;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -66,7 +67,10 @@ extern uint32_t noOfRotations;
 /************************************
  * STATIC FUNCTIONS
  ************************************/
-
+void wait(uint32_t ms)
+{
+	for(int i = 0; i < ms; i++);
+}
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
@@ -80,15 +84,14 @@ int main(void)
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
-	vTaskDelay(1500);
+	wait(1500);
 	startupBoard();
-	vTaskDelay(600);
+	wait(600);
 	PRINTF("All peripherals have been started.\r\n");
 
 	while(1)
 	{
-			routine();
-	    PRINTF("Rotations: %i\r\n", noOfRotations);
-			vTaskDelay(2000);
+		routine();
+	    wait(20000);
 	}
 }

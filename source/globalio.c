@@ -6,23 +6,26 @@
  * @brief
  ********************************************************************************
  */
-
+#include "global_macros.h"
+#include "stdbool.h"
 
 /************************************
  * GLOBAL VARIABLES
  ************************************/
 //! Current speed of right motor. Left motor is calculated when writing
 //! new speed.
-float RightMotorSpeed = 7.365;
+//float _RightMotorSpeed = 7.365;
 
 //! Current steer of car.
-float CurrentSteer = 7.365;
+//float CurrentSteer = 7.365;
 
 //! Number of wheel rotations
 //! This is incremented every time hall sensor is in logic 0
-unsigned int noOfRotations = 0;
+float distance = 0.0;
 
-uint8_t lineDetected = 0;
+line_location_t lineDetected = LineNone;
+
+bool isCmdToStopCar = false;
 
 /************************************
  * MACROS AND DEFINES

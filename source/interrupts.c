@@ -18,7 +18,7 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern uint32_t noOfRotations;
+extern float distance;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -52,13 +52,49 @@ static uint32_t timerLeftSensor = 0;
  ************************************/
 void GPIO_HALL_IRQHandler()
 {
-	noOfRotations++;
+	// distance = 2*pi*r
+	// One rotation is ~9.5cm
+	// Interrupt every half spin (two magnets)
+	distance += 4.75;
+
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 }
 
 // TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
 void GPIO_COLOR_MAIN_IRQHandler()
 {
+	
+
+
+
+	/*static uint32_t riseCnt = 0;
+	static uint32_t fallCnt = 0;
+	static bool wasRising = false;
+
+	uint32_t pinInterrupt = GPIO_GetPinsInterruptFlags(PORTD);
+
+
+	if(GPIO_ReadPinInput(PORTD, 0))
+	{
+		riseCnt = TPM_GetCurrentTimerCount(DEMO_TPM_BASEADDR);
+		wasRising = true;
+	}
+	else
+	{
+		if(wasRising)
+		{
+			fallCnt = TPM_GetCurrentTimerCount(DEMO_TPM_BASEADDR);
+			tpmIsrFlag = true;
+		}
+		wasRising = false;
+	}
+
+	if (tpmIsrFlag)
+	{
+		currTime = fallCnt - riseCnt;
+	}
+	tpmIsrFlag = false;
+	tpmIsrFlag = true;*/
 
 }
 
