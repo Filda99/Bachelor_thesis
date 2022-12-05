@@ -17,7 +17,7 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern unsigned char lineDetected;
+extern unsigned char LineDetected;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -52,7 +52,7 @@ void controlUnit()
 {
   static uint32_t distanceWithoutInterrupt = 0;
 
-  switch (lineDetected)
+  switch (LineDetected)
   {
   case LineNone:
   {

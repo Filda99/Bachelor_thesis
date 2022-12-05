@@ -15,6 +15,7 @@ processor_version: 11.0.1
 board: FRDM-KL25Z
 pin_labels:
 - {pin_num: '26', pin_signal: TSI0_CH1/PTA0/TPM0_CH5/SWD_CLK, label: 'J6[4]/U4D[11]/KL25_SWD_CLK', identifier: LEFTMINORSEN}
+- {pin_num: '30', pin_signal: TSI0_CH5/PTA4/I2C1_SDA/TPM0_CH1/NMI_b, label: 'J1[10]/D4', identifier: LEFTMINORSEN}
 - {pin_num: '31', pin_signal: PTA5/USB_CLKIN/TPM0_CH2, label: 'J1[12]/D5', identifier: RIGHTMINORSEN}
 - {pin_num: '61', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3, label: 'J1[7]', identifier: S0S2COLORSEN}
 - {pin_num: '62', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT, label: 'J1[9]', identifier: S1S3COLORSEN}
@@ -61,9 +62,9 @@ BOARD_InitPins:
   - {pin_num: '67', peripheral: I2C1, signal: SCL, pin_signal: PTC10/I2C1_SCL}
   - {pin_num: '68', peripheral: I2C1, signal: SDA, pin_signal: PTC11/I2C1_SDA}
   - {pin_num: '61', peripheral: GPIOC, signal: 'GPIO, 4', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3, direction: OUTPUT, gpio_init_state: 'true'}
-  - {pin_num: '26', peripheral: GPIOA, signal: 'GPIO, 0', pin_signal: TSI0_CH1/PTA0/TPM0_CH5/SWD_CLK, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge,
-    pull_enable: disable}
   - {pin_num: '31', peripheral: GPIOA, signal: 'GPIO, 5', pin_signal: PTA5/USB_CLKIN/TPM0_CH2, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge, pull_enable: disable}
+  - {pin_num: '30', peripheral: GPIOA, signal: 'GPIO, 4', pin_signal: TSI0_CH5/PTA4/I2C1_SDA/TPM0_CH1/NMI_b, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge,
+    pull_enable: disable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -89,7 +90,7 @@ void BOARD_InitPins(void)
         .pinDirection = kGPIO_DigitalInput,
         .outputLogic = 0U
     };
-    /* Initialize GPIO functionality on pin PTA0 (pin 26)  */
+    /* Initialize GPIO functionality on pin PTA4 (pin 30)  */
     GPIO_PinInit(BOARD_INITPINS_LEFTMINORSEN_GPIO, BOARD_INITPINS_LEFTMINORSEN_PIN, &LEFTMINORSEN_config);
 
     gpio_pin_config_t RIGHTMINORSEN_config = {
@@ -120,22 +121,6 @@ void BOARD_InitPins(void)
     /* Initialize GPIO functionality on pin PTD2 (pin 75)  */
     GPIO_PinInit(BOARD_INITPINS_RIGHTHALL_GPIO, BOARD_INITPINS_RIGHTHALL_PIN, &RIGHTHALL_config);
 
-    const port_pin_config_t LEFTMINORSEN = {/* Internal pull-up/down resistor is disabled */
-                                            kPORT_PullDisable,
-                                            /* Slow slew rate is configured */
-                                            kPORT_SlowSlewRate,
-                                            /* Passive filter is disabled */
-                                            kPORT_PassiveFilterDisable,
-                                            /* Low drive strength is configured */
-                                            kPORT_LowDriveStrength,
-                                            /* Pin is configured as PTA0 */
-                                            kPORT_MuxAsGpio};
-    /* PORTA0 (pin 26) is configured as PTA0 */
-    PORT_SetPinConfig(BOARD_INITPINS_LEFTMINORSEN_PORT, BOARD_INITPINS_LEFTMINORSEN_PIN, &LEFTMINORSEN);
-
-    /* Interrupt configuration on PORTA0 (pin 26): Interrupt on rising edge */
-    PORT_SetPinInterruptConfig(BOARD_INITPINS_LEFTMINORSEN_PORT, BOARD_INITPINS_LEFTMINORSEN_PIN, kPORT_InterruptRisingEdge);
-
     /* PORTA1 (pin 27) is configured as UART0_RX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_RX_PORT, BOARD_INITPINS_DEBUG_UART_RX_PIN, kPORT_MuxAlt2);
 
@@ -147,6 +132,19 @@ void BOARD_InitPins(void)
 
     /* PORTA2 (pin 28) is configured as UART0_TX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_TX_PORT, BOARD_INITPINS_DEBUG_UART_TX_PIN, kPORT_MuxAlt2);
+
+    /* PORTA4 (pin 30) is configured as PTA4 */
+    PORT_SetPinMux(BOARD_INITPINS_LEFTMINORSEN_PORT, BOARD_INITPINS_LEFTMINORSEN_PIN, kPORT_MuxAsGpio);
+
+    /* Interrupt configuration on PORTA4 (pin 30): Interrupt on rising edge */
+    PORT_SetPinInterruptConfig(BOARD_INITPINS_LEFTMINORSEN_PORT, BOARD_INITPINS_LEFTMINORSEN_PIN, kPORT_InterruptRisingEdge);
+
+    PORTA->PCR[4] = ((PORTA->PCR[4] &
+                      /* Mask bits to zero which are setting */
+                      (~(PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
+
+                     /* Pull Enable: Internal pullup or pulldown resistor is not enabled on the corresponding pin. */
+                     | PORT_PCR_PE(kPORT_PullDisable));
 
     /* PORTA5 (pin 31) is configured as PTA5 */
     PORT_SetPinMux(BOARD_INITPINS_RIGHTMINORSEN_PORT, BOARD_INITPINS_RIGHTMINORSEN_PIN, kPORT_MuxAsGpio);

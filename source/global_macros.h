@@ -17,6 +17,7 @@ extern "C" {
 /************************************
  * INCLUDES
  ************************************/
+#include "fsl_tpm.h"
 
 /************************************
  * MACROS AND DEFINES
@@ -24,32 +25,37 @@ extern "C" {
 #define STOP			7.365
 
 /*************************************/
-// Hall sensors 
+// Hall sensor
 /*************************************/
 #define GPIO_HALL 		PORTD
-#define HALL_LEFT		2
-#define HALL_RIGHT		3
+#define HALL_PIN			2
 
-// Clear both hall sensors
-#define HALL_IRQ_MASK	0x06
+// Clear hall sensor
+#define HALL_IRQ_MASK	0x04
 
 /*************************************/
 // Color sensors
 /*************************************/
 #define GPIO_COLOR_MAIN_SEN		PORTD
-#define LEFT_MAIN_SEN			0
-#define RIGHT_MAIN_SEN			1
-#define CENTER_MAIN_SEN			2
+#define LEFT_MAIN_SEN_PIN			0
+#define RIGHT_MAIN_SEN_PIN		4
+#define CENTER_MAIN_SEN_PIN		3
+
+#define MAIN_SEN_TPM_BASE			TPM0
+#define LEFT_TPM_IC						kTPM_Chnl_0
+#define RIGHT_TPM_IC					kTPM_Chnl_4
+#define CENTER_TPM_IC					kTPM_Chnl_3
 
 #define GPIO_COLOR_MINOR_SEN	PORTA
-#define LEFT_MINOR_SEN			4
-#define RIGHT_MINOR_SEN			5
+#define LEFT_MINOR_SEN_PIN		0
+#define RIGHT_MINOR_SEN_PIN		5
 
 // Clear sensors
-#define COLOR_MAIN_IRQ_MASK		0x45
-#define COLOR_MINOR_IRQ_MASK	0x18
+#define COLOR_MAIN_IRQ_MASK		0x18
+#define COLOR_MINOR_IRQ_MASK	0x21
 
-// Helping pins
+// Helping pins for setting color sensors
+#define GPIO_SET_UP_COLOR_SEN	PORTC
 #define S0S2_COLOR_SEN		4
 #define S1S3_COLOR_SEN		5
 

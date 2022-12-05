@@ -41,8 +41,8 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern unsigned int noOfRotations;
-extern unsigned char lineDetected;
+extern unsigned LeftSensorValue;
+extern unsigned char LineDetected;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -84,14 +84,12 @@ int main(void)
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
-	wait(1500);
 	startupBoard();
-	wait(600);
-	PRINTF("All peripherals have been started.\r\n");
 
 	while(1)
 	{
 		routine();
+		//PRINTF("Left sensor value = %x\r\n", LeftSensorValue);
 	    wait(20000);
 	}
 }

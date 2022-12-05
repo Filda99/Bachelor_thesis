@@ -21,7 +21,9 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern unsigned char lineDetected;
+extern unsigned char LineDetected;
+extern unsigned LeftSensorValue;
+
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
@@ -48,17 +50,14 @@ extern unsigned char lineDetected;
 #include "fsl_debug_console.h"
 volatile bool tpmIsrFlag = false;
 
-#define TPM_INPUT_CAPTURE_HANDLER TPM0_IRQHandler
-void TPM_INPUT_CAPTURE_HANDLER(void)
-{
-    tpmIsrFlag = true;
 
-    /* Clear interrupt flag.*/
-    TPM_ClearStatusFlags(TPM0, kTPM_Chnl0Flag);
-}
+
+
 
 void checkLeftSen()
 {
+	//PRINTF("Left sensor value = %x\r\n", LeftSensorValue);
+
 	/*time_t timeRise;
 	time_t timeFall;
 
@@ -99,23 +98,23 @@ static void checkLine()
     PRINTF("Left: %i\r\n", statusLeft);
 	if (statusLeft > temp)
 	{
-		lineDetected = LineLeft;
+		LineDetected = LineLeft;
 		prevLine = LineLeft;
 	}
 	if (statusRight > temp)
 	{
-		lineDetected = LineRight;
+		LineDetected = LineRight;
 		prevLine = LineRight;
 	}
 	if (statusCenter > temp)
 	{
 		if (prevLine == LineLeft)
 		{
-			lineDetected = LineCenter_Left;
+			LineDetected = LineCenter_Left;
 		}
 		else
 		{
-			lineDetected = LineCenter_Right;
+			LineDetected = LineCenter_Right;
 		}
 	}*/
 }
@@ -126,6 +125,6 @@ static void checkLine()
 void routine(void)
 {
 	checkLine();
-	controlUnit();
+	//controlUnit();
 }
 

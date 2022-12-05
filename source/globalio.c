@@ -12,21 +12,16 @@
 /************************************
  * GLOBAL VARIABLES
  ************************************/
-//! Current speed of right motor. Left motor is calculated when writing
-//! new speed.
-//float _RightMotorSpeed = 7.365;
+// Distance measured by wheel rotations
+float Distance = 0.0;
 
-//! Current steer of car.
-//float CurrentSteer = 7.365;
+// Which line is detected at the moment
+line_location_t LineDetected = LineNone;
 
-//! Number of wheel rotations
-//! This is incremented every time hall sensor is in logic 0
-float distance = 0.0;
+// Stop car, because some error has occured
+// When IsCmdToStopCar is true, no more action will be taken
+// Last thing is to save map
+bool IsCmdToStopCar = false;
 
-line_location_t lineDetected = LineNone;
-
-bool isCmdToStopCar = false;
-
-/************************************
- * MACROS AND DEFINES
- ************************************/
+// Left sensor color value
+unsigned LeftSensorValue = 0;

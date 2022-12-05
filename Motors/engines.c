@@ -17,7 +17,7 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern bool isCmdToStopCar;
+extern bool IsCmdToStopCar;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -151,7 +151,7 @@ void slackUpSpeedCustom(int speed)
 void stopCar()
 {
 	currentSpeed = STOP_SPEED;
-	isCmdToStopCar = true;
+	IsCmdToStopCar = true;
 	setMotorSpeed(currentSpeed);
 }
 
