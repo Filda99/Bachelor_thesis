@@ -23,6 +23,7 @@
  ************************************/
 extern unsigned char LineDetected;
 extern unsigned LeftSensorValue;
+extern float Distance;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -56,21 +57,22 @@ volatile bool tpmIsrFlag = false;
 
 void checkLeftSen()
 {
-	//PRINTF("Left sensor value = %x\r\n", LeftSensorValue);
+	static int enableIrq = 0;
+	static uint32_t prevVal = 0;
 
-	/*time_t timeRise;
-	time_t timeFall;
+	if(LeftSensorValue <= 10000)
+	{
+		if (prevVal != LeftSensorValue)
+			PRINTF("Left sensor value = %i\r\n", LeftSensorValue);
+	}
+	prevVal = LeftSensorValue;
 
-
-	while(!GPIO_ReadPinInput(PORTD, 0));
-	time(&timeRise);
-	time()
-	while(GPIO_ReadPinInput(PORTD, 0));
-	time(&timeFall);
-
-	uint32_t timeSum = timeFall - timeRise;
-	PRINTF("\r\nCapture value C(n)V=%x\r\n", timeSum);
-*/
+	if(enableIrq >= 20)
+	{
+		EnableIRQ(MAIN_SEN_TPM_IRQ);
+		enableIrq = 0;
+	}
+	enableIrq++;
 }
 
 static void checkLine()

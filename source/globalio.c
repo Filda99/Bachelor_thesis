@@ -13,7 +13,7 @@
  * GLOBAL VARIABLES
  ************************************/
 // Distance measured by wheel rotations
-float Distance = 0.0;
+uint32_t Distance = 0.0;
 
 // Which line is detected at the moment
 line_location_t LineDetected = LineNone;
@@ -25,3 +25,7 @@ bool IsCmdToStopCar = false;
 
 // Left sensor color value
 unsigned LeftSensorValue = 0;
+
+unsigned char posX = BLK_ROWS / 2;
+unsigned char posY = BLK_COLS / 2;
+

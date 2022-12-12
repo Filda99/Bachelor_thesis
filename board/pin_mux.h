@@ -153,6 +153,20 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_LEFTMINORSEN_PIN_MASK (1U << 4U)      /*!<@brief PORT pin mask */
                                                              /* @} */
 
+/*! @name PORTD7 (number 80), J2[19]
+  @{ */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_Helping_FGPIO FGPIOD             /*!<@brief FGPIO peripheral base pointer */
+#define BOARD_INITPINS_Helping_GPIO GPIOD               /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITPINS_Helping_GPIO_PIN_MASK (1U << 7U) /*!<@brief GPIO pin mask */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_Helping_PORT PORTD               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_Helping_PIN 7U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_Helping_PIN_MASK (1U << 7U)      /*!<@brief PORT pin mask */
+                                                        /* @} */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *

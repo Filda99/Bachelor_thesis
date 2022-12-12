@@ -22,6 +22,16 @@ extern "C" {
 /************************************
  * MACROS AND DEFINES
  ************************************/
+
+/*************************************/
+// Map size
+/*************************************/
+#define BLK_ROWS  3
+#define BLK_COLS  3
+
+/*************************************/
+// PWM for STOP the car
+/*************************************/
 #define STOP			7.365
 
 /*************************************/
@@ -42,9 +52,10 @@ extern "C" {
 #define CENTER_MAIN_SEN_PIN		3
 
 #define MAIN_SEN_TPM_BASE			TPM0
-#define LEFT_TPM_IC						kTPM_Chnl_0
-#define RIGHT_TPM_IC					kTPM_Chnl_4
-#define CENTER_TPM_IC					kTPM_Chnl_3
+#define MAIN_SEN_TPM_IRQ			TPM0_IRQn
+#define LEFT_TPM_IC					kTPM_Chnl_0
+#define RIGHT_TPM_IC				kTPM_Chnl_4
+#define CENTER_TPM_IC				kTPM_Chnl_3
 
 #define GPIO_COLOR_MINOR_SEN	PORTA
 #define LEFT_MINOR_SEN_PIN		0

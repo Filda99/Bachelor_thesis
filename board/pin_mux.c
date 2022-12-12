@@ -17,12 +17,14 @@ pin_labels:
 - {pin_num: '26', pin_signal: TSI0_CH1/PTA0/TPM0_CH5/SWD_CLK, label: 'J6[4]/U4D[11]/KL25_SWD_CLK', identifier: LEFTMINORSEN}
 - {pin_num: '30', pin_signal: TSI0_CH5/PTA4/I2C1_SDA/TPM0_CH1/NMI_b, label: 'J1[10]/D4', identifier: LEFTMINORSEN}
 - {pin_num: '31', pin_signal: PTA5/USB_CLKIN/TPM0_CH2, label: 'J1[12]/D5', identifier: RIGHTMINORSEN}
+- {pin_num: '55', pin_signal: ADC0_SE14/TSI0_CH13/PTC0/EXTRG_IN/CMP0_OUT, label: 'J1[3]', identifier: TestingPin}
 - {pin_num: '61', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3, label: 'J1[7]', identifier: S0S2COLORSEN}
 - {pin_num: '62', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT, label: 'J1[9]', identifier: S1S3COLORSEN}
 - {pin_num: '73', pin_signal: PTD0/SPI0_PCS0/TPM0_CH0, label: 'J2[6]/D10', identifier: LEFTMAINSEN}
 - {pin_num: '75', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO, label: 'J2[8]/D11', identifier: RIGHTHALL}
 - {pin_num: '76', pin_signal: PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI, label: 'J2[10]/D12', identifier: CENTERMAINSEN}
 - {pin_num: '77', pin_signal: PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4, label: 'J1[6]/D2', identifier: RIGHTMAINSEN}
+- {pin_num: '80', pin_signal: PTD7/SPI1_MISO/UART0_TX/SPI1_MOSI, label: 'J2[19]', identifier: Helping}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -65,6 +67,7 @@ BOARD_InitPins:
   - {pin_num: '31', peripheral: GPIOA, signal: 'GPIO, 5', pin_signal: PTA5/USB_CLKIN/TPM0_CH2, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge, pull_enable: disable}
   - {pin_num: '30', peripheral: GPIOA, signal: 'GPIO, 4', pin_signal: TSI0_CH5/PTA4/I2C1_SDA/TPM0_CH1/NMI_b, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge,
     pull_enable: disable}
+  - {pin_num: '80', peripheral: GPIOD, signal: 'GPIO, 7', pin_signal: PTD7/SPI1_MISO/UART0_TX/SPI1_MOSI, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -120,6 +123,13 @@ void BOARD_InitPins(void)
     };
     /* Initialize GPIO functionality on pin PTD2 (pin 75)  */
     GPIO_PinInit(BOARD_INITPINS_RIGHTHALL_GPIO, BOARD_INITPINS_RIGHTHALL_PIN, &RIGHTHALL_config);
+
+    gpio_pin_config_t Helping_config = {
+        .pinDirection = kGPIO_DigitalInput,
+        .outputLogic = 0U
+    };
+    /* Initialize GPIO functionality on pin PTD7 (pin 80)  */
+    GPIO_PinInit(BOARD_INITPINS_Helping_GPIO, BOARD_INITPINS_Helping_PIN, &Helping_config);
 
     /* PORTA1 (pin 27) is configured as UART0_RX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_RX_PORT, BOARD_INITPINS_DEBUG_UART_RX_PIN, kPORT_MuxAlt2);
@@ -185,6 +195,12 @@ void BOARD_InitPins(void)
 
     /* PORTD4 (pin 77) is configured as TPM0_CH4 */
     PORT_SetPinMux(BOARD_INITPINS_RIGHTMAINSEN_PORT, BOARD_INITPINS_RIGHTMAINSEN_PIN, kPORT_MuxAlt4);
+
+    /* PORTD7 (pin 80) is configured as PTD7 */
+    PORT_SetPinMux(BOARD_INITPINS_Helping_PORT, BOARD_INITPINS_Helping_PIN, kPORT_MuxAsGpio);
+
+    /* Interrupt configuration on PORTD7 (pin 80): Interrupt on rising edge */
+    PORT_SetPinInterruptConfig(BOARD_INITPINS_Helping_PORT, BOARD_INITPINS_Helping_PIN, kPORT_InterruptRisingEdge);
 
     /* PORTE25 (pin 25) is configured as TPM0_CH1 */
     PORT_SetPinMux(BOARD_INITPINS_ACCEL_SDA_PORT, BOARD_INITPINS_ACCEL_SDA_PIN, kPORT_MuxAlt3);

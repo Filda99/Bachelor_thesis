@@ -98,7 +98,7 @@ static void startupI2C(void)
 		ISL_readRed(redColor);
 		redColor[1]++;
 	}
-}
+}*/
 
 static void startupInterrupts(void)
 {
@@ -111,15 +111,15 @@ static void startupInterrupts(void)
 	portInterrupt = kPORT_InterruptFallingEdge;
 
 	//PORT_SetMultiplePinsConfig(GPIO_HALL, HALL_IRQ_MASK, &config);
-	PORT_SetPinConfig(GPIO_HALL, HALL_LEFT, &config);
-	PORT_SetPinConfig(GPIO_HALL, HALL_RIGHT, &config);
-	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_LEFT, portInterrupt);
-	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_RIGHT, portInterrupt);
+	//PORT_SetPinConfig(GPIO_HALL, HALL_LEFT, &config);
+	PORT_SetPinConfig(GPIO_HALL, HALL_PIN, &config);
+	//PORT_SetPinInterruptConfig(GPIO_HALL, HALL_LEFT, portInterrupt);
+	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_PIN, portInterrupt);
 
 	EnableIRQ(GPIO_HALL_IRQn);
 
 	// Color sensor minor interrupt
-	config.mux = kPORT_MuxAsGpio;
+	/*config.mux = kPORT_MuxAsGpio;
 	config.pullSelect = kPORT_PullUp;
 	portInterrupt = kPORT_InterruptFallingEdge;
 
@@ -141,9 +141,9 @@ static void startupInterrupts(void)
 	PORT_SetPinInterruptConfig(GPIO_COLOR_MAIN_SEN, LEFT_MAIN_SEN, portInterrupt);
 	PORT_SetPinInterruptConfig(GPIO_COLOR_MAIN_SEN, RIGHT_MAIN_SEN, portInterrupt);
 
-	EnableIRQ(GPIO_COLOR_MAIN_IRQn);
+	EnableIRQ(GPIO_COLOR_MAIN_IRQn);*/
 }
-*/
+
 
 
 
@@ -155,16 +155,15 @@ static void startupSensorCapture()
 	CLOCK_SetTpmClock(1U);
 
 	TPM_GetDefaultConfig(&tpmInfo);
-	tpmInfo.prescale = 7;
 	// Initialize TPM module
 	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
 
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
 	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RiseAndFallEdge);
 	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RiseAndFallEdge);
 
     TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl0InterruptEnable);
-    EnableIRQ(TPM0_IRQn);
+    EnableIRQ(MAIN_SEN_TPM_IRQ);
 
 
 	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
@@ -181,5 +180,5 @@ void startupBoard(void)
 
 	//startupClock();
 	//startupI2C();
-	//startupInterrupts();
+	startupInterrupts();
 }

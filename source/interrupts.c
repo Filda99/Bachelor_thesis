@@ -58,47 +58,53 @@ void GPIO_HALL_IRQHandler()
 	// distance = 2*pi*r
 	// One rotation is ~9.5cm
 	// Interrupt every half spin (two magnets)
-	Distance += 4.75;
-
+	//Distance += 4.75;
+	Distance++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 }
+
+#define FIELD_SIZE 200
 
 // TODO: Pokud se vyvola preruseni, zjisti od koho a zjisti CnV a uloz do glob. prom.
 void GPIO_COLOR_MAIN_IRQHandler()
 {
-	uint32_t pinInterrupt;// = GPIO_GetPinsInterruptFlags(PTD);
-	uint32_t timeNow = TPM0->CNT;
+	//LeftSensorValue++;
+	//PRINTF("Time: %i\r\n", MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV);
+	uint32_t pinInterrupt = GPIO_GetPinsInterruptFlags(PTD);
+	static uint32_t firstCapture = 0;
+	static uint32_t secondCapture = 0;
 
-	static uint32_t colorDetection[10] = {0, };
+	static uint32_t colorDetection[FIELD_SIZE] = {0, };
 	static uint8_t head = 0;
 
 	static bool rising = true;
 
 	if (rising)
 	{
-		//LeftSensorValue = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
-		LeftSensorValue = timeNow;
+		firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
 	}
 	else
 	{
-		//pinInterrupt = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
-		pinInterrupt = timeNow;
-		int highTime = pinInterrupt - LeftSensorValue;
-		if(head != 10)
+		secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+		int pulseWidth = secondCapture - firstCapture;
+		//PRINTF("PulseWidth: %i\r\n", pulseWidth);
+		if(head != 9)
 		{
-			colorDetection[head] = highTime;
+			colorDetection[head] = pulseWidth;
 			head++;
 		}
 		else
 		{
+			colorDetection[head] = pulseWidth;
+
 			uint32_t color = 0;
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < FIELD_SIZE; i++)
 			{
 				color += colorDetection[i];
 			}
-			color /= 10;
+			LeftSensorValue = color/FIELD_SIZE;
 			head = 0;
-			PRINTF("Left sensor value = %i\r\n", color);
+			DisableIRQ(MAIN_SEN_TPM_IRQ);
 		}
 	}
 	rising = !rising;
@@ -109,9 +115,8 @@ void GPIO_COLOR_MAIN_IRQHandler()
 
 
 	//}
-	for(int i = 0; i < 50000; i++);
-	TPM0->STATUS |= 0x01;
-	PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, 1);
+	MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
+	PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, pinInterrupt);
 }
 
 // TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!

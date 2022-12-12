@@ -37,6 +37,7 @@
 #include "pin_mux.h"
 #include "routine.h"
 #include "fsl_port.h"
+#include "map/map_init.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -85,11 +86,12 @@ int main(void)
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
 	startupBoard();
+	//initMap();
+
 
 	while(1)
 	{
 		routine();
 		//PRINTF("Left sensor value = %x\r\n", LeftSensorValue);
-	    wait(20000);
 	}
 }
