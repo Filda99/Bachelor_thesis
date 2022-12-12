@@ -47,33 +47,26 @@ typedef enum _block_direction
 /************************************
  * STATIC FUNCTIONS
  ************************************/
-static map_object_t **malloc2dArray()
+static void initNewBlock(map_block *newBlock)
 {
-	map_object_t **ppArray;
-
-	ppArray = (map_object_t**)malloc(BLK_ROWS * sizeof(map_object_t*));
+	block *block;
+	block->field = (enum _map_object**)malloc(BLK_ROWS * sizeof(enum _map_object*));
 
 	for (int i = 0; i < BLK_ROWS; i++)
 	{
-		ppArray[i] = (map_object_t*)malloc(BLK_COLS * sizeof(enum _map_object));
+		block->field[i] = (enum _map_object*)malloc(BLK_COLS * sizeof(enum _map_object));
 	}
 
-	return ppArray;
-}
-
- static void initNewBlock(map_block *newBlock)
-{
-	map_object_t **field = malloc2dArray();
+	newBlock->currentBlock = block;
 
 	for(int i = 0; i < BLK_ROWS; i++)
 	{
 		for (int j = 0; j < BLK_COLS; j++)
 		{
-			field[i][j] = Empty;
+			newBlock->currentBlock->field[i][j] = Empty;
 		}
 	}
 
-	newBlock->currentBlock->field = field;
 }
 
 static void createNewBlock(map_block *current, map_block *newBlock, block_direction direction)
@@ -111,6 +104,6 @@ void initMap()
   map_block currentBlock;
   initNewBlock(&currentBlock);
   currentBlock.currentBlock->field[0][0] = Wall;
-  for (int i = 0; i < BLK_ROWS; i++)
-	  free(currentBlock.currentBlock->field[i]);
+
+  free(currentBlock.currentBlock->field);
 }
