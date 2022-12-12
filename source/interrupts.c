@@ -28,6 +28,7 @@ extern uint32_t LeftSensorValue;
 #define GPIO_HALL_IRQHandler		PORTD_IRQHandler
 #define GPIO_COLOR_MINOR_IRQHandler	PORTA_IRQHandler
 #define GPIO_COLOR_MAIN_IRQHandler	TPM0_IRQHandler
+#define FIELD_SIZE 500
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -58,18 +59,14 @@ void GPIO_HALL_IRQHandler()
 	// distance = 2*pi*r
 	// One rotation is ~9.5cm
 	// Interrupt every half spin (two magnets)
-	//Distance += 4.75;
 	Distance++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 }
 
-#define FIELD_SIZE 200
 
 // TODO: Pokud se vyvola preruseni, zjisti od koho a zjisti CnV a uloz do glob. prom.
 void GPIO_COLOR_MAIN_IRQHandler()
 {
-	//LeftSensorValue++;
-	//PRINTF("Time: %i\r\n", MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV);
 	uint32_t pinInterrupt = GPIO_GetPinsInterruptFlags(PTD);
 	static uint32_t firstCapture = 0;
 	static uint32_t secondCapture = 0;
@@ -86,7 +83,7 @@ void GPIO_COLOR_MAIN_IRQHandler()
 	else
 	{
 		secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
-		int pulseWidth = secondCapture - firstCapture;
+		uint32_t pulseWidth = secondCapture - firstCapture;
 		//PRINTF("PulseWidth: %i\r\n", pulseWidth);
 		if(head != 9)
 		{

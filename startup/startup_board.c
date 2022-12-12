@@ -159,10 +159,12 @@ static void startupSensorCapture()
 	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
 
 	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RiseAndFallEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RisingEdge);
+	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RisingEdge);
 
     TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl0InterruptEnable);
+    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl4InterruptEnable);
+    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl3InterruptEnable);
     EnableIRQ(MAIN_SEN_TPM_IRQ);
 
 
@@ -178,7 +180,6 @@ void startupBoard(void)
 	startupPWM();
 	startupSensorCapture();
 
-	//startupClock();
 	//startupI2C();
 	startupInterrupts();
 }

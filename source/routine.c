@@ -67,7 +67,7 @@ void checkLeftSen()
 	}
 	prevVal = LeftSensorValue;
 
-	if(enableIrq >= 20)
+	if(enableIrq >= 100)
 	{
 		EnableIRQ(MAIN_SEN_TPM_IRQ);
 		enableIrq = 0;

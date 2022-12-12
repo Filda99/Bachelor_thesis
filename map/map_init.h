@@ -34,7 +34,7 @@ typedef enum _map_object {
 }map_object_t;
 
 typedef struct block{
-  map_object_t field[BLK_ROWS][BLK_COLS];
+  map_object_t **field;
 }block;
 
 typedef struct map_blk
