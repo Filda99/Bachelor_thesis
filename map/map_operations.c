@@ -10,7 +10,7 @@
 /************************************
  * INCLUDES
  ************************************/
-#include "map_init.h"
+#include "map/map_operations.h"
 #include "stdlib.h"
 
 /************************************
@@ -103,6 +103,12 @@ void initMap()
 {
   map_block currentBlock;
   initNewBlock(&currentBlock);
+}
+
+
+void saveMap()
+{
+
 }
 
 

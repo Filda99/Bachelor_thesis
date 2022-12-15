@@ -31,13 +31,13 @@
 /************************************
  * INCLUDES
  ************************************/
+#include <map/map_operations.h>
 #include "fsl_debug_console.h"
 #include "board.h"
 #include "startup_board.h"
 #include "pin_mux.h"
 #include "routine.h"
 #include "fsl_port.h"
-#include "map/map_init.h"
 
 /************************************
  * EXTERN VARIABLES

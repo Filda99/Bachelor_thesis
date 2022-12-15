@@ -7,8 +7,8 @@
  ********************************************************************************
  */
 
-#ifndef MAP_INIT_H_
-#define MAP_INIT_H_
+#ifndef MAP_OPERATIONS_H_
+#define MAP_OPERATIONS_H_
 
 #ifdef __cplusplus
 extern "C" {
