@@ -63,7 +63,7 @@ static void initNewBlock(map_block *newBlock)
 	{
 		for (int j = 0; j < BLK_COLS; j++)
 		{
-			newBlock->currentBlock[i][j] = Empty;
+			newBlock->currentBlock[i][j] = map_Empty;
 		}
 	}
 
@@ -103,7 +103,11 @@ void initMap()
 {
   map_block currentBlock;
   initNewBlock(&currentBlock);
-  currentBlock.currentBlock[0][0] = Wall;
+}
 
-  free(currentBlock.currentBlock);
+
+void deinitMap()
+{
+  //free(currentBlock.currentBlock);
+
 }

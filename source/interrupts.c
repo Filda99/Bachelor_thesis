@@ -19,7 +19,7 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern unsigned int Distance;
+extern unsigned int WheelRotations;
 extern unsigned int LeftSensorValue;
 
 /************************************
@@ -60,10 +60,8 @@ extern unsigned int LeftSensorValue;
  ************************************/
 void GPIO_HALL_IRQHandler()
 {
-	// distance = 2*pi*r
-	// One rotation is ~9.5cm
 	// Interrupt every half spin (two magnets)
-	Distance++;
+	WheelRotations++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 }
 

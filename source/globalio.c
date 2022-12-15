@@ -12,8 +12,8 @@
 /************************************
  * GLOBAL VARIABLES
  ************************************/
-//* Distance measured by wheel rotations
-unsigned int Distance = 0.0;
+//* Number of wheel rotations
+unsigned int WheelRotations = 0;
 
 //* Which line is detected at the moment
 line_location_t LineDetected = LineNone;
