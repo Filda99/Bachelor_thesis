@@ -24,6 +24,7 @@ extern bool IsCmdToStopCar;
  ************************************/
 #define STOP			7.365
 
+
 /************************************
  * PRIVATE TYPEDEFS
  ************************************/
@@ -78,9 +79,20 @@ static void getDutyCycle(float setSpeed)
 }
 
 
-/************************************
- * GLOBAL FUNCTIONS
- ************************************/
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
+
+//!*************************************************************************************************
+//! void setMotorSpeed(int speed)
+//!
+//! @description
+//! Update PWM duty cycle based on variables rightMotorSpeed and leftMotorSpeed.
+//!
+//! @param	speed	Number which points to position in SpeedMap array.
+//!
+//! @return	None
+//!*************************************************************************************************
 void setMotorSpeed(int speed)
 {
 	float setSpeed = SpeedMap[speed];
