@@ -47,15 +47,13 @@ extern "C" {
 // Color sensors
 /*************************************/
 #define GPIO_COLOR_MAIN_SEN		PORTD
-#define LEFT_MAIN_SEN_PIN			0
+#define LEFT_MAIN_SEN_PIN		0
 #define RIGHT_MAIN_SEN_PIN		4
 #define CENTER_MAIN_SEN_PIN		3
 
-#define MAIN_SEN_TPM_BASE			TPM0
-#define MAIN_SEN_TPM_IRQ			TPM0_IRQn
-#define LEFT_TPM_IC					kTPM_Chnl_0
-#define RIGHT_TPM_IC				kTPM_Chnl_4
-#define CENTER_TPM_IC				kTPM_Chnl_3
+#define MAIN_SEN_TPM_BASE		TPM0
+#define MAIN_SEN_TPM_IRQ		TPM0_IRQn
+
 
 #define GPIO_COLOR_MINOR_SEN	PORTA
 #define LEFT_MINOR_SEN_PIN		0
@@ -67,8 +65,8 @@ extern "C" {
 
 // Helping pins for setting color sensors
 #define GPIO_SET_UP_COLOR_SEN	PORTC
-#define S0S2_COLOR_SEN		4
-#define S1S3_COLOR_SEN		5
+#define S0S2_COLOR_SEN			4
+#define S1S3_COLOR_SEN			5
 
 /*************************************/
 // Distance 

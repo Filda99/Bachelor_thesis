@@ -25,6 +25,8 @@ bool IsCmdToStopCar = false;
 
 // Left sensor color value
 unsigned LeftSensorValue = 0;
+unsigned CenterSensorValue = 0;
+unsigned RightSensorValue = 0;
 
 unsigned char posX = BLK_ROWS / 2;
 unsigned char posY = BLK_COLS / 2;

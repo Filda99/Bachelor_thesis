@@ -68,10 +68,7 @@ extern unsigned char LineDetected;
 /************************************
  * STATIC FUNCTIONS
  ************************************/
-void wait(uint32_t ms)
-{
-	for(int i = 0; i < ms; i++);
-}
+
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/

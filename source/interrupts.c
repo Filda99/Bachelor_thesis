@@ -30,6 +30,10 @@ extern uint32_t LeftSensorValue;
 #define GPIO_COLOR_MAIN_IRQHandler	TPM0_IRQHandler
 #define FIELD_SIZE 500
 
+#define LEFT_TPM_IC					kTPM_Chnl_0
+#define RIGHT_TPM_IC				kTPM_Chnl_4
+#define CENTER_TPM_IC				kTPM_Chnl_3
+
 /************************************
  * PRIVATE TYPEDEFS
  ************************************/
@@ -37,7 +41,6 @@ extern uint32_t LeftSensorValue;
 /************************************
  * STATIC VARIABLES
  ************************************/
-static uint32_t timerLeftSensor = 0;
 
 /************************************
  * GLOBAL VARIABLES

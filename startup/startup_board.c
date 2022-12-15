@@ -34,6 +34,10 @@
 #define GPIO_HALL_IRQn			PORTA_IRQn
 #define GPIO_COLOR_MAIN_IRQn	PORTD_IRQn
 
+#define LEFT_TPM_IC					kTPM_Chnl_0
+#define RIGHT_TPM_IC				kTPM_Chnl_4
+#define CENTER_TPM_IC				kTPM_Chnl_3
+
 /************************************
  * PRIVATE TYPEDEFS
  ************************************/
