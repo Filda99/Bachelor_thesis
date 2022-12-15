@@ -22,6 +22,7 @@ extern bool IsCmdToStopCar;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
+#define STOP			7.365
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -37,13 +38,13 @@ float rightMotorSpeed;
 //! 0 = max backwards
 //! 5 = stop engines
 //! 11 = max forwards
-static int currentSpeed = 5;
+static int currentSpeed = STOP_SPEED;
 
 //! Current position in steer array.
 //! 0 = max left
 //! 3 = direct
 //! 7 = max right
-static int currentSteer = 3;
+static int currentSteer = GO_DIRECT;
 
 /************************************
  * GLOBAL VARIABLES

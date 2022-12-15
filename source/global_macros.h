@@ -30,15 +30,10 @@ extern "C" {
 #define BLK_COLS  3
 
 /*************************************/
-// PWM for STOP the car
-/*************************************/
-#define STOP			7.365
-
-/*************************************/
 // Hall sensor
 /*************************************/
 #define GPIO_HALL 		PORTD
-#define HALL_PIN			2
+#define HALL_PIN		2
 
 // Clear hall sensor
 #define HALL_IRQ_MASK	0x04
@@ -46,20 +41,22 @@ extern "C" {
 /*************************************/
 // Color sensors
 /*************************************/
+// Main color sensors GPIO
 #define GPIO_COLOR_MAIN_SEN		PORTD
 #define LEFT_MAIN_SEN_PIN		0
 #define RIGHT_MAIN_SEN_PIN		4
 #define CENTER_MAIN_SEN_PIN		3
 
+// Main color sensor TPM
 #define MAIN_SEN_TPM_BASE		TPM0
 #define MAIN_SEN_TPM_IRQ		TPM0_IRQn
 
-
+// Minor color sensors GPIO
 #define GPIO_COLOR_MINOR_SEN	PORTA
 #define LEFT_MINOR_SEN_PIN		0
 #define RIGHT_MINOR_SEN_PIN		5
 
-// Helping pins for setting color sensors
+// Helping pins for setting up main color sensors
 #define GPIO_SET_UP_COLOR_SEN	PORTC
 #define S0S2_COLOR_SEN			4
 #define S1S3_COLOR_SEN			5
@@ -67,6 +64,7 @@ extern "C" {
 /*************************************/
 // Distance 
 /*************************************/
+// Counter how long are we going straight without any interrupt
 #define MAX_DISTANCE_WITHOUT_IRQ_LINE	25000
 
 /*************************************/
@@ -83,11 +81,12 @@ extern "C" {
 /*************************************/
 #define MAX_SPEED_FORWARDS	11
 #define MAX_SPEED_BACKWARDS	0
-#define MAX_STEER_LEFT		0
-#define MAX_STEER_RIGHT		7
 
-#define STOP_SPEED			5
-#define GO_DIRECT			3
+#define MAX_STEER_RIGHT		7
+#define MAX_STEER_LEFT		0
+
+#define STOP_SPEED			((MAX_SPEED_FORWARDS - 1) / 2)
+#define GO_DIRECT			((MAX_STEER_RIGHT - 1) / 2)
 
 /************************************
  * TYPEDEFS
