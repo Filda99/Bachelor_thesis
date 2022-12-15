@@ -31,6 +31,8 @@ extern unsigned int WheelRotations;
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
+unsigned char posX = BLK_ROWS / 2;
+unsigned char posY = BLK_COLS / 2;
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -56,9 +58,16 @@ extern unsigned int WheelRotations;
 //!*************************************************************************************************
 void mapping()
 {
-	//* distance = 2*pi*r
-	//* r = ~1.7
-	//* One rotation is ~10.68cm
+	// distance = 2*pi*r
+	// r = ~1.7
+	// One rotation is ~10.68cm
+	static float newDistance = 0;
+	static uint32_t prevNoWheelRot = 0;
+
+	// Get distance from previous position
+	newDistance = WheelRotations - prevNoWheelRot;
+	newDistance *= 10.68;
+
 }
 
 

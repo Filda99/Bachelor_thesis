@@ -83,7 +83,7 @@ int main(void)
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
 	startupBoard();
-	initMap();
+	createMap();
 
 
 	while(1)

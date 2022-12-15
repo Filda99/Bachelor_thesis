@@ -99,7 +99,7 @@ static void createNewBlock(map_block *current, map_block *newBlock, block_direct
 /************************************
  * GLOBAL FUNCTIONS
  ************************************/
-void initMap()
+void createMap()
 {
   map_block currentBlock;
   initNewBlock(&currentBlock);
@@ -112,7 +112,7 @@ void saveMap()
 }
 
 
-void deinitMap()
+void deleteMap()
 {
   //free(currentBlock.currentBlock);
 

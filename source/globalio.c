@@ -27,7 +27,3 @@ bool IsCmdToStopCar = false;
 unsigned int LeftSensorValue = 0;
 unsigned int CenterSensorValue = 0;
 unsigned int RightSensorValue = 0;
-
-unsigned char posX = BLK_ROWS / 2;
-unsigned char posY = BLK_COLS / 2;
-
