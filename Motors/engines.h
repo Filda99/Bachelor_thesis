@@ -26,8 +26,8 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 
-// In the middle is the pulse width for STOP.
-// Otherwise we add/sub 0.127 for higher/slower speed.
+//* In the middle is the pulse width for STOP.
+//* Otherwise we add/sub 0.127 for higher/slower speed.
 static const float SpeedMap[11] = {
 		6.73,
 		6.857,
@@ -42,8 +42,8 @@ static const float SpeedMap[11] = {
 		8.0
 };
 
-// In the middle is the pulse width for GO DIRECT.
-// Otherwise we add/sub 10 pct. for turning LEFT/RIGHT.
+//* In the middle is the pulse width for GO DIRECT.
+//* Otherwise we add/sub 10 pct. for turning LEFT/RIGHT.
 static const int SteerMap[7] = {
 		20,
 		30,

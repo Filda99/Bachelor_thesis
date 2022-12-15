@@ -12,10 +12,10 @@
 /************************************
  * GLOBAL VARIABLES
  ************************************/
-// Distance measured by wheel rotations
+//* Distance measured by wheel rotations
 unsigned int Distance = 0.0;
 
-// Which line is detected at the moment
+//* Which line is detected at the moment
 line_location_t LineDetected = LineNone;
 
 // Stop car, because some error has occured

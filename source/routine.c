@@ -83,5 +83,6 @@ void routine(void)
 {
 	checkLine();
 	//controlUnit();
+	mapping();
 }
 
