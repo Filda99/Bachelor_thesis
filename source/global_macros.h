@@ -76,7 +76,11 @@ extern "C" {
 /*************************************/
 // Line detected counter
 /*************************************/
+// Counter which says how long are we over the line
 #define MAX_CNT_ON_LINE	20
+
+// If there is white color under sensor, no more than 2500 will occure
+#define COLOR_TRESHOLD	2500
 
 /*************************************/
 // Engine
