@@ -33,17 +33,13 @@ typedef enum _map_object {
   Wall         // Wall detected on field
 }map_object_t;
 
-typedef struct block{
-  map_object_t **field;
-}block;
-
 typedef struct map_blk
 {
-  struct block   *currentBlock;
-  struct map_blk *blockUp;
-  struct map_blk *blockDown;
-  struct map_blk *blockLeft;
-  struct map_blk *blockRight;
+	map_object_t 	**currentBlock;
+	struct map_blk 	*blockUp;
+	struct map_blk 	*blockDown;
+	struct map_blk 	*blockLeft;
+	struct map_blk 	*blockRight;
 }map_block;
 
 

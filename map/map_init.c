@@ -49,12 +49,12 @@ typedef enum _block_direction
  ************************************/
 static void initNewBlock(map_block *newBlock)
 {
-	block *block;
-	block->field = (enum _map_object**)malloc(BLK_ROWS * sizeof(enum _map_object*));
+	map_object_t **block;
+	block = (enum _map_object**)malloc(BLK_ROWS * sizeof(enum _map_object*));
 
 	for (int i = 0; i < BLK_ROWS; i++)
 	{
-		block->field[i] = (enum _map_object*)malloc(BLK_COLS * sizeof(enum _map_object));
+		block[i] = (enum _map_object*)malloc(BLK_COLS * sizeof(enum _map_object));
 	}
 
 	newBlock->currentBlock = block;
@@ -63,7 +63,7 @@ static void initNewBlock(map_block *newBlock)
 	{
 		for (int j = 0; j < BLK_COLS; j++)
 		{
-			newBlock->currentBlock->field[i][j] = Empty;
+			newBlock->currentBlock[i][j] = Empty;
 		}
 	}
 
@@ -103,7 +103,7 @@ void initMap()
 {
   map_block currentBlock;
   initNewBlock(&currentBlock);
-  currentBlock.currentBlock->field[0][0] = Wall;
+  currentBlock.currentBlock[0][0] = Wall;
 
-  free(currentBlock.currentBlock->field);
+  free(currentBlock.currentBlock);
 }
