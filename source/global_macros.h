@@ -59,10 +59,6 @@ extern "C" {
 #define LEFT_MINOR_SEN_PIN		0
 #define RIGHT_MINOR_SEN_PIN		5
 
-// Clear sensors
-#define COLOR_MAIN_IRQ_MASK		0x18
-#define COLOR_MINOR_IRQ_MASK	0x21
-
 // Helping pins for setting color sensors
 #define GPIO_SET_UP_COLOR_SEN	PORTC
 #define S0S2_COLOR_SEN			4

@@ -34,9 +34,9 @@
 #define GPIO_HALL_IRQn			PORTA_IRQn
 #define GPIO_COLOR_MAIN_IRQn	PORTD_IRQn
 
-#define LEFT_TPM_IC					kTPM_Chnl_0
-#define RIGHT_TPM_IC				kTPM_Chnl_4
-#define CENTER_TPM_IC				kTPM_Chnl_3
+#define LEFT_TPM_IC				kTPM_Chnl_0
+#define RIGHT_TPM_IC			kTPM_Chnl_4
+#define CENTER_TPM_IC			kTPM_Chnl_3
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -76,13 +76,13 @@ static void startupPWM(void)
 
 	TPM_GetDefaultConfig(&tpmInfo);
 	tpmInfo.prescale = kTPM_Prescale_Divide_32;
-	// Initialize TPM module
 	TPM_Init(TPM1, &tpmInfo);
 
 	TPM_SetupPwm(TPM1, tpmParam, 2U, kTPM_EdgeAlignedPwm, 50U,
 			TPM_SOURCE_CLOCK);
 	TPM_StartTimer(TPM1, kTPM_SystemClock);
 }
+
 /*
 static void startupI2C(void)
 {
@@ -102,7 +102,8 @@ static void startupI2C(void)
 		ISL_readRed(redColor);
 		redColor[1]++;
 	}
-}*/
+}
+*/
 
 static void startupInterrupts(void)
 {
@@ -114,10 +115,7 @@ static void startupInterrupts(void)
 	config.pullSelect = kPORT_PullUp;
 	portInterrupt = kPORT_InterruptFallingEdge;
 
-	//PORT_SetMultiplePinsConfig(GPIO_HALL, HALL_IRQ_MASK, &config);
-	//PORT_SetPinConfig(GPIO_HALL, HALL_LEFT, &config);
 	PORT_SetPinConfig(GPIO_HALL, HALL_PIN, &config);
-	//PORT_SetPinInterruptConfig(GPIO_HALL, HALL_LEFT, portInterrupt);
 	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_PIN, portInterrupt);
 
 	EnableIRQ(GPIO_HALL_IRQn);
@@ -133,18 +131,6 @@ static void startupInterrupts(void)
 	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, LEFT_MINOR_SEN, portInterrupt);
 	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, RIGHT_MINOR_SEN, portInterrupt);
 
-	EnableIRQ(GPIO_COLOR_MAIN_IRQn);
-
-	// Color sensor major interrupt
-	config.mux = kPORT_MuxAsGpio;
-	config.pullSelect = kPORT_PullDisable;
-	//portInterrupt = kPORT_InterruptEitherEdge;
-	PORT_SetPinConfig(GPIO_COLOR_MAIN_SEN, LEFT_MAIN_SEN, &config);
-	PORT_SetPinConfig(GPIO_COLOR_MAIN_SEN, RIGHT_MAIN_SEN, &config);
-	//PORT_SetPinConfig(GPIO_COLOR_MAIN_SEN, CENTER_MAIN_SEN, &config);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MAIN_SEN, LEFT_MAIN_SEN, portInterrupt);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MAIN_SEN, RIGHT_MAIN_SEN, portInterrupt);
-
 	EnableIRQ(GPIO_COLOR_MAIN_IRQn);*/
 }
 
@@ -159,7 +145,6 @@ static void startupSensorCapture()
 	CLOCK_SetTpmClock(1U);
 
 	TPM_GetDefaultConfig(&tpmInfo);
-	// Initialize TPM module
 	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
 
 	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
@@ -182,8 +167,8 @@ static void startupSensorCapture()
 void startupBoard(void)
 {
 	startupPWM();
+	startupInterrupts();
 	startupSensorCapture();
 
 	//startupI2C();
-	startupInterrupts();
 }
