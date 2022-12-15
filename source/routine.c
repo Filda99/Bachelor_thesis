@@ -11,12 +11,15 @@
  * INCLUDES
  ************************************/
 #include "routine.h"
-#include "motors/engines.h"
-#include "global_macros.h"
-#include "control_unit.h"
 #include "MKL25Z4.h"
+#include "global_macros.h"
+
 #include "fsl_tpm.h"
 #include "fsl_gpio.h"
+
+#include "motors/engines.h"
+#include "control_unit.h"
+#include "map/mapping.h"
 
 /************************************
  * EXTERN VARIABLES

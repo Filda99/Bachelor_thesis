@@ -27,10 +27,12 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 typedef enum _map_object {
-  Empty = 0U,  // We don't know, what is here yet
-  Road,		   // Road (between lines)
-  Line,        // Line detected on current field of the map
-  Wall         // Wall detected on field
+  map_Empty = 0U,	// We don't know, what is here yet
+  map_CurrentPosition,
+  map_Track,		// I was there in prev. steps
+  map_Road,		   	// Road (between lines)
+  map_Line,        	// Line detected on current field of the map
+  map_Wall         	// Wall detected on field
 }map_object_t;
 
 typedef struct map_blk
