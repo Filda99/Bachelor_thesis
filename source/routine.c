@@ -21,8 +21,8 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern unsigned char LineDetected;
-extern unsigned LeftSensorValue;
+extern line_location_t LineDetected;
+extern unsigned int LeftSensorValue;
 
 /************************************
  * PRIVATE MACROS AND DEFINES

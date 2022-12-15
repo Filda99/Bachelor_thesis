@@ -19,8 +19,8 @@
 /************************************
  * EXTERN VARIABLES
  ************************************/
-extern float Distance;
-extern uint32_t LeftSensorValue;
+extern unsigned int Distance;
+extern unsigned int LeftSensorValue;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
