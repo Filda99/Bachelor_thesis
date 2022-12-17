@@ -47,7 +47,7 @@
 //! void function(void)
 //!
 //! @description
-//! Brief description
+//! Function
 //!
 //! @param    None
 //!
