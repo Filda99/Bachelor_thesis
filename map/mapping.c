@@ -10,6 +10,8 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include "global_macros.h"
+#include "stdint.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -31,8 +33,8 @@ extern unsigned int WheelRotations;
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
-unsigned char posX = BLK_ROWS / 2;
-unsigned char posY = BLK_COLS / 2;
+unsigned char posX = MAP_BLOCK_ROWS / 2;
+unsigned char posY = MAP_BLOCK_COLS / 2;
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -61,12 +63,21 @@ void mapping()
 	// distance = 2*pi*r
 	// r = ~1.7
 	// One rotation is ~10.68cm
+
+	// Distance traveled from previous mapping
 	static float newDistance = 0;
+
+	// Number of wheel rotations from previous mapping
 	static uint32_t prevNoWheelRot = 0;
 
 	// Get distance from previous position
 	newDistance = WheelRotations - prevNoWheelRot;
 	newDistance *= 10.68;
+
+	if (newDistance > MAP_BLOCK_SIZE)
+	{
+
+	}
 
 }
 

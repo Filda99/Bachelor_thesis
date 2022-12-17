@@ -27,6 +27,8 @@
 //**************************************************************************************************
 extern line_location_t LineDetected;
 extern unsigned int LeftSensorValue;
+extern unsigned int CenterSensorValue;
+extern unsigned int RightSensorValue;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -60,7 +62,7 @@ extern unsigned int LeftSensorValue;
 //! If the value is greater than COLOR_TRESHOLD, LineDetected is set to that side.
 //! That means that we detected line under the sensor.
 //!
-//! Function after 100 cycles enables irq for main sensors.
+//! Function after 100 cycles enables interrupts for main sensors.
 //!
 //! @param    None
 //!
@@ -80,7 +82,7 @@ static void checkLines()
 	}
 	if (CenterSensorValue > COLOR_TRESHOLD)
 	{
-		LineDetected |= LineCente;
+		// TODO: LineDetected |= LineCenter;
 	}
 
 	if(enableIrq >= 100)

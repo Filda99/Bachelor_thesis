@@ -26,8 +26,10 @@ extern "C" {
 /*************************************/
 // Map size
 /*************************************/
-#define BLK_ROWS  3
-#define BLK_COLS  3
+#define MAP_BLOCK_ROWS  3
+#define MAP_BLOCK_COLS  3
+
+#define MAP_BLOCK_SIZE	10	// One decimetre
 
 /*************************************/
 // Hall sensor

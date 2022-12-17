@@ -3,7 +3,7 @@
  * @file    control_unit.c
  * @author  user
  * @date    Dec 1, 2022
- * @brief   
+ * @brief
  ********************************************************************************
  */
 
@@ -61,79 +61,75 @@ static uint8_t lineCnt = 0;
 //!*************************************************************************************************
 void controlUnit()
 {
-  static uint32_t distanceWithoutInterrupt = 0;
+	static uint32_t distanceWithoutInterrupt = 0;
 
-  switch (LineDetected)
-  {
-  case LineNone:
-  {
-    addSpeed();
-    goDirect();
-    distanceWithoutInterrupt++;
+	if (LineDetected & LineNone)
+	{
+		addSpeed();
+		goDirect();
+		distanceWithoutInterrupt++;
 
-    if(distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
-    {
-      stopCar();
-    }
-    prevTurning = LineNone;
-    break;
-  }
-    
-  case LineLeft:
-  {
-    if (prevTurning == LineLeft)
-    {
-      lineCnt++;
-    }
-    else
-    {
-      lineCnt = 0;
-    }
+		// If car goes straight for too long
+		if (distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
+		{
+			stopCar();
+		}
+		prevTurning = LineNone;
+	}
 
-    if (lineCnt > MAX_CNT_ON_LINE)
-    {
-      turnRight();
-      slackUpSpeed();
-    }
-    
-    prevTurning = LineLeft;
-    break;
-  }
-   
-  case LineRight:
-  {
-    if (prevTurning == LineRight)
-    {
-      lineCnt++;
-    }
-    else
-    {
-      lineCnt = 0;
-    }
+	if (LineDetected & LineLeft)
+	{
+		if (prevTurning == LineLeft)
+		{
+			lineCnt++;
+		}
+		else
+		{
+			lineCnt = 0;
+		}
 
-    if (lineCnt > MAX_CNT_ON_LINE)
-    {
-      turnLeft();
-      slackUpSpeed();
-    }
-    
-    prevTurning = LineRight;
-    break;    
-  }
+		if (lineCnt > MAX_CNT_ON_LINE)
+		{
+			turnRight();
+			slackUpSpeed();
+		}
 
-  case LineCenter_Left:
-    turnRightCustom(MAX_STEER_RIGHT);
-    slackUpSpeedCustom(2);
-    break;
+		prevTurning = LineLeft;
+		LineDetected &= ~LineLeft;
+	}
 
-  case LineCenter_Right:
-    turnLeftCustom(MAX_STEER_LEFT);
-    slackUpSpeedCustom(2);
-    break;
-  
-  default:
-    break;
-  }
+	if (LineDetected & LineRight)
+	{
+		if (prevTurning == LineRight)
+		{
+			lineCnt++;
+		}
+		else
+		{
+			lineCnt = 0;
+		}
+
+		if (lineCnt > MAX_CNT_ON_LINE)
+		{
+			turnLeft();
+			slackUpSpeed();
+		}
+
+		prevTurning = LineRight;
+		LineDetected &= ~LineRight;
+	}
+
+	if (LineDetected & LineCenter_Left)
+	{
+		turnRightCustom(MAX_STEER_RIGHT);
+		slackUpSpeedCustom(2);
+		LineDetected &= ~LineCenter_Left;
+	}
+
+	if (LineDetected & LineCenter_Right)
+	{
+		turnLeftCustom(MAX_STEER_LEFT);
+		slackUpSpeedCustom(2);
+		LineDetected &= ~LineCenter_Right;
+	}
 }
-
-

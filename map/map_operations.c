@@ -32,6 +32,7 @@ typedef enum _block_direction
   Right
 }block_direction;
 
+
 /************************************
  * STATIC VARIABLES
  ************************************/
@@ -50,18 +51,18 @@ typedef enum _block_direction
 static void initNewBlock(map_block *newBlock)
 {
 	map_object_t **block;
-	block = (enum _map_object**)malloc(BLK_ROWS * sizeof(enum _map_object*));
+	block = (enum _map_object**)malloc(MAP_BLOCK_ROWS * sizeof(enum _map_object*));
 
-	for (int i = 0; i < BLK_ROWS; i++)
+	for (int i = 0; i < MAP_BLOCK_ROWS; i++)
 	{
-		block[i] = (enum _map_object*)malloc(BLK_COLS * sizeof(enum _map_object));
+		block[i] = (enum _map_object*)malloc(MAP_BLOCK_COLS * sizeof(enum _map_object));
 	}
 
 	newBlock->currentBlock = block;
 
-	for(int i = 0; i < BLK_ROWS; i++)
+	for(int i = 0; i < MAP_BLOCK_ROWS; i++)
 	{
-		for (int j = 0; j < BLK_COLS; j++)
+		for (int j = 0; j < MAP_BLOCK_COLS; j++)
 		{
 			newBlock->currentBlock[i][j] = map_Empty;
 		}
@@ -117,3 +118,11 @@ void deleteMap()
   //free(currentBlock.currentBlock);
 
 }
+
+void moveInMap()
+{
+
+}
+
+
+
