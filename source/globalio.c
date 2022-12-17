@@ -15,8 +15,8 @@
 //* Number of wheel rotations
 unsigned int WheelRotations = 0;
 
-//* Which line is detected at the moment
-line_location_t LineDetected = LineNone;
+//* Which lines are detected at the moment
+uint8_t LineDetected = LineNone;
 
 // Stop car, because some error has occured
 // When IsCmdToStopCar is true, no more action will be taken
