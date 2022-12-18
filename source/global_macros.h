@@ -32,10 +32,15 @@ extern "C" {
 //* User defined, how many columns should one map block have
 #define MAP_COLUMNS	3
 
+//* First useable row
+#define MAP_BLOCK_MIN_ROW	0
+//* First useable column
+#define MAP_BLOCK_MIN_COL	0
+
 //* Last useable row in map block
-#define MAP_BLOCK_ROWS  (MAP_ROWS - 1)
+#define MAP_BLOCK_MAX_ROW  (MAP_ROWS - 1)
 //* Last useable column in map block
-#define MAP_BLOCK_COLS  (MAP_COLUMNS - 1)
+#define MAP_BLOCK_MAX_COL  (MAP_COLUMNS - 1)
 
 //* Size of one field in map block in centimetres
 #define MAP_BLOCK_SIZE	10	// One decimetre
