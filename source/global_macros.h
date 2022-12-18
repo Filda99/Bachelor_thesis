@@ -26,9 +26,18 @@ extern "C" {
 /*************************************/
 // Map size
 /*************************************/
-#define MAP_BLOCK_ROWS  3
-#define MAP_BLOCK_COLS  3
 
+//* User defined, how many rows should one map block have
+#define MAP_ROWS		3
+//* User defined, how many columns should one map block have
+#define MAP_COLUMNS	3
+
+//* Last useable row in map block
+#define MAP_BLOCK_ROWS  (MAP_ROWS - 1)
+//* Last useable column in map block
+#define MAP_BLOCK_COLS  (MAP_COLUMNS - 1)
+
+//* Size of one field in map block in centimetres
 #define MAP_BLOCK_SIZE	10	// One decimetre
 
 /*************************************/

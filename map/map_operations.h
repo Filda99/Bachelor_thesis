@@ -26,15 +26,18 @@ extern "C" {
 /************************************
  * TYPEDEFS
  ************************************/
+
+//* Map field possible objects
 typedef enum _map_object {
-  map_Empty = 0U,	// We don't know, what is here yet
+  map_Empty = 0U,	///< We don't know, what is here yet
   map_CurrentPosition,
-  map_Track,		// I was there in prev. steps
-  map_Road,		   	// Road (between lines)
-  map_Line,        	// Line detected on current field of the map
-  map_Wall         	// Wall detected on field
+  map_Track,		///< I was there in prev. steps
+  map_Road,		   	///< Road (between lines)
+  map_Line,        	///< Line detected on current field of the map
+  map_Wall         	///< Wall detected on field
 }map_object_t;
 
+//* One block in a map
 typedef struct map_blk
 {
 	map_object_t 	**currentBlock;
@@ -44,6 +47,18 @@ typedef struct map_blk
 	struct map_blk 	*blockRight;
 }map_block;
 
+//* Directions for moving in the map
+typedef enum
+{
+	move_up = 0U,
+	move_upRight,
+	move_right,
+	move_downRight,
+	move_down,
+	move_downLeft,
+	move_left,
+	move_upLeft
+}map_move_direction;
 
 /************************************
  * EXPORTED VARIABLES
@@ -52,7 +67,10 @@ typedef struct map_blk
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void initMap(void);
+void createMap(void);
+void saveMap(void);
+void deleteMap(void);
+void moveInMap(map_move_direction direction);
 
 #ifdef __cplusplus
 }

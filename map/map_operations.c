@@ -24,12 +24,14 @@
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
+
+//* Directions for creating new block
 typedef enum _block_direction
 {
-  Up = 0U,
-  Down,
-  Left,
-  Right
+  newBlock_up = 0U,
+  newBlock_down,
+  newBlock_left,
+  newBlock_right
 }block_direction;
 
 
@@ -40,7 +42,9 @@ typedef enum _block_direction
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
-map_block *currentBlock;
+map_block *currentBlockInMap;
+uint8_t currentPosRows = MAP_BLOCK_ROWS / 2;
+uint8_t currentPosCols = MAP_BLOCK_COLS / 2;
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -55,19 +59,20 @@ map_block *currentBlock;
 //!
 //! @description
 //! Function alocates memory for the new block and sets all fields to empty.
+//! Also sets all neighbour pointers to null.
 //!
 //! @param    map_block *newBlock Pointer to a new map block, which should be alocated
 //!
 //! @return   None
 //!*************************************************************************************************
-static void initNewBlock(map_block *newBlock)
+static void initNewBlock(struct map_blk *newBlock)
 {
 	map_object_t **block;
-	block = (enum _map_object**)malloc(MAP_BLOCK_ROWS * sizeof(enum _map_object*));
+	block = (enum _map_object**)malloc(MAP_ROWS * sizeof(enum _map_object*));
 
 	for (int i = 0; i < MAP_BLOCK_ROWS; i++)
 	{
-		block[i] = (enum _map_object*)malloc(MAP_BLOCK_COLS * sizeof(enum _map_object));
+		block[i] = (enum _map_object*)malloc(MAP_COLUMNS * sizeof(enum _map_object));
 	}
 
 	newBlock->currentBlock = block;
@@ -80,6 +85,10 @@ static void initNewBlock(map_block *newBlock)
 		}
 	}
 
+  newBlock->blockDown = NULL;
+  newBlock->blockLeft = NULL;
+  newBlock->blockRight = NULL;
+  newBlock->blockUp = NULL;
 }
 
 //!*************************************************************************************************
@@ -94,31 +103,38 @@ static void initNewBlock(map_block *newBlock)
 //!
 //! @return   None
 //!*************************************************************************************************
-static void createNewBlock(map_block *current, map_block *newBlock, block_direction direction)
+static void createNewBlock(block_direction direction)
 {
+  map_block *newBlock = malloc(sizeof(*newBlock));
+
   initNewBlock(newBlock);
   switch (direction)
   {
-  case Up:
-    current->blockUp = newBlock;
-    newBlock->blockDown = current;
+  case newBlock_up:
+    currentBlockInMap->blockUp = newBlock;
+    newBlock->blockDown = currentBlockInMap;
     break;
-  case Down:
-    current->blockDown = newBlock;
-    newBlock->blockUp = current;
+  case newBlock_down:
+    currentBlockInMap->blockDown = newBlock;
+    newBlock->blockUp = currentBlockInMap;
     break;
-  case Left:
-    current->blockLeft = newBlock;
-    newBlock->blockRight = current;
+  case newBlock_left:
+    currentBlockInMap->blockLeft = newBlock;
+    newBlock->blockRight = currentBlockInMap;
     break;
-  case Right:
-    current->blockRight = newBlock;
-    newBlock->blockLeft = current;
+  case newBlock_right:
+    currentBlockInMap->blockRight = newBlock;
+    newBlock->blockLeft = currentBlockInMap;
     break;
   
   default:
     break;
   }
+
+  // Move to new block
+  currentBlockInMap = newBlock;
+
+  // TODO: connect block to existing neighbours
 }
 
 //**************************************************************************************************
@@ -129,7 +145,7 @@ static void createNewBlock(map_block *current, map_block *newBlock, block_direct
 //! void createMap(void)
 //!
 //! @description
-//! Function creates first map block.
+//! Function creates first block of a map.
 //!
 //! @param    None
 //!
@@ -137,7 +153,8 @@ static void createNewBlock(map_block *current, map_block *newBlock, block_direct
 //!*************************************************************************************************
 void createMap()
 {
-  initNewBlock(&currentBlock);
+	currentBlockInMap = malloc(sizeof(*currentBlockInMap));
+	initNewBlock(currentBlockInMap);
 }
 
 
@@ -158,7 +175,7 @@ void saveMap()
 
 
 //!*************************************************************************************************
-//! void saveMap(void)
+//! void deleteMap(void)
 //!
 //! @description
 //! Function goes through all map blocks and dealocates them.
@@ -169,13 +186,14 @@ void saveMap()
 //!*************************************************************************************************
 void deleteMap()
 {
-  //free(currentBlock.currentBlock);
-
+	// TODO: Go through all map blocks.
+	free(currentBlockInMap->currentBlock);
+	free(currentBlockInMap);
 }
 
 
 //!*************************************************************************************************
-//! void saveMap(void)
+//! void moveInMap(void)
 //!
 //! @description
 //! TBD
@@ -184,9 +202,54 @@ void deleteMap()
 //!
 //! @return   None
 //!*************************************************************************************************
-void moveInMap()
+void moveInMap(map_move_direction direction)
 {
+  switch (direction)
+  {
+  case move_up:
+    // If we can move in block, move up
+    if (currentPosRows != 0)
+    {
+      currentPosRows--;
+    }
+    else
+    {
+      // Create new block up from the previous and move to its last row.
+      createNewBlock(newBlock_up);
+      currentPosRows = MAP_BLOCK_ROWS;
+    }
+    break;
 
+  case move_upLeft:
+    // If we can move 
+    if (currentPosCols > 0 && currentPosRows > 0)
+    {
+    	currentPosCols--;
+    	currentPosRows--;
+    }
+    break;
+
+  case move_left:
+    break;
+
+  case move_downLeft:
+    break;
+
+  case move_down:
+    break;
+
+  case move_downRight:
+    break;
+
+  case move_right:
+    break;
+  
+  case move_upRight:
+    break;
+  
+  default:
+    break;
+  }
 }
 
 
