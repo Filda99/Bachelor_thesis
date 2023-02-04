@@ -99,7 +99,7 @@ static void checkLines()
 void routine(void)
 {
 	checkLines();
-	//controlUnit();
+	controlUnit();
 	mapping();
 }
 

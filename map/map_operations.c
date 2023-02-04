@@ -133,7 +133,7 @@ static void createNewBlock(block_direction direction)
   // Move to new block
   currentBlockInMap = newBlock;
 
-  // TODO: connect block to existing neighbours
+  // TODO: connect block to existing neighbors
 }
 
 //**************************************************************************************************

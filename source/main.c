@@ -25,6 +25,7 @@
 //**************************************************************************************************
 extern unsigned LeftSensorValue;
 extern unsigned char LineDetected;
+extern bool IsCmdToStopCar;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -75,8 +76,8 @@ int main(void)
 
 	startupInit();
 	uint16_t touch_value;
+	uint8_t nextAction = 0;
 
-	// todo: based on where the finger is, the appropriate action is taken
 	while (1)
 	{
 		TSI0->DATA |= TSI_DATA_SWTS_MASK;
@@ -84,27 +85,41 @@ int main(void)
 		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
 		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
 
-		if (touch_value > 0 && touch_value < 4) {
+		// Wait for initialization
+		if (touch_value > 0 && touch_value < 4 && (nextAction == 0))
+		{
 		  LED_RED_ON();
 		  LED_GREEN_OFF();
 		  LED_BLUE_OFF();
-		} else if (touch_value >= 4 && touch_value < 6) {
-		  LED_RED_OFF();
-		  LED_GREEN_ON();
-		  LED_BLUE_OFF();
-		} else if (touch_value >= 6) {
-		  LED_RED_OFF();
-		  LED_GREEN_OFF();
-		  LED_BLUE_ON();
+
+		  nextAction++;
 		}
+		// Initial initialization
+		else if (touch_value >= 4 && touch_value < 6  && (nextAction == 1))
+		{
+		  LED_RED_ON();
+		  LED_GREEN_ON();
 
+		  startupBoard();
+		  createMap();
+
+		  nextAction++;
+		}
+		// Start routine
+		else if (touch_value >= 6  && (nextAction == 2))
+		{
+		  LED_RED_OFF();
+
+		  while (!IsCmdToStopCar)
+		  {
+			  routine();
+		  }
+
+		  nextAction = 0;
+		}
 	}
 
-	startupBoard();
-	createMap();
 
-	while (1)
-	{
-		routine();
-	}
+
+
 }

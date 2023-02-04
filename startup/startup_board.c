@@ -102,6 +102,7 @@ static void init_leds(void)
 //!
 //! @description
 //! Function sets appropriate parameters and starts pwm with duty cycle for stopping.
+//! This starts both motors and servo.
 //!
 //! @param    None
 //!
@@ -179,19 +180,6 @@ static void startupInterrupts(void)
 	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_PIN, portInterrupt);
 
 	EnableIRQ(GPIO_HALL_IRQn);
-
-	// Color sensor minor interrupt
-	/*config.mux = kPORT_MuxAsGpio;
-	config.pullSelect = kPORT_PullUp;
-	portInterrupt = kPORT_InterruptFallingEdge;
-
-	//PORT_SetMultiplePinsConfig(GPIO_COLOR_MINOR_SEN, COLOR_MINOR_IRQ_MASK, &config);
-	PORT_SetPinConfig(GPIO_COLOR_MINOR_SEN, LEFT_MINOR_SEN, &config);
-	PORT_SetPinConfig(GPIO_COLOR_MINOR_SEN, RIGHT_MINOR_SEN, &config);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, LEFT_MINOR_SEN, portInterrupt);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, RIGHT_MINOR_SEN, portInterrupt);
-
-	EnableIRQ(GPIO_COLOR_MAIN_IRQn);*/
 }
 
 
