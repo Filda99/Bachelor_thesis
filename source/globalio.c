@@ -27,6 +27,10 @@ uint8_t LineDetected = LineNone;
 // Last thing is to save map
 bool IsCmdToStopCar = false;
 
+// In initial initialization there is need to rotate wheel to starting position and hold this
+// position until car starts. With this we can be sure, that distance measurement is correct.
+bool InitStop = true;
+
 // Left sensor color value
 unsigned int LeftSensorValue = 0;
 unsigned int CenterSensorValue = 0;

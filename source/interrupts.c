@@ -15,12 +15,14 @@
 #include "fsl_gpio.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
+#include "motors/engines.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
 extern unsigned int WheelRotations;
 extern unsigned int LeftSensorValue;
+extern bool InitStop;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -34,7 +36,8 @@ extern unsigned int LeftSensorValue;
 #define RIGHT_TPM_IC				kTPM_Chnl_4
 #define CENTER_TPM_IC				kTPM_Chnl_3
 
-#define MAX_UINT16	65536
+#define MAX_UINT16	65535
+
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
@@ -63,6 +66,13 @@ void GPIO_HALL_IRQHandler()
 	// Interrupt every half spin (two magnets)
 	WheelRotations++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
+
+	if (InitStop)
+	{
+		stopCar();
+		WheelRotations = 0;
+		InitStop = false;
+	}
 }
 
 

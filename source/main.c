@@ -19,6 +19,7 @@
 #include "routine.h"
 #include "fsl_port.h"
 #include "MKL25Z4.h"
+#include "control_unit.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -101,6 +102,8 @@ int main(void)
 		  LED_GREEN_ON();
 
 		  startupBoard();
+		  // todo: Reach the starting line
+		  setWheelToInitPosition();
 		  createMap();
 
 		  nextAction++;

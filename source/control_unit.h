@@ -34,6 +34,7 @@ extern "C" {
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
 void controlUnit(void);
+void setWheelToInitPosition(void);
 
 #ifdef __cplusplus
 }

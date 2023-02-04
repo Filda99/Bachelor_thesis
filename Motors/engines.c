@@ -18,6 +18,7 @@
  * EXTERN VARIABLES
  ************************************/
 extern bool IsCmdToStopCar;
+extern bool InitStop;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -165,6 +166,10 @@ void stopCar()
 	currentSpeed = STOP_SPEED;
 	IsCmdToStopCar = true;
 	setMotorSpeed(currentSpeed);
+	if(InitStop)
+	{
+		IsCmdToStopCar = false;
+	}
 }
 
 
