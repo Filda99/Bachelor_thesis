@@ -34,7 +34,7 @@ extern "C" {
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
 void startupBoard(void);
-
+void startupInit(void);
 
 #ifdef __cplusplus
 }

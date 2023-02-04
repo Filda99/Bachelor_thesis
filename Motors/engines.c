@@ -11,8 +11,8 @@
  * INCLUDES
  ************************************/
 #include "engines.h"
-#include "fsl_tpm.h"
-#include "global_macros.h"
+#include "../drivers/fsl_tpm.h"
+#include "../source/global_macros.h"
 
 /************************************
  * EXTERN VARIABLES

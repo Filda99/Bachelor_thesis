@@ -17,7 +17,7 @@ extern "C" {
 /************************************
  * INCLUDES
  ************************************/
-#include "fsl_tpm.h"
+#include "../drivers/fsl_tpm.h"
 
 /************************************
  * MACROS AND DEFINES

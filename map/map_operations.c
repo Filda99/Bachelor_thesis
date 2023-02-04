@@ -191,7 +191,11 @@ void deleteMap()
 //! void moveInMap(void)
 //!
 //! @description
-//! TBD
+//! Movement in the map based on a certain direction.
+//!
+//! If we can move in current map block, we just simply move in the field.
+//! But if we are on the border and want to move across it, we have to allocate a new block and 
+//! update our position in the field.
 //!
 //! @param    None
 //!

@@ -32,8 +32,8 @@
 // Get source clock for TPM driver
 #define TPM_SOURCE_CLOCK 		CLOCK_GetFreq(kCLOCK_PllFllSelClk)
 #define I2C_MASTER_CLK_FREQ 	CLOCK_GetFreq(I2C0_CLK_SRC)
-#define GPIO_HALL_IRQn			PORTA_IRQn
-#define GPIO_COLOR_MAIN_IRQn	PORTD_IRQn
+#define GPIO_HALL_IRQn			PORTD_IRQn
+#define GPIO_COLOR_MAIN_IRQn	PORTA_IRQn
 
 #define LEFT_TPM_IC				kTPM_Chnl_0
 #define RIGHT_TPM_IC			kTPM_Chnl_4
@@ -58,6 +58,44 @@
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
+
+//!*************************************************************************************************
+//! static void init_tsi(void)
+//!
+//! @description
+//! Function enables capacitive touch sensor on the MCU.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void init_tsi(void)
+{
+	SIM->SCGC5 |= SIM_SCGC5_TSI_MASK;
+	TSI0->GENCS = TSI_GENCS_TSIEN_MASK | TSI_GENCS_MODE(0) | TSI_GENCS_REFCHRG(4) | TSI_GENCS_DVOLT(0) | TSI_GENCS_EXTCHRG(7);
+	TSI0->DATA = TSI_DATA_TSICH(9) | TSI_DATA_TSICNT_MASK | TSI_DATA_SWTS_MASK;
+}
+
+//!*************************************************************************************************
+//! static void init_leds()
+//!
+//! @description
+//! Function enables leds on the MCU.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void init_leds(void)
+{
+	SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;
+	PORTB->PCR[18] = PORT_PCR_MUX(1);
+	PORTB->PCR[19] = PORT_PCR_MUX(1);
+	PORTD->PCR[1] = PORT_PCR_MUX(1);
+	GPIOB->PDDR |= (1 << 18) | (1 << 19);
+	GPIOD->PDDR |= (1<<1);
+}
+
 
 //!*************************************************************************************************
 //! static void startupPWM(void)
@@ -194,6 +232,12 @@ static void startupSensorCapture()
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
+
+void startupInit(void)
+{
+	init_leds();
+	init_tsi();
+}
 
 //!*************************************************************************************************
 //! void startupBoard(void)
