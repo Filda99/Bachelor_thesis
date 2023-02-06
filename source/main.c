@@ -140,7 +140,8 @@ int main(void)
 				//routine();
 			}
 
-			nextAction = 0;
+			// If car stopped, wait for command to continue.
+			nextAction = 2;
 		}
 	}
 }

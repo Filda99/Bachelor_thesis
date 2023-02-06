@@ -17,7 +17,7 @@
 //* GLOBAL VARIABLES
 //**************************************************************************************************
 //* Number of wheel rotations
-unsigned int WheelRotations = 0;
+unsigned int HalfWheelRotations = 0;
 
 //* Which lines are detected at the moment
 uint8_t LineDetected = LineNone;

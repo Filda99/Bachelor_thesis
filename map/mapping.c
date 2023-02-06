@@ -16,7 +16,7 @@
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern unsigned int WheelRotations;
+extern unsigned int HalfWheelRotations;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -60,21 +60,27 @@ void mapping()
 {
 	// distance = 2*pi*r
 	// r = ~1.7
-	// One rotation is ~10.68cm
+	// One rotation is ~10.5cm, so one HalfWheelRotation is 5cm
 
 	// Distance traveled from previous mapping
-	static float newDistance = 0;
+	uint32_t newRotations, distance = 0;
 
-	// Number of wheel rotations from previous mapping
+	// Number of half-wheel rotations from previous mapping
 	static uint32_t prevNoWheelRot = 0;
 
 	// Get distance from previous position
-	newDistance = WheelRotations - prevNoWheelRot;
-	newDistance *= 10.68;
+	newRotations = HalfWheelRotations - prevNoWheelRot;
+	distance = newRotations * 5;
 
-	if (newDistance > MAP_BLOCK_SIZE)
+	// If the wheel moves a full turn, add one cm to distance
+	if ((HalfWheelRotations % 2) == 0)
 	{
+		distance += newRotations;
+	}
 
+	if (distance > MAP_BLOCK_SIZE)
+	{
+		//moveInMap();
 	}
 
 }

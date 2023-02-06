@@ -182,7 +182,7 @@ static void startupI2C(void)
 //! static void startupInterrupts(void)
 //!
 //! @description
-//! Function starts interrupts for HALL sensor on one wheel.
+//! Function starts interrupts for HALL sensor on the left wheel.
 //!
 //! @param    None
 //!
@@ -190,7 +190,7 @@ static void startupI2C(void)
 //!*************************************************************************************************
 static void startupInterrupts(void)
 {
-	PRINTF("\t- Interrupts.\r\n");
+	PRINTF("\t- Hall interrupt.\r\n");
 	port_pin_config_t config;
 	port_interrupt_t portInterrupt;
 

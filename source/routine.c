@@ -30,6 +30,9 @@ extern unsigned int LeftSensorValue;
 extern unsigned int CenterSensorValue;
 extern unsigned int RightSensorValue;
 
+// todo: remove. This is only for program without car.
+extern unsigned int HalfWheelRotations;
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -110,8 +113,9 @@ static void checkLines()
 void routine(void)
 {
 	PRINTF("----------------\r\n");
-	checkLines();
-	controlUnit();
+	//checkLines();
+	//controlUnit();
+	HalfWheelRotations++;
 	mapping();
 }
 

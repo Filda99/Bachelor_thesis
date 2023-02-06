@@ -20,7 +20,7 @@
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern unsigned int WheelRotations;
+extern unsigned int HalfWheelRotations;
 extern unsigned int LeftSensorValue;
 extern bool InitStop;
 
@@ -64,13 +64,13 @@ extern bool InitStop;
 void GPIO_HALL_IRQHandler()
 {
 	// Interrupt every half spin (two magnets)
-	WheelRotations++;
+	HalfWheelRotations++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 
 	if (InitStop)
 	{
 		stopCar();
-		WheelRotations = 0;
+		HalfWheelRotations = 0;
 		InitStop = false;
 	}
 }
