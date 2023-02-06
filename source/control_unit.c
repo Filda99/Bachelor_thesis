@@ -13,6 +13,7 @@
 #include "global_macros.h"
 #include "motors/engines.h"
 #include "MKL25Z4.h"
+#include "fsl_debug_console.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -51,6 +52,7 @@ static uint8_t lineCnt = 0;
 
 void setWheelToInitPosition()
 {
+	//setInitSpeed();
 	addSpeed();
 }
 
@@ -66,24 +68,29 @@ void setWheelToInitPosition()
 //!*************************************************************************************************
 void controlUnit()
 {
+	PRINTF("Control unit: \r\n");
 	static uint32_t distanceWithoutInterrupt = 0;
 
 	if (LineDetected & LineNone)
 	{
-		addSpeed();
+		PRINTF("- Line detected.: None r\n");
+		//addSpeed();
 		goDirect();
+		PRINTF("-> Go direct. \r\n");
 		distanceWithoutInterrupt++;
 
 		// If car goes straight for too long
-		if (distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
+		/*if (distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
 		{
 			stopCar();
-		}
+		}*/
+		LineDetected &= ~LineNone;
 		prevTurning = LineNone;
 	}
 
 	if (LineDetected & LineLeft)
 	{
+		PRINTF("- Line detected.: Left \r\n");
 		if (prevTurning == LineLeft)
 		{
 			lineCnt++;
@@ -95,8 +102,9 @@ void controlUnit()
 
 		if (lineCnt > MAX_CNT_ON_LINE)
 		{
+			PRINTF("-> Turning left. \r\n");
 			turnRight();
-			slackUpSpeed();
+			//slackUpSpeed();
 		}
 
 		prevTurning = LineLeft;

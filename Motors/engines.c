@@ -60,7 +60,7 @@ static int currentSteer = GO_DIRECT;
  ************************************/
 static void getDutyCycle(float setSpeed)
 {
-	float rightMotorSpeed = setSpeed;
+	rightMotorSpeed = setSpeed;
 	// Car wants to move forwards
 	if (rightMotorSpeed > STOP)
 	{
@@ -100,23 +100,33 @@ void setMotorSpeed(int speed)
 
 	// Set left motor duty cycle.
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
-			kTPM_EdgeAlignedPwm, rightMotorSpeed);
+			kTPM_EdgeAlignedPwm, leftMotorSpeed);
 
 	// Set right motor duty cycle.
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
-			kTPM_EdgeAlignedPwm, leftMotorSpeed);
+			kTPM_EdgeAlignedPwm, rightMotorSpeed);
 }
 
 void setMotorSteer(int steer)
 {
 	float setSteer = SteerMap[steer];
-	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_1,
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5,
 				kTPM_EdgeAlignedPwm, setSteer);
 }
 
 //-------------------
 //------ SPEED ------
 //-------------------
+void setInitSpeed()
+{
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
+				kTPM_EdgeAlignedPwm, 7.365000);
+
+	// Set right motor duty cycle.
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
+			kTPM_EdgeAlignedPwm, 7.365000);
+}
+
 void addSpeed()
 {
 	if (currentSpeed == MAX_SPEED_FORWARDS) return;

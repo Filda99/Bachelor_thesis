@@ -110,17 +110,19 @@ static void init_leds(void)
 //!*************************************************************************************************
 static void startupPWM(void)
 {
+	PRINTF("\t- Motor and servo.\r\n");
+	// Motors
 	tpm_config_t tpmInfo;
 	tpm_chnl_pwm_signal_param_t tpmParam[2];
 
 	// Configure tpm params with frequency 24kHZ
 	tpmParam[0].chnlNumber = kTPM_Chnl_0;
 	tpmParam[0].level = kTPM_HighTrue;
-	tpmParam[0].dutyCyclePercent = 7.365;
+	tpmParam[0].dutyCyclePercent = 7.365000;
 
 	tpmParam[1].chnlNumber = kTPM_Chnl_1;
 	tpmParam[1].level = kTPM_HighTrue;
-	tpmParam[1].dutyCyclePercent = 7.365;
+	tpmParam[1].dutyCyclePercent = 7.365000;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
@@ -132,6 +134,26 @@ static void startupPWM(void)
 	TPM_SetupPwm(TPM1, tpmParam, 2U, kTPM_EdgeAlignedPwm, 50U,
 			TPM_SOURCE_CLOCK);
 	TPM_StartTimer(TPM1, kTPM_SystemClock);
+
+	// Servo
+	tpm_chnl_pwm_signal_param_t tpmParamSer;
+
+	// Configure tpm params with frequency 24kHZ
+	tpmParamSer.chnlNumber = kTPM_Chnl_5;
+	tpmParamSer.level = kTPM_HighTrue;
+	tpmParamSer.dutyCyclePercent = 50.0000;
+
+	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
+	CLOCK_SetTpmClock(1U);
+
+	TPM_GetDefaultConfig(&tpmInfo);
+	tpmInfo.prescale = kTPM_Prescale_Divide_32;
+	TPM_Init(TPM0, &tpmInfo);
+
+	TPM_SetupPwm(TPM0, &tpmParamSer, 1U, kTPM_EdgeAlignedPwm, 1000U,
+			TPM_SOURCE_CLOCK);
+	TPM_StartTimer(TPM0, kTPM_SystemClock);
+
 }
 
 /*
@@ -168,6 +190,7 @@ static void startupI2C(void)
 //!*************************************************************************************************
 static void startupInterrupts(void)
 {
+	PRINTF("\t- Interrupts.\r\n");
 	port_pin_config_t config;
 	port_interrupt_t portInterrupt;
 
@@ -195,6 +218,7 @@ static void startupInterrupts(void)
 //!*************************************************************************************************
 static void startupSensorCapture()
 {
+	PRINTF("\t- Color sensor.\r\n");
 	tpm_config_t tpmInfo;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
@@ -214,6 +238,8 @@ static void startupSensorCapture()
 
 
 	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
+
+	// todo: GPIO C4 set to HIGH, GPIO C5 set to LOW
 }
 
 
@@ -239,6 +265,7 @@ void startupInit(void)
 //!*************************************************************************************************
 void startupBoard(void)
 {
+	PRINTF("Startup:\r\n");
 	startupPWM();
 	startupInterrupts();
 	startupSensorCapture();

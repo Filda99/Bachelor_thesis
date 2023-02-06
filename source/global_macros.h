@@ -90,7 +90,7 @@ extern "C" {
 #define MAX_CNT_ON_LINE	20
 
 // If there is white color under sensor, no more than 2500 will occure
-#define COLOR_TRESHOLD	2500
+#define COLOR_TRESHOLD	40
 
 /*************************************/
 // Engine
@@ -108,11 +108,11 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 typedef enum _line_location {
-	LineLeft = 0U,		// Line on the left side detected
-	LineRight,				// Line on the right side detected
-	LineCenter_Left,	// Line in the middle detected, on the left before
-	LineCenter_Right,	// Line in the middle detected, on the right before
-	LineNone					// No line detected
+	LineLeft  = 1U,		// Line on the left side detected
+	LineRight = 2U,				// Line on the right side detected
+	LineCenter_Left = 4U,	// Line in the middle detected, on the left before
+	LineCenter_Right = 8U,	// Line in the middle detected, on the right before
+	LineNone = 16U					// No line detected
 }line_location_t;
 
 /************************************

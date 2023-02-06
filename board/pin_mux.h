@@ -47,6 +47,24 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_DEBUG_UART_RX_PIN_MASK (1U << 1U)      /*!<@brief PORT pin mask */
                                                               /* @} */
 
+/*! @name PORTA12 (number 32), J1[8]/D3
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_LeftMotor_PORT PORTA                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_LeftMotor_PIN 12U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_LeftMotor_PIN_MASK (1U << 12U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
+
+/*! @name PORTA13 (number 33), J2[2]/D8
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_RightMotor_PORT PORTA                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_RightMotor_PIN 13U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_RightMotor_PIN_MASK (1U << 13U)      /*!<@brief PORT pin mask */
+                                                            /* @} */
+
 /*! @name PORTE25 (number 25), U7[6]/I2C0_SDA
   @{ */
 
@@ -166,6 +184,15 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_Helping_PIN 7U                   /*!<@brief PORT pin number */
 #define BOARD_INITPINS_Helping_PIN_MASK (1U << 7U)      /*!<@brief PORT pin mask */
                                                         /* @} */
+
+/*! @name PORTD5 (number 78), J2[4]/D9
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_ServoMotor_PORT PORTD               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_ServoMotor_PIN 5U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_ServoMotor_PIN_MASK (1U << 5U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

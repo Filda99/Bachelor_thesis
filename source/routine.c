@@ -71,18 +71,28 @@ extern unsigned int RightSensorValue;
 static void checkLines()
 {
 	static int enableIrq = 0;
+	bool lineDetected = false;
 
-	if (LeftSensorValue > COLOR_TRESHOLD)
+	if (LeftSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected |= LineLeft;
+		lineDetected = true;
 	}
-	if (RightSensorValue > COLOR_TRESHOLD)
+	/*if (RightSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected |= LineRight;
+		lineDetected = true;
 	}
-	if (CenterSensorValue > COLOR_TRESHOLD)
+	if (CenterSensorValue < COLOR_TRESHOLD)
 	{
 		// TODO: LineDetected |= LineCenter;
+		lineDetected = true;
+	}*/
+
+
+	if (!lineDetected)
+	{
+		LineDetected |= LineNone;
 	}
 
 	if(enableIrq >= 100)
@@ -91,6 +101,7 @@ static void checkLines()
 		enableIrq = 0;
 	}
 	enableIrq++;
+	PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
 }
 
 //**************************************************************************************************
@@ -98,6 +109,7 @@ static void checkLines()
 //**************************************************************************************************
 void routine(void)
 {
+	PRINTF("----------------\r\n");
 	checkLines();
 	controlUnit();
 	mapping();

@@ -44,14 +44,14 @@ static const float SpeedMap[11] = {
 
 //* In the middle is the pulse width for GO DIRECT.
 //* Otherwise we add/sub 10 pct. for turning LEFT/RIGHT.
-static const int SteerMap[7] = {
-		20,
-		30,
-		40,
-		50,
-		60,
-		70,
-		80
+static const float SteerMap[7] = {
+		20.0,
+		30.0,
+		40.0,
+		50.0,
+		60.0,
+		70.0,
+		80.0
 };
 
 /************************************

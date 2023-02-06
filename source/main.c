@@ -20,6 +20,7 @@
 #include "fsl_port.h"
 #include "MKL25Z4.h"
 #include "control_unit.h"
+#include "motors/engines.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -82,47 +83,65 @@ int main(void)
 	while (1)
 	{
 		TSI0->DATA |= TSI_DATA_SWTS_MASK;
-		while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK)) {}
+		while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
+		{
+		}
 		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
 		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
 
 		// Wait for initialization
-		if (touch_value > 0 && touch_value < 4 && (nextAction == 0))
+		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
 		{
-		  LED_RED_ON();
-		  LED_GREEN_OFF();
-		  LED_BLUE_OFF();
+			PRINTF("Waiting for initialization.\r\n");
+			LED_RED_ON();
+			LED_GREEN_OFF();
+			LED_BLUE_OFF();
 
-		  nextAction++;
+			nextAction++;
 		}
 		// Initial initialization
-		else if (touch_value >= 4 && touch_value < 6  && (nextAction == 1))
+		else if (touch_value > 2 && touch_value < 10 && (nextAction == 1))
 		{
-		  LED_RED_ON();
-		  LED_GREEN_ON();
+			PRINTF("Initialization.\r\n");
+			LED_RED_ON();
+			LED_GREEN_ON();
 
-		  startupBoard();
-		  // todo: Reach the starting line
-		  setWheelToInitPosition();
-		  createMap();
+			startupBoard();
+			// todo: Reach the starting line
+			setWheelToInitPosition();
+			createMap();
 
-		  nextAction++;
+			nextAction++;
 		}
 		// Start routine
-		else if (touch_value >= 6  && (nextAction == 2))
+		else if (touch_value > 2 && touch_value < 10 && (nextAction == 2))
 		{
-		  LED_RED_OFF();
+			PRINTF("-----------------\r\n");
+			PRINTF("Starting routine.\r\n");
+			LED_RED_OFF();
 
-		  while (!IsCmdToStopCar)
-		  {
-			  routine();
-		  }
+			while (!IsCmdToStopCar)
+			{
+				PRINTF("PWM: 10.\r\n");
+				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
+						10.00);
+				for (int i = 0; i < 10000000; i++)
+					;
+				PRINTF("PWM: 50.\r\n");
+				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
+						50.00);
+				for (int i = 0; i < 10000000; i++)
+					;
+				PRINTF("PWM: 90.\r\n");
+				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
+						90.00);
+				for (int i = 0; i < 10000000; i++)
+					;
+				//routine();
+			}
 
-		  nextAction = 0;
+			nextAction = 0;
 		}
 	}
-
-
-
-
 }
+
