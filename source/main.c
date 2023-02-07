@@ -122,19 +122,23 @@ int main(void)
 
 			while (!IsCmdToStopCar)
 			{
+				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
+										7.37);
+				for (int i = 0; i < 10000000; i++)
+									;
 				PRINTF("PWM: 10.\r\n");
 				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-						10.00);
+						2.74);
 				for (int i = 0; i < 10000000; i++)
 					;
 				PRINTF("PWM: 50.\r\n");
 				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-						50.00);
+						7.37);
 				for (int i = 0; i < 10000000; i++)
 					;
 				PRINTF("PWM: 90.\r\n");
 				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-						90.00);
+						12);
 				for (int i = 0; i < 10000000; i++)
 					;
 				//routine();

@@ -112,6 +112,7 @@ static void startupPWM(void)
 {
 	PRINTF("\t- Motor and servo.\r\n");
 	// Motors
+	// todo: Motor Configuration
 	tpm_config_t tpmInfo;
 	tpm_chnl_pwm_signal_param_t tpmParam[2];
 
@@ -141,7 +142,7 @@ static void startupPWM(void)
 	// Configure tpm params with frequency 24kHZ
 	tpmParamSer.chnlNumber = kTPM_Chnl_5;
 	tpmParamSer.level = kTPM_HighTrue;
-	tpmParamSer.dutyCyclePercent = 50.0000;
+	tpmParamSer.dutyCyclePercent = 7.37;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
@@ -150,7 +151,7 @@ static void startupPWM(void)
 	tpmInfo.prescale = kTPM_Prescale_Divide_32;
 	TPM_Init(TPM0, &tpmInfo);
 
-	TPM_SetupPwm(TPM0, &tpmParamSer, 1U, kTPM_EdgeAlignedPwm, 1000U,
+	TPM_SetupPwm(TPM0, &tpmParamSer, 1U, kTPM_EdgeAlignedPwm, 50U,
 			TPM_SOURCE_CLOCK);
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
 
