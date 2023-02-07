@@ -21,6 +21,7 @@
 #include "MKL25Z4.h"
 #include "control_unit.h"
 #include "motors/engines.h"
+#include "common.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -108,7 +109,7 @@ int main(void)
 
 			startupBoard();
 			// todo: Reach the starting line
-			setWheelToInitPosition();
+			//setWheelToInitPosition();
 			createMap();
 
 			nextAction++;
@@ -122,7 +123,16 @@ int main(void)
 
 			while (!IsCmdToStopCar)
 			{
-				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
+				addSpeedCustom(2);
+				for(int i = 0; i < 150000; i++)
+				{
+					double a = 0.5;
+					a *= 0.2;
+				}
+				stopCar();
+				delay_ms(500);
+
+				/*TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
 										7.37);
 				for (int i = 0; i < 10000000; i++)
 									;
@@ -140,7 +150,9 @@ int main(void)
 				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
 						12);
 				for (int i = 0; i < 10000000; i++)
-					;
+					;*/
+
+
 				//routine();
 			}
 

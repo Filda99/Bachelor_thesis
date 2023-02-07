@@ -29,17 +29,17 @@ extern "C" {
 //* In the middle is the pulse width for STOP.
 //* Otherwise we add/sub 0.127 for higher/slower speed.
 static const float SpeedMap[11] = {
-		6.73,
-		6.857,
-		6.984,
-		7.111,	// ...
-		7.238,	// Backwards
+		5.93,
+		6.217,
+		6.504,
+		6.791,	// ...
+		7.078,	// Backwards
 		7.365, 	// STOP motors
-		7.492,	// Forwards
-		7.619,	// ...
-		7.746,
-		7.873,
-		8.0
+		7.652,	// Forwards
+		7.939,	// ...
+		8.226,
+		8.513,
+		8.8
 };
 
 //* In the middle is the pulse width for GO DIRECT.

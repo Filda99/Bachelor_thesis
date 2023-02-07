@@ -20,6 +20,7 @@
 #include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
+#include "common.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -58,6 +59,42 @@
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
+
+
+//!*************************************************************************************************
+//! static void initMotors()
+//!
+//! @description
+//! Function initialize motors.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void initMotors()
+{
+	PRINTF("\t\t- Init motors.\r\n");
+	static float initDutyCycleStep = 0.06;
+
+	float initDutyCycle = 2.88;
+
+	delay_ms(400);
+
+	for (int i = 0; i < 100; i++)
+	{
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, initDutyCycle);
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, initDutyCycle);
+		delay_ms(2);
+
+		initDutyCycle += initDutyCycleStep;
+	}
+
+	// After inicialization, stop motors
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
+	delay_ms(50);
+
+}
 
 //!*************************************************************************************************
 //! static void init_tsi(void)
@@ -119,20 +156,18 @@ static void startupPWM(void)
 	// Configure tpm params with frequency 24kHZ
 	tpmParam[0].chnlNumber = kTPM_Chnl_0;
 	tpmParam[0].level = kTPM_HighTrue;
-	tpmParam[0].dutyCyclePercent = 7.365000;
 
 	tpmParam[1].chnlNumber = kTPM_Chnl_1;
 	tpmParam[1].level = kTPM_HighTrue;
-	tpmParam[1].dutyCyclePercent = 7.365000;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
 
 	TPM_GetDefaultConfig(&tpmInfo);
-	tpmInfo.prescale = kTPM_Prescale_Divide_32;
+	tpmInfo.prescale = kTPM_Prescale_Divide_16;
 	TPM_Init(TPM1, &tpmInfo);
 
-	TPM_SetupPwm(TPM1, tpmParam, 2U, kTPM_EdgeAlignedPwm, 50U,
+	TPM_SetupPwm(TPM1, tpmParam, 2U, kTPM_CenterAlignedPwm, 50U,
 			TPM_SOURCE_CLOCK);
 	TPM_StartTimer(TPM1, kTPM_SystemClock);
 
@@ -155,6 +190,8 @@ static void startupPWM(void)
 			TPM_SOURCE_CLOCK);
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
 
+
+	initMotors();
 }
 
 /*

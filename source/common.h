@@ -1,14 +1,14 @@
 /**
  ***************************************************************************************************
- * @file    ${file_name}
- * @author  ${user}
- * @date    ${date}
+ * @file    common.h
+ * @author  user
+ * @date    Feb 7, 2023
  * @brief   
  ***************************************************************************************************
  */
 
-#ifndef ${include_guard_symbol}
-#define ${include_guard_symbol}
+#ifndef COMMON_H_
+#define COMMON_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,10 +33,10 @@ extern "C" {
 //**************************************************************************************************
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
-
+void delay_ms(uint32_t ms);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ${include_guard_symbol} */
+#endif /* COMMON_H_ */

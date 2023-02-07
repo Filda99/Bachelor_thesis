@@ -13,6 +13,7 @@
 #include "engines.h"
 #include "../drivers/fsl_tpm.h"
 #include "../source/global_macros.h"
+#include "../source/common.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -105,6 +106,8 @@ void setMotorSpeed(int speed)
 	// Set right motor duty cycle.
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
 			kTPM_EdgeAlignedPwm, rightMotorSpeed);
+
+	delay_ms(50);
 }
 
 void setMotorSteer(int steer)
