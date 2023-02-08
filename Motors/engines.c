@@ -40,7 +40,7 @@ float rightMotorSpeed;
 //! 0 = max backwards
 //! 5 = stop engines
 //! 11 = max forwards
-static int currentSpeed = STOP_SPEED;
+static int currentSpeed = ENGINE_STOP;
 
 //! Current position in steer array.
 //! 0 = max left
@@ -122,7 +122,7 @@ void setMotorSteer(int steer)
 //-------------------
 void addSpeed()
 {
-	if (currentSpeed == MAX_FORWARDS) return;
+	if (currentSpeed == MAX_FORWARD_ENGINE_LIMIT) return;
 
 	currentSpeed++;
 	setMotorSpeed(currentSpeed);
@@ -130,9 +130,9 @@ void addSpeed()
 
 void addSpeedCustom(int speed)
 {
-	if ((currentSpeed + speed) >= MAX_FORWARDS)
+	if ((currentSpeed + speed) >= MAX_FORWARD_ENGINE_LIMIT)
 	{
-		currentSpeed = MAX_FORWARDS;
+		currentSpeed = MAX_FORWARD_ENGINE_LIMIT;
 	}
 	else
 	{
@@ -144,17 +144,21 @@ void addSpeedCustom(int speed)
 
 void slackUpSpeed()
 {
-	if (currentSpeed == REVERSE) return;
+	if (currentSpeed == MAX_REVERSE_ENGINE_LIMIT) return;
 
 	currentSpeed--;
+	if(currentSpeed < ENGINE_STOP)
+	{
+		currentSpeed = ENGINE_STOP + 1;
+	}
 	setMotorSpeed(currentSpeed);
 }
 
 void slackUpSpeedCustom(int speed)
 {
-	if ((currentSpeed - speed) <= REVERSE)
+	if ((currentSpeed - speed) < ENGINE_STOP)
 	{
-		currentSpeed = REVERSE;
+		currentSpeed = ENGINE_STOP + 1;
 	}
 	else
 	{
@@ -166,13 +170,13 @@ void slackUpSpeedCustom(int speed)
 
 void goBackwards()
 {
-	currentSpeed = REVERSE;
+	currentSpeed = MAX_REVERSE_ENGINE_LIMIT;
 	setMotorSpeed(currentSpeed);
 }
 
 void stopCar()
 {
-	currentSpeed = STOP_SPEED;
+	currentSpeed = ENGINE_STOP;
 	setMotorSpeed(currentSpeed);
 }
 
@@ -180,7 +184,7 @@ void hardStop()
 {
 	IsCmdToStopCar = true;
 
-	currentSpeed = STOP_SPEED;
+	currentSpeed = ENGINE_STOP;
 	setMotorSpeed(currentSpeed);
 }
 

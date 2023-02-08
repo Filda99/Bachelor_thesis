@@ -73,7 +73,7 @@
 //!*************************************************************************************************
 static void initMotors()
 {
-	PRINTF("\t\t- Init motors.\r\n");
+	PRINTF("\t\t- Motors initialization started.");
 	static float initDutyCycleStep = 0.06;
 
 	float initDutyCycle = 2.88;
@@ -87,12 +87,14 @@ static void initMotors()
 		delay_ms(2);
 
 		initDutyCycle += initDutyCycleStep;
+		PRINTF(".");
 	}
 
 	// After inicialization, stop motors
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
 	delay_ms(50);
+	PRINTF("\n\t\t- Motors initialization complete.");
 
 }
 
@@ -147,7 +149,7 @@ static void init_leds(void)
 //!*************************************************************************************************
 static void startupPWM(void)
 {
-	PRINTF("\t- Motor and servo.\r\n");
+	PRINTF("\t- Motor and servo pwm initialization.\r\n");
 	// Motors
 	// todo: Motor Configuration
 	tpm_config_t tpmInfo;
@@ -228,7 +230,7 @@ static void startupI2C(void)
 //!*************************************************************************************************
 static void startupInterrupts(void)
 {
-	PRINTF("\t- Hall interrupt.\r\n");
+	PRINTF("\t- Hall interrupt initialization.\r\n");
 	port_pin_config_t config;
 	port_interrupt_t portInterrupt;
 
@@ -256,7 +258,7 @@ static void startupInterrupts(void)
 //!*************************************************************************************************
 static void startupSensorCapture()
 {
-	PRINTF("\t- Color sensor.\r\n");
+	PRINTF("\t- Color sensor initialization.\r\n");
 	tpm_config_t tpmInfo;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
@@ -303,10 +305,11 @@ void startupInit(void)
 //!*************************************************************************************************
 void startupBoard(void)
 {
-	PRINTF("Startup:\r\n");
+	PRINTF("Startup board and peripherals.\r\n");
 	startupPWM();
 	startupInterrupts();
 	startupSensorCapture();
 
 	//startupI2C();
+	PRINTF("Startup board and peripherals complete.\r\n");
 }

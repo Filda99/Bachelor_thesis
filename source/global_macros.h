@@ -86,8 +86,11 @@ extern "C" {
 /*************************************/
 // Line detected counter
 /*************************************/
-// Counter which says how long are we over the line
+// Maximum number which says how long can we be on the line
 #define MAX_CNT_ON_LINE	20
+// The number that tells us after how long we should increase the speed
+// if there is no line
+#define CNT_OUT_OF_LANE 500
 
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	40
@@ -95,13 +98,13 @@ extern "C" {
 /*************************************/
 // Engine
 /*************************************/
-#define MAX_FORWARDS	6
-#define REVERSE	0
+#define MAX_FORWARD_ENGINE_LIMIT	6
+#define MAX_REVERSE_ENGINE_LIMIT	0
 
 #define MAX_STEER_RIGHT		7
 #define MAX_STEER_LEFT		0
 
-#define STOP_SPEED			1	// Pulse width for STOP is the second value in the speed field
+#define ENGINE_STOP			1	// Pulse width for STOP is the second value in the speed field
 #define GO_DIRECT			((MAX_STEER_RIGHT - 1) / 2)
 
 /************************************
@@ -109,10 +112,11 @@ extern "C" {
  ************************************/
 typedef enum _line_location {
 	LineLeft  = 1U,		// Line on the left side detected
-	LineRight = 2U,				// Line on the right side detected
-	LineCenter_Left = 4U,	// Line in the middle detected, on the left before
-	LineCenter_Right = 8U,	// Line in the middle detected, on the right before
-	LineNone = 16U					// No line detected
+	LineRight,			// Line on the right side detected
+	LineCenter_Left,	// Line in the middle detected, on the left before
+	LineCenter_Right,	// Line in the middle detected, on the right before
+	LineCenter_None,	// Line in the middle detected, be we didn't detected any line before
+	LineNone			// No line detected
 }line_location_t;
 
 /************************************

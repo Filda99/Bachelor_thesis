@@ -69,79 +69,94 @@ void controlUnit()
 {
 	PRINTF("Control unit: \r\n");
 	static uint32_t distanceWithoutInterrupt = 0;
+	static uint32_t cntLineNone = 0;
 
-	if (LineDetected & LineNone)
+	switch(LineDetected)
 	{
-		PRINTF("- Line detected.: None r\n");
-		//addSpeed();
-		goDirect();
-		PRINTF("-> Go direct. \r\n");
-		distanceWithoutInterrupt++;
-
-		// If car goes straight for too long
-		/*if (distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
+		case LineNone:
 		{
-			stopCar();
-		}*/
-		LineDetected &= ~LineNone;
-		prevTurning = LineNone;
+			PRINTF("\t- Line detected.: None r\n");
+			PRINTF("\t-> Go direct. \r\n");
+			cntLineNone++;
+			distanceWithoutInterrupt++;
+
+			// If car goes straight for too long
+			if (distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
+			{
+				stopCar();
+			}
+			// If there is no line for some time, add speed
+			else if (cntLineNone > CNT_OUT_OF_LANE)
+			{
+				addSpeed();
+				goDirect();
+			}
+
+			prevTurning = LineNone;
+		}
+
+		case LineLeft:
+		{
+			PRINTF("\t- Line detected.: Left \r\n");
+			if (prevTurning == LineLeft)
+			{
+				lineCnt++;
+			}
+			else
+			{
+				lineCnt = 0;
+			}
+
+			if (lineCnt > MAX_CNT_ON_LINE)
+			{
+				PRINTF("\t-> Turning left. \r\n");
+				turnRight();
+				slackUpSpeedCustom(2);
+			}
+
+			prevTurning = LineLeft;
+		}
+
+		case LineRight:
+		{
+			if (prevTurning == LineRight)
+			{
+				lineCnt++;
+			}
+			else
+			{
+				lineCnt = 0;
+			}
+
+			if (lineCnt > MAX_CNT_ON_LINE)
+			{
+				turnLeft();
+				slackUpSpeed();
+			}
+
+			prevTurning = LineRight;
+		}
+
+		case LineCenter_Left:
+		{
+			turnRightCustom(MAX_STEER_RIGHT);
+			slackUpSpeedCustom(2);
+			LineDetected &= ~LineCenter_Left;
+		}
+
+		case LineCenter_Right:
+		{
+			turnLeftCustom(MAX_STEER_LEFT);
+			slackUpSpeedCustom(2);
+			LineDetected &= ~LineCenter_Right;
+		}
+
+		case LineCenter_None:
+		{
+			// todo: go backwards until some sensor detects line
+			goDirect();
+			goBackwards();
+		}
 	}
 
-	if (LineDetected & LineLeft)
-	{
-		PRINTF("- Line detected.: Left \r\n");
-		if (prevTurning == LineLeft)
-		{
-			lineCnt++;
-		}
-		else
-		{
-			lineCnt = 0;
-		}
-
-		if (lineCnt > MAX_CNT_ON_LINE)
-		{
-			PRINTF("-> Turning left. \r\n");
-			turnRight();
-			//slackUpSpeed();
-		}
-
-		prevTurning = LineLeft;
-		LineDetected &= ~LineLeft;
-	}
-
-	if (LineDetected & LineRight)
-	{
-		if (prevTurning == LineRight)
-		{
-			lineCnt++;
-		}
-		else
-		{
-			lineCnt = 0;
-		}
-
-		if (lineCnt > MAX_CNT_ON_LINE)
-		{
-			turnLeft();
-			slackUpSpeed();
-		}
-
-		prevTurning = LineRight;
-		LineDetected &= ~LineRight;
-	}
-
-	if (LineDetected & LineCenter_Left)
-	{
-		turnRightCustom(MAX_STEER_RIGHT);
-		slackUpSpeedCustom(2);
-		LineDetected &= ~LineCenter_Left;
-	}
-
-	if (LineDetected & LineCenter_Right)
-	{
-		turnLeftCustom(MAX_STEER_LEFT);
-		slackUpSpeedCustom(2);
-		LineDetected &= ~LineCenter_Right;
-	}
 }

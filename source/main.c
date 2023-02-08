@@ -33,8 +33,8 @@ extern bool IsCmdToStopCar;
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
-#define LED_BLUE_ON() GPIOD->PCOR |= (1<<1)
-#define LED_BLUE_OFF() GPIOD->PSOR |= (1<<1)
+#define LED_BLUE_TURN_ON() GPIOD->PCOR |= (1<<1)
+#define LED_BLUE_TURN_OFF() GPIOD->PSOR |= (1<<1)
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -93,17 +93,17 @@ int main(void)
 		// Wait for initialization
 		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
 		{
-			PRINTF("Waiting for initialization.\r\n");
+			PRINTF("Waiting for initialization... \t->Press capacitive sensor.\r\n");
 			LED_RED_ON();
 			LED_GREEN_OFF();
-			LED_BLUE_OFF();
+			LED_BLUE_TURN_OFF();
 
 			nextAction++;
 		}
 		// Initial initialization
 		else if (touch_value > 2 && touch_value < 10 && (nextAction == 1))
 		{
-			PRINTF("Initialization.\r\n");
+			PRINTF("-----------------\r\n");
 			LED_RED_ON();
 			LED_GREEN_ON();
 
@@ -123,13 +123,18 @@ int main(void)
 
 			while (!IsCmdToStopCar)
 			{
-				addSpeedCustom(2);
+				routine();
+
+				// DEBUG: Control motors
+				/*addSpeedCustom(2);
 				delay_ms(200);
 				stopCar();
 				delay_ms(200);
 				goBackwards();
-				delay_ms(200);
+				delay_ms(200);*/
 
+
+				// DEBUG: Control servo
 				/*TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
 										7.37);
 				for (int i = 0; i < 10000000; i++)
@@ -151,7 +156,6 @@ int main(void)
 					;*/
 
 
-				//routine();
 			}
 
 			// If car stopped, wait for command to continue.

@@ -78,7 +78,7 @@ static void checkLines()
 
 	if (LeftSensorValue < COLOR_TRESHOLD)
 	{
-		LineDetected |= LineLeft;
+		LineDetected = LineLeft;
 		lineDetected = true;
 	}
 	/*if (RightSensorValue < COLOR_TRESHOLD)
@@ -95,7 +95,7 @@ static void checkLines()
 
 	if (!lineDetected)
 	{
-		LineDetected |= LineNone;
+		LineDetected = LineNone;
 	}
 
 	if(enableIrq >= 100)
@@ -113,9 +113,9 @@ static void checkLines()
 void routine(void)
 {
 	PRINTF("----------------\r\n");
-	//checkLines();
-	//controlUnit();
-	HalfWheelRotations++;
+	checkLines();
+	controlUnit();
+	//HalfWheelRotations++;
 	mapping();
 }
 
