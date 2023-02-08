@@ -120,19 +120,9 @@ void setMotorSteer(int steer)
 //-------------------
 //------ SPEED ------
 //-------------------
-void setInitSpeed()
-{
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
-				kTPM_EdgeAlignedPwm, 7.365000);
-
-	// Set right motor duty cycle.
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
-			kTPM_EdgeAlignedPwm, 7.365000);
-}
-
 void addSpeed()
 {
-	if (currentSpeed == MAX_SPEED_FORWARDS) return;
+	if (currentSpeed == MAX_FORWARDS) return;
 
 	currentSpeed++;
 	setMotorSpeed(currentSpeed);
@@ -140,9 +130,9 @@ void addSpeed()
 
 void addSpeedCustom(int speed)
 {
-	if ((currentSpeed + speed) >= MAX_SPEED_FORWARDS)
+	if ((currentSpeed + speed) >= MAX_FORWARDS)
 	{
-		currentSpeed = MAX_SPEED_FORWARDS;
+		currentSpeed = MAX_FORWARDS;
 	}
 	else
 	{
@@ -154,7 +144,7 @@ void addSpeedCustom(int speed)
 
 void slackUpSpeed()
 {
-	if (currentSpeed == MAX_SPEED_BACKWARDS) return;
+	if (currentSpeed == REVERSE) return;
 
 	currentSpeed--;
 	setMotorSpeed(currentSpeed);
@@ -162,9 +152,9 @@ void slackUpSpeed()
 
 void slackUpSpeedCustom(int speed)
 {
-	if ((currentSpeed - speed) <= MAX_SPEED_BACKWARDS)
+	if ((currentSpeed - speed) <= REVERSE)
 	{
-		currentSpeed = MAX_SPEED_BACKWARDS;
+		currentSpeed = REVERSE;
 	}
 	else
 	{
@@ -174,15 +164,24 @@ void slackUpSpeedCustom(int speed)
 	setMotorSpeed(currentSpeed);
 }
 
+void goBackwards()
+{
+	currentSpeed = REVERSE;
+	setMotorSpeed(currentSpeed);
+}
+
 void stopCar()
 {
 	currentSpeed = STOP_SPEED;
-	IsCmdToStopCar = true;
 	setMotorSpeed(currentSpeed);
-	if(InitStop)
-	{
-		IsCmdToStopCar = false;
-	}
+}
+
+void hardStop()
+{
+	IsCmdToStopCar = true;
+
+	currentSpeed = STOP_SPEED;
+	setMotorSpeed(currentSpeed);
 }
 
 

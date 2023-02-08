@@ -124,13 +124,11 @@ int main(void)
 			while (!IsCmdToStopCar)
 			{
 				addSpeedCustom(2);
-				for(int i = 0; i < 150000; i++)
-				{
-					double a = 0.5;
-					a *= 0.2;
-				}
+				delay_ms(200);
 				stopCar();
-				delay_ms(500);
+				delay_ms(200);
+				goBackwards();
+				delay_ms(200);
 
 				/*TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
 										7.37);

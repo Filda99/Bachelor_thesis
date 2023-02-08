@@ -26,19 +26,15 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 
-//* In the middle is the pulse width for STOP.
-//* Otherwise we add/sub 0.127 for higher/slower speed.
-static const float SpeedMap[11] = {
-		5.93,
-		6.217,
-		6.504,
-		6.791,	// ...
-		7.078,	// Backwards
-		7.365, 	// STOP motors
-		7.652,	// Forwards
-		7.939,	// ...
-		8.226,
-		8.513,
+//* First one in the field is pulse width for reverse.
+//* Then to stop. And the following for higher speed forwards.
+//* Otherwise we add/sub 0.35875 for higher/slower speed.
+static const float SpeedMap[6] = {
+		6.7,		// Backwards
+		7.365, 		// STOP motors
+		7.72375,	// Forwards
+		8.0825,		// ...
+		8.44125,
 		8.8
 };
 
@@ -68,7 +64,9 @@ void addSpeed();
 void addSpeedCustom(int speed);
 void slackUpSpeed();
 void slackUpSpeedCustom(int speed);
+void goBackwards();
 void stopCar();
+void hardStop();
 
 void turnRight();
 void turnRightCustom(int steer);

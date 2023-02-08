@@ -95,13 +95,13 @@ extern "C" {
 /*************************************/
 // Engine
 /*************************************/
-#define MAX_SPEED_FORWARDS	11
-#define MAX_SPEED_BACKWARDS	0
+#define MAX_FORWARDS	6
+#define REVERSE	0
 
 #define MAX_STEER_RIGHT		7
 #define MAX_STEER_LEFT		0
 
-#define STOP_SPEED			((MAX_SPEED_FORWARDS - 1) / 2)
+#define STOP_SPEED			1	// Pulse width for STOP is the second value in the speed field
 #define GO_DIRECT			((MAX_STEER_RIGHT - 1) / 2)
 
 /************************************

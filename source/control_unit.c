@@ -52,7 +52,6 @@ static uint8_t lineCnt = 0;
 
 void setWheelToInitPosition()
 {
-	//setInitSpeed();
 	addSpeed();
 }
 
