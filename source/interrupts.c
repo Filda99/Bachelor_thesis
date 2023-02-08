@@ -67,12 +67,13 @@ void GPIO_HALL_IRQHandler()
 	HalfWheelRotations++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
 
-	if (InitStop)
+	// TBD
+	/*if (InitStop)
 	{
 		stopCar();
 		HalfWheelRotations = 0;
 		InitStop = false;
-	}
+	}*/
 }
 
 

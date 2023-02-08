@@ -87,14 +87,14 @@ static void initMotors()
 		delay_ms(2);
 
 		initDutyCycle += initDutyCycleStep;
-		PRINTF(".");
+		if( (i % 10) == 0) PRINTF(".");
 	}
 
 	// After inicialization, stop motors
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
 	delay_ms(50);
-	PRINTF("\n\t\t- Motors initialization complete.");
+	PRINTF("\r\n\t\t- Motors initialization complete.\r\n");
 
 }
 

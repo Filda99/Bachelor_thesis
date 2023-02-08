@@ -75,9 +75,10 @@ void controlUnit()
 	{
 		case LineNone:
 		{
-			PRINTF("\t- Line detected.: None r\n");
+			PRINTF("\t- Line detected: None \r\n");
 			PRINTF("\t-> Go direct. \r\n");
 			cntLineNone++;
+			PRINTF("cntLineNone: %i\r\n", cntLineNone);
 			distanceWithoutInterrupt++;
 
 			// If car goes straight for too long
@@ -88,16 +89,19 @@ void controlUnit()
 			// If there is no line for some time, add speed
 			else if (cntLineNone > CNT_OUT_OF_LANE)
 			{
+				PRINTF("\t-> Add speed. \r\n");
 				addSpeed();
 				goDirect();
+				cntLineNone = 0;
 			}
 
 			prevTurning = LineNone;
+			break;
 		}
 
 		case LineLeft:
 		{
-			PRINTF("\t- Line detected.: Left \r\n");
+			PRINTF("\t- Line detected: Left \r\n");
 			if (prevTurning == LineLeft)
 			{
 				lineCnt++;
@@ -115,6 +119,7 @@ void controlUnit()
 			}
 
 			prevTurning = LineLeft;
+			break;
 		}
 
 		case LineRight:
@@ -135,6 +140,7 @@ void controlUnit()
 			}
 
 			prevTurning = LineRight;
+			break;
 		}
 
 		case LineCenter_Left:
@@ -142,6 +148,7 @@ void controlUnit()
 			turnRightCustom(MAX_STEER_RIGHT);
 			slackUpSpeedCustom(2);
 			LineDetected &= ~LineCenter_Left;
+			break;
 		}
 
 		case LineCenter_Right:
@@ -149,6 +156,7 @@ void controlUnit()
 			turnLeftCustom(MAX_STEER_LEFT);
 			slackUpSpeedCustom(2);
 			LineDetected &= ~LineCenter_Right;
+			break;
 		}
 
 		case LineCenter_None:
@@ -156,6 +164,7 @@ void controlUnit()
 			// todo: go backwards until some sensor detects line
 			goDirect();
 			goBackwards();
+			break;
 		}
 	}
 

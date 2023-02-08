@@ -76,11 +76,11 @@ static void checkLines()
 	static int enableIrq = 0;
 	bool lineDetected = false;
 
-	if (LeftSensorValue < COLOR_TRESHOLD)
+	/*if (LeftSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected = LineLeft;
 		lineDetected = true;
-	}
+	}*/
 	/*if (RightSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected |= LineRight;
@@ -113,9 +113,10 @@ static void checkLines()
 void routine(void)
 {
 	PRINTF("----------------\r\n");
+	PRINTF("Number of wheel half-rotations: %i\r\n", HalfWheelRotations);
 	checkLines();
 	controlUnit();
-	//HalfWheelRotations++;
+	// DEBUG: HalfWheelRotations++;
 	mapping();
 }
 

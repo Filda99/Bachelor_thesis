@@ -81,6 +81,8 @@ int main(void)
 	uint16_t touch_value;
 	uint8_t nextAction = 0;
 
+	PRINTF("Waiting for initialization -> Press capacitive sensor.\r\n");
+
 	while (1)
 	{
 		TSI0->DATA |= TSI_DATA_SWTS_MASK;
@@ -93,7 +95,6 @@ int main(void)
 		// Wait for initialization
 		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
 		{
-			PRINTF("Waiting for initialization... \t->Press capacitive sensor.\r\n");
 			LED_RED_ON();
 			LED_GREEN_OFF();
 			LED_BLUE_TURN_OFF();
@@ -113,6 +114,7 @@ int main(void)
 			createMap();
 
 			nextAction++;
+			PRINTF("Waiting for routine -> Press capacitive sensor.\r\n");
 		}
 		// Start routine
 		else if (touch_value > 2 && touch_value < 10 && (nextAction == 2))
@@ -120,19 +122,11 @@ int main(void)
 			PRINTF("-----------------\r\n");
 			PRINTF("Starting routine.\r\n");
 			LED_RED_OFF();
+			addSpeed();
 
 			while (!IsCmdToStopCar)
 			{
 				routine();
-
-				// DEBUG: Control motors
-				/*addSpeedCustom(2);
-				delay_ms(200);
-				stopCar();
-				delay_ms(200);
-				goBackwards();
-				delay_ms(200);*/
-
 
 				// DEBUG: Control servo
 				/*TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
