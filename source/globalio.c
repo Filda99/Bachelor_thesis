@@ -35,3 +35,15 @@ bool InitStop = true;
 unsigned int LeftSensorValue = 0;
 unsigned int CenterSensorValue = 0;
 unsigned int RightSensorValue = 0;
+
+//! Current position in speed array.
+//! 0 = max backwards
+//! 5 = stop engines
+//! 11 = max forwards
+uint8_t currentSpeed = ENGINE_STOP;
+
+//! Current position in steer array.
+//! 0 = max left
+//! 3 = direct
+//! 7 = max right
+uint8_t currentSteer = GO_DIRECT;

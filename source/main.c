@@ -85,6 +85,7 @@ int main(void)
 
 	while (1)
 	{
+		// Get data from touch sensor
 		TSI0->DATA |= TSI_DATA_SWTS_MASK;
 		while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
 		{
@@ -128,26 +129,23 @@ int main(void)
 			{
 				routine();
 
+				/*PRINTF("Go direct.\r\n");
+				goDirect();
+				delay_ms(100);
+
 				// DEBUG: Control servo
-				/*TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-										7.37);
-				for (int i = 0; i < 10000000; i++)
-									;
-				PRINTF("PWM: 10.\r\n");
-				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-						2.74);
-				for (int i = 0; i < 10000000; i++)
-					;
-				PRINTF("PWM: 50.\r\n");
-				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-						7.37);
-				for (int i = 0; i < 10000000; i++)
-					;
-				PRINTF("PWM: 90.\r\n");
-				TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_EdgeAlignedPwm,
-						12);
-				for (int i = 0; i < 10000000; i++)
-					;*/
+				PRINTF("Go left 3 times.\r\n");
+				for (int i = 0; i < 3; i++)
+				{
+					turnLeft();
+					delay_ms(100);
+				}
+				PRINTF("Go right 6 times.\r\n");
+				for (int i = 0; i < 6; i++)
+				{
+					turnRight();
+					delay_ms(100);
+				}*/
 
 
 			}

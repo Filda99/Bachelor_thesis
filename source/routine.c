@@ -21,6 +21,7 @@
 #include "motors/engines.h"
 #include "control_unit.h"
 #include "map/mapping.h"
+#include "map/map_operations.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -32,7 +33,7 @@ extern unsigned int RightSensorValue;
 
 // todo: remove. This is only for program without car.
 extern unsigned int HalfWheelRotations;
-
+extern map_block *currentBlockInMap;
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -57,6 +58,19 @@ extern unsigned int HalfWheelRotations;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+static void printBlock()
+{
+	PRINTF("Current block looks like this:\r\n");
+	for (int i = 0; i < MAP_ROWS; i++)
+	{
+		for (int j = 0; j < MAP_COLUMNS; j++)
+		{
+			PRINTF(" %d |", currentBlockInMap->currentBlock[i][j]);
+		}
+		PRINTF("\r\n");
+	}
+}
+
 //!*************************************************************************************************
 //! void checkLine(void)
 //!
@@ -76,11 +90,11 @@ static void checkLines()
 	static int enableIrq = 0;
 	bool lineDetected = false;
 
-	/*if (LeftSensorValue < COLOR_TRESHOLD)
+	if (LeftSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected = LineLeft;
 		lineDetected = true;
-	}*/
+	}
 	/*if (RightSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected |= LineRight;
@@ -98,7 +112,7 @@ static void checkLines()
 		LineDetected = LineNone;
 	}
 
-	if(enableIrq >= 100)
+	if(enableIrq >= 10)
 	{
 		EnableIRQ(MAIN_SEN_TPM_IRQ);
 		enableIrq = 0;
@@ -113,10 +127,22 @@ static void checkLines()
 void routine(void)
 {
 	PRINTF("----------------\r\n");
+	HalfWheelRotations++;
 	PRINTF("Number of wheel half-rotations: %i\r\n", HalfWheelRotations);
-	checkLines();
-	controlUnit();
-	// DEBUG: HalfWheelRotations++;
+	printBlock();
+
+	//checkLines();
+	//controlUnit();
+
+	if (HalfWheelRotations == 1)
+	{
+		turnRight();
+	}
+	if (HalfWheelRotations == 20)
+	{
+		turnRight();
+	}
+
 	mapping();
 }
 

@@ -28,10 +28,7 @@
 //* Directions for creating new block
 typedef enum _block_direction
 {
-  newBlock_up = 0U,
-  newBlock_down,
-  newBlock_left,
-  newBlock_right
+	newBlock_up = 0U, newBlock_down, newBlock_left, newBlock_right
 } block_direction;
 
 //**************************************************************************************************
@@ -66,28 +63,29 @@ uint8_t currentPosCols = MAP_BLOCK_MAX_COL / 2;
 //!*************************************************************************************************
 static void initNewBlock(struct map_blk *newBlock)
 {
-  map_object_t **block;
-  block = (enum _map_object **)malloc(MAP_ROWS * sizeof(enum _map_object *));
+	map_object_t **block;
+	block = (enum _map_object**) malloc(MAP_ROWS * sizeof(enum _map_object*));
 
-  for (int i = 0; i < MAP_BLOCK_MAX_ROW; i++)
-  {
-    block[i] = (enum _map_object *)malloc(MAP_COLUMNS * sizeof(enum _map_object));
-  }
+	for (int i = 0; i < MAP_ROWS; i++)
+	{
+		block[i] = (enum _map_object*) malloc(
+				MAP_COLUMNS * sizeof(enum _map_object));
+	}
 
-  newBlock->currentBlock = block;
+	newBlock->currentBlock = block;
 
-  for (int i = 0; i < MAP_BLOCK_MAX_ROW; i++)
-  {
-    for (int j = 0; j < MAP_BLOCK_MAX_COL; j++)
-    {
-      newBlock->currentBlock[i][j] = map_Empty;
-    }
-  }
+	for (int i = 0; i < MAP_ROWS; i++)
+	{
+		for (int j = 0; j < MAP_COLUMNS; j++)
+		{
+			newBlock->currentBlock[i][j] = map_Empty;
+		}
+	}
 
-  newBlock->blockDown = NULL;
-  newBlock->blockLeft = NULL;
-  newBlock->blockRight = NULL;
-  newBlock->blockUp = NULL;
+	newBlock->blockDown = NULL;
+	newBlock->blockLeft = NULL;
+	newBlock->blockRight = NULL;
+	newBlock->blockUp = NULL;
 }
 
 //!*************************************************************************************************
@@ -104,36 +102,36 @@ static void initNewBlock(struct map_blk *newBlock)
 //!*************************************************************************************************
 static void createNewBlock(block_direction direction)
 {
-  map_block *newBlock = malloc(sizeof(*newBlock));
+	map_block *newBlock = malloc(sizeof(*newBlock));
 
-  initNewBlock(newBlock);
-  switch (direction)
-  {
-  case newBlock_up:
-    currentBlockInMap->blockUp = newBlock;
-    newBlock->blockDown = currentBlockInMap;
-    break;
-  case newBlock_down:
-    currentBlockInMap->blockDown = newBlock;
-    newBlock->blockUp = currentBlockInMap;
-    break;
-  case newBlock_left:
-    currentBlockInMap->blockLeft = newBlock;
-    newBlock->blockRight = currentBlockInMap;
-    break;
-  case newBlock_right:
-    currentBlockInMap->blockRight = newBlock;
-    newBlock->blockLeft = currentBlockInMap;
-    break;
+	initNewBlock(newBlock);
+	switch (direction)
+	{
+		case newBlock_up:
+			currentBlockInMap->blockUp = newBlock;
+			newBlock->blockDown = currentBlockInMap;
+			break;
+		case newBlock_down:
+			currentBlockInMap->blockDown = newBlock;
+			newBlock->blockUp = currentBlockInMap;
+			break;
+		case newBlock_left:
+			currentBlockInMap->blockLeft = newBlock;
+			newBlock->blockRight = currentBlockInMap;
+			break;
+		case newBlock_right:
+			currentBlockInMap->blockRight = newBlock;
+			newBlock->blockLeft = currentBlockInMap;
+			break;
 
-  default:
-    break;
-  }
+		default:
+			break;
+	}
 
-  // Move to new block
-  currentBlockInMap = newBlock;
+	// Move to new block
+	currentBlockInMap = newBlock;
 
-  // TODO: connect block to existing neighbors
+	// TODO: connect block to existing neighbors
 }
 
 //**************************************************************************************************
@@ -152,8 +150,9 @@ static void createNewBlock(block_direction direction)
 //!*************************************************************************************************
 void createMap()
 {
-  currentBlockInMap = malloc(sizeof(*currentBlockInMap));
-  initNewBlock(currentBlockInMap);
+	currentBlockInMap = malloc(sizeof(*currentBlockInMap));
+	initNewBlock(currentBlockInMap);
+	currentBlockInMap->currentBlock[currentPosRows][currentPosCols] = map_CurrentPosition;
 }
 
 //!*************************************************************************************************
@@ -182,9 +181,9 @@ void saveMap()
 //!*************************************************************************************************
 void deleteMap()
 {
-  // TODO: Go through all map blocks.
-  free(currentBlockInMap->currentBlock);
-  free(currentBlockInMap);
+	// TODO: Go through all map blocks.
+	free(currentBlockInMap->currentBlock);
+	free(currentBlockInMap);
 }
 
 //!*************************************************************************************************
@@ -203,119 +202,125 @@ void deleteMap()
 //!*************************************************************************************************
 void moveInMap(map_move_direction direction)
 {
-  switch (direction)
-  {
-  case move_up:
-    // If we can move in block, move up
-    if (currentPosRows != MAP_BLOCK_MIN_ROW)
-    {
-      currentPosRows--;
-    }
-    else
-    {
-      // Create new block up from the previous and move to its last row.
-      createNewBlock(newBlock_up);
-      currentPosRows = MAP_BLOCK_MAX_ROW;
-    }
-    break;
+	currentBlockInMap->currentBlock[currentPosRows][currentPosCols] = map_Track;
+	switch (direction)
+	{
+		case move_up:
+			// If we can move in block, move up
+			if (currentPosRows != MAP_BLOCK_MIN_ROW)
+			{
+				currentPosRows--;
+			}
+			else
+			{
+				// Create new block up and move to its last row.
+				createNewBlock(newBlock_up);
+				currentPosRows = MAP_BLOCK_MAX_ROW;
+			}
+			break;
 
-  case move_upLeft:
-    if (currentPosCols != MAP_BLOCK_MIN_COL && currentPosRows != MAP_BLOCK_MIN_ROW)
-    {
-      currentPosCols--;
-      currentPosRows--;
-    }
-    else
-    {
-      createNewBlock(newBlock_up);
-      createNewBlock(newBlock_left);
-      currentPosCols = MAP_BLOCK_MAX_COL;
-      currentPosRows = MAP_BLOCK_MAX_ROW;
-    }
-    break;
+		case move_upLeft:
+			if (currentPosCols != MAP_BLOCK_MIN_COL
+					&& currentPosRows != MAP_BLOCK_MIN_ROW)
+			{
+				currentPosCols--;
+				currentPosRows--;
+			}
+			else
+			{
+				createNewBlock(newBlock_up);
+				createNewBlock(newBlock_left);
+				currentPosCols = MAP_BLOCK_MAX_COL;
+				currentPosRows = MAP_BLOCK_MAX_ROW;
+			}
+			break;
 
-  case move_left:
-    if (currentPosCols != MAP_BLOCK_MIN_COL)
-    {
-      currentPosCols--;
-    }
-    else
-    {
-      createNewBlock(newBlock_left);
-      currentPosCols = MAP_BLOCK_MAX_COL;
-    }
-    break;
+		case move_left:
+			if (currentPosCols != MAP_BLOCK_MIN_COL)
+			{
+				currentPosCols--;
+			}
+			else
+			{
+				createNewBlock(newBlock_left);
+				currentPosCols = MAP_BLOCK_MAX_COL;
+			}
+			break;
 
-  case move_downLeft:
-    if (currentPosCols != MAP_BLOCK_MIN_COL && currentPosRows != MAP_BLOCK_MAX_ROW)
-    {
-      currentPosCols--;
-      currentPosRows++;
-    }
-    else
-    {
-      createNewBlock(newBlock_down);
-      createNewBlock(newBlock_left);
-      currentPosCols = MAP_BLOCK_MAX_COL;
-      currentPosRows = MAP_BLOCK_MIN_ROW;
-    }
-    break;
+		case move_downLeft:
+			if (currentPosCols != MAP_BLOCK_MIN_COL
+					&& currentPosRows != MAP_BLOCK_MAX_ROW)
+			{
+				currentPosCols--;
+				currentPosRows++;
+			}
+			else
+			{
+				createNewBlock(newBlock_down);
+				createNewBlock(newBlock_left);
+				currentPosCols = MAP_BLOCK_MAX_COL;
+				currentPosRows = MAP_BLOCK_MIN_ROW;
+			}
+			break;
 
-  case move_down:
-    if (currentPosRows != MAP_BLOCK_MAX_ROW)
-    {
-      currentPosRows++;
-    }
-    else
-    {
-      createNewBlock(newBlock_down);
-      currentPosRows = MAP_BLOCK_MIN_ROW;
-    }
-    break;
+		case move_down:
+			if (currentPosRows != MAP_BLOCK_MAX_ROW)
+			{
+				currentPosRows++;
+			}
+			else
+			{
+				createNewBlock(newBlock_down);
+				currentPosRows = MAP_BLOCK_MIN_ROW;
+			}
+			break;
 
-  case move_downRight:
-    if (currentPosCols != MAP_BLOCK_MAX_COL && currentPosRows != MAP_BLOCK_MAX_ROW)
-    {
-      currentPosCols++;
-      currentPosRows++;
-    }
-    else
-    {
-      createNewBlock(newBlock_down);
-      createNewBlock(newBlock_right);
-      currentPosCols = MAP_BLOCK_MIN_COL;
-      currentPosRows = MAP_BLOCK_MIN_ROW;
-    }
-    break;
+		case move_downRight:
+			if (currentPosCols != MAP_BLOCK_MAX_COL
+					&& currentPosRows != MAP_BLOCK_MAX_ROW)
+			{
+				currentPosCols++;
+				currentPosRows++;
+			}
+			else
+			{
+				createNewBlock(newBlock_down);
+				createNewBlock(newBlock_right);
+				currentPosCols = MAP_BLOCK_MIN_COL;
+				currentPosRows = MAP_BLOCK_MIN_ROW;
+			}
+			break;
 
-  case move_right:
-    if (currentPosCols != MAP_BLOCK_MAX_COL)
-    {
-      currentPosCols++;
-    }
-    else
-    {
-      createNewBlock(newBlock_right);
-      currentPosCols = MAP_BLOCK_MIN_COL;
-    }
-    break;
+		case move_right:
+			if (currentPosCols != MAP_BLOCK_MAX_COL)
+			{
+				currentPosCols++;
+			}
+			else
+			{
+				createNewBlock(newBlock_right);
+				currentPosCols = MAP_BLOCK_MIN_COL;
+			}
+			break;
 
-  case move_upRight:
-    if (currentPosCols != MAP_BLOCK_MAX_COL && currentPosRows != MAP_BLOCK_MIN_ROW)
-    {
-    	currentPosCols++;
-    	currentPosRows--;
-    }
-    else
-    {
-      createNewBlock(newBlock_up);
-      createNewBlock(newBlock_right);
-      currentPosCols = MAP_BLOCK_MIN_COL;
-      currentPosRows = MAP_BLOCK_MAX_ROW;
-    }
-    break;
+		case move_upRight:
+			if (currentPosCols != MAP_BLOCK_MAX_COL
+					&& currentPosRows != MAP_BLOCK_MIN_ROW)
+			{
+				currentPosCols++;
+				currentPosRows--;
+			}
+			else
+			{
+				createNewBlock(newBlock_up);
+				createNewBlock(newBlock_right);
+				currentPosCols = MAP_BLOCK_MIN_COL;
+				currentPosRows = MAP_BLOCK_MAX_ROW;
+			}
+			break;
 
-  default:
-    break;
-  }
+		default:
+			break;
+	}
+	currentBlockInMap->currentBlock[currentPosRows][currentPosCols] = map_CurrentPosition;
 }

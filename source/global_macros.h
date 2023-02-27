@@ -81,16 +81,16 @@ extern "C" {
 // Distance 
 /*************************************/
 // Counter how long are we going straight without any interrupt
-#define MAX_DISTANCE_WITHOUT_IRQ_LINE	25000
+#define MAX_DISTANCE_WITHOUT_LINE	2000
 
 /*************************************/
 // Line detected counter
 /*************************************/
 // Maximum number which says how long can we be on the line
-#define MAX_CNT_ON_LINE	20
+#define MAX_CNT_ON_LINE	40
 // The number that tells us after how long we should increase the speed
 // if there is no line
-#define CNT_OUT_OF_LANE 500
+#define CNT_OUT_OF_LANE 80
 
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	40

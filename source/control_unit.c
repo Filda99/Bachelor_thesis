@@ -19,6 +19,7 @@
 //* EXTERN VARIABLES
 //**************************************************************************************************
 extern unsigned char LineDetected;
+extern unsigned int HalfWheelRotations;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -67,32 +68,27 @@ void setWheelToInitPosition()
 //!*************************************************************************************************
 void controlUnit()
 {
-	PRINTF("Control unit: \r\n");
-	static uint32_t distanceWithoutInterrupt = 0;
-	static uint32_t cntLineNone = 0;
+	//PRINTF("Control unit: \r\n");
 
 	switch(LineDetected)
 	{
 		case LineNone:
 		{
-			PRINTF("\t- Line detected: None \r\n");
-			PRINTF("\t-> Go direct. \r\n");
-			cntLineNone++;
-			PRINTF("cntLineNone: %i\r\n", cntLineNone);
-			distanceWithoutInterrupt++;
+			//PRINTF("\t- Line detected: None \r\n");
+			//PRINTF("\t-> Go direct. \r\n");
 
 			// If car goes straight for too long
-			if (distanceWithoutInterrupt > MAX_DISTANCE_WITHOUT_IRQ_LINE)
+			if (HalfWheelRotations > MAX_DISTANCE_WITHOUT_LINE)
 			{
+				PRINTF("\t-> Distance without interrupt -> STOP. \r\n");
 				stopCar();
 			}
 			// If there is no line for some time, add speed
-			else if (cntLineNone > CNT_OUT_OF_LANE)
+			else if (HalfWheelRotations > CNT_OUT_OF_LANE)
 			{
 				PRINTF("\t-> Add speed. \r\n");
-				addSpeed();
+				//addSpeed();
 				goDirect();
-				cntLineNone = 0;
 			}
 
 			prevTurning = LineNone;
@@ -101,7 +97,7 @@ void controlUnit()
 
 		case LineLeft:
 		{
-			PRINTF("\t- Line detected: Left \r\n");
+			//PRINTF("\t- Line detected: Left \r\n");
 			if (prevTurning == LineLeft)
 			{
 				lineCnt++;
@@ -113,7 +109,7 @@ void controlUnit()
 
 			if (lineCnt > MAX_CNT_ON_LINE)
 			{
-				PRINTF("\t-> Turning left. \r\n");
+				PRINTF("\t-> Turning right! \r\n");
 				turnRight();
 				slackUpSpeedCustom(2);
 			}

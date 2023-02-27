@@ -95,7 +95,14 @@ static void initMotors()
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
 	delay_ms(50);
 	PRINTF("\r\n\t\t- Motors initialization complete.\r\n");
+}
 
+static void initServo()
+{
+	PRINTF("\t\t- Servo initialization started.\r\n");
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.37);
+	delay_ms(100);
+	PRINTF("\t\t- Servo initialization complete.\r\n");
 }
 
 //!*************************************************************************************************
@@ -191,9 +198,6 @@ static void startupPWM(void)
 	TPM_SetupPwm(TPM0, &tpmParamSer, 1U, kTPM_EdgeAlignedPwm, 50U,
 			TPM_SOURCE_CLOCK);
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
-
-
-	initMotors();
 }
 
 /*
@@ -307,6 +311,9 @@ void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
 	startupPWM();
+	//initMotors();
+	//initServo();
+
 	startupInterrupts();
 	startupSensorCapture();
 

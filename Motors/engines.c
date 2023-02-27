@@ -20,6 +20,8 @@
  ************************************/
 extern bool IsCmdToStopCar;
 extern bool InitStop;
+extern uint8_t currentSpeed;
+extern uint8_t currentSteer;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
@@ -36,17 +38,7 @@ extern bool InitStop;
 float leftMotorSpeed;
 float rightMotorSpeed;
 
-//! Current position in speed array.
-//! 0 = max backwards
-//! 5 = stop engines
-//! 11 = max forwards
-static int currentSpeed = ENGINE_STOP;
 
-//! Current position in steer array.
-//! 0 = max left
-//! 3 = direct
-//! 7 = max right
-static int currentSteer = GO_DIRECT;
 
 /************************************
  * GLOBAL VARIABLES
