@@ -267,6 +267,9 @@ void deleteMap()
 //! But if we are on the border and want to move across it, we have to allocate a new block and 
 //! update our position in the field.
 //!
+//! IMPORTANT! If we move up relative to our previous position, we have to reduce currentPosRow
+//! by one. That is due 2D field indexing in C!
+//!
 //! @param    None
 //!
 //! @return   None
@@ -291,6 +294,7 @@ void moveInMap(map_move_direction direction)
 			break;
 
 		case move_upLeft:
+			// If we can move in block, move up and left
 			if (currentPosCols != MAP_BLOCK_MIN_COL
 					&& currentPosRows != MAP_BLOCK_MIN_ROW)
 			{
@@ -299,7 +303,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				// Move to block on the left
+				// Move to the block on the left
 				if (currentPosCols == MAP_BLOCK_MIN_COL &&
 						currentPosRows != MAP_BLOCK_MIN_ROW)
 				{
@@ -307,7 +311,7 @@ void moveInMap(map_move_direction direction)
 					currentPosRows--;
 					currentPosCols = MAP_BLOCK_MAX_COL;
 				}
-				// Move to block above us
+				// Move to the block above us
 				else if (currentPosCols != MAP_BLOCK_MIN_COL &&
 						currentPosRows == MAP_BLOCK_MIN_ROW)
 				{
@@ -315,7 +319,7 @@ void moveInMap(map_move_direction direction)
 					currentPosRows = MAP_BLOCK_MAX_ROW;
 					currentPosCols--;
 				}
-				// Move to upper left block
+				// Move to the upper left block
 				else
 				{
 					moveInBlocks(newBlock_up);
@@ -327,6 +331,7 @@ void moveInMap(map_move_direction direction)
 			break;
 
 		case move_left:
+			// If we can move in block, move left
 			if (currentPosCols != MAP_BLOCK_MIN_COL)
 			{
 				currentPosCols--;
@@ -347,10 +352,30 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(newBlock_down);
-				createNewBlock(newBlock_left);
-				currentPosCols = MAP_BLOCK_MAX_COL;
-				currentPosRows = MAP_BLOCK_MIN_ROW;
+				// Move to the block on the left
+				if (currentPosCols == MAP_BLOCK_MIN_COL &&
+						currentPosRows != MAP_BLOCK_MAX_ROW)
+				{
+					moveInBlocks(newBlock_left);
+					currentPosRows--;
+					currentPosCols = MAP_BLOCK_MAX_COL;
+				}
+				// Move to the block below us
+				else if (currentPosCols != MAP_BLOCK_MIN_COL &&
+						currentPosRows == MAP_BLOCK_MAX_ROW)
+				{
+					moveInBlocks(newBlock_down);
+					currentPosRows = MAP_BLOCK_MIN_ROW;
+					currentPosCols--;
+				}
+				// Move to the block to the left below us
+				else
+				{
+					createNewBlock(newBlock_down);
+					createNewBlock(newBlock_left);
+					currentPosCols = MAP_BLOCK_MAX_COL;
+					currentPosRows = MAP_BLOCK_MIN_ROW;
+				}
 			}
 			break;
 
@@ -375,10 +400,30 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(newBlock_down);
-				createNewBlock(newBlock_right);
-				currentPosCols = MAP_BLOCK_MIN_COL;
-				currentPosRows = MAP_BLOCK_MIN_ROW;
+				// Move to the block on the right
+				if (currentPosCols == MAP_BLOCK_MAX_COL &&
+						currentPosRows != MAP_BLOCK_MAX_ROW)
+				{
+					moveInBlocks(newBlock_right);
+					currentPosCols = MAP_BLOCK_MIN_COL;
+					currentPosRows--;
+				}
+				// Move to the block below us
+				else if (currentPosCols != MAP_BLOCK_MAX_COL &&
+						currentPosRows == MAP_BLOCK_MAX_ROW)
+				{
+					moveInBlocks(newBlock_down);
+					currentPosRows = MAP_BLOCK_MIN_ROW;
+					currentPosCols--;
+				}
+				// Move to the block to the right below us
+				else
+				{
+					createNewBlock(newBlock_down);
+					createNewBlock(newBlock_right);
+					currentPosCols = MAP_BLOCK_MIN_COL;
+					currentPosRows = MAP_BLOCK_MIN_ROW;
+				}
 			}
 			break;
 
@@ -403,10 +448,30 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(newBlock_up);
-				createNewBlock(newBlock_right);
-				currentPosCols = MAP_BLOCK_MIN_COL;
-				currentPosRows = MAP_BLOCK_MAX_ROW;
+				// Move to the block on the right
+				if (currentPosCols == MAP_BLOCK_MAX_COL &&
+						currentPosRows != MAP_BLOCK_MIN_ROW)
+				{
+					moveInBlocks(newBlock_right);
+					currentPosCols = MAP_BLOCK_MIN_COL;
+					currentPosRows--;
+				}
+				// Move to the block above us
+				else if (currentPosCols != MAP_BLOCK_MAX_COL &&
+						currentPosRows == MAP_BLOCK_MIN_ROW)
+				{
+					moveInBlocks(newBlock_up);
+					currentPosRows = MAP_BLOCK_MAX_ROW;
+					currentPosCols++;
+				}
+				// Move to the upper left block
+				else
+				{
+					moveInBlocks(newBlock_up);
+					moveInBlocks(newBlock_right);
+					currentPosCols = MAP_BLOCK_MIN_COL;
+					currentPosRows = MAP_BLOCK_MAX_ROW;
+				}
 			}
 			break;
 

@@ -134,9 +134,9 @@ void routine(void)
 	{
 		turnRightCustom(3);
 	}
-	if (HalfWheelRotations == 20)
+	if (HalfWheelRotations == 26)
 	{
-		turnRight();
+		turnLeftCustom(6);
 	}
 
 	static int i = 0;
