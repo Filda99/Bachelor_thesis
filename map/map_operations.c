@@ -89,6 +89,17 @@ static void initNewBlock(struct map_blk *newBlock)
 	newBlock->blockUp = NULL;
 }
 
+//!*************************************************************************************************
+//! static bool checkExistingBlock(block_direction direction)
+//!
+//! @description
+//! Function looks at the block next to current in the direction we want to move
+//! if block already exists or not.
+//!
+//! @param    block_direction direction	The direction we want to go
+//!
+//! @return   True if block already exists, False otherwise
+//!*************************************************************************************************
 static bool checkExistingBlock(block_direction direction)
 {
 	bool ret = false;
@@ -130,12 +141,9 @@ static bool checkExistingBlock(block_direction direction)
 //! static void createNewBlock(map_block *current, map_block *newBlock, block_direction direction)
 //!
 //! @description
-//! Function connects new map block to existing one if there is NOT.
-//! If block already exists, function just move us there.
+//! Function connects new map block to existing one.
 //!
-//! @param    map_block *current  Pointer to a existing map block
-//! @param    map_block *newBlock Pointer to a new map block
-//! @param    block_direction direction Direction The direction in which the new block is allocated
+//! @param    block_direction direction The direction in which the new block will be created
 //!
 //! @return   None
 //!*************************************************************************************************
@@ -173,6 +181,16 @@ static void createNewBlock(block_direction direction)
 	// TODO: connect block to existing neighbors
 }
 
+//!*************************************************************************************************
+//! static void moveInBlocks(block_direction direction)
+//!
+//! @description
+//! Function ensures movement between blocks.
+//!
+//! @param    block_direction direction The direction in which we want to go
+//!
+//! @return   None
+//!*************************************************************************************************
 static void moveInBlocks(block_direction direction)
 {
 	bool blockExists = checkExistingBlock(direction);
