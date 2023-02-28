@@ -50,14 +50,15 @@ typedef struct map_blk
 //* Directions for moving in the map
 typedef enum
 {
-	move_up = 0U,
+	move_unknown = 0U,
 	move_upRight,
-	move_right,
+	move_up = 2,
 	move_downRight,
-	move_down,
+	move_right = 4,
 	move_downLeft,
-	move_left,
-	move_upLeft
+	move_down = 8,
+	move_upLeft,
+	move_left = 16,
 }map_move_direction;
 
 /************************************

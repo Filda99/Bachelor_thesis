@@ -37,9 +37,7 @@ extern uint8_t currentPosCols;
 #define TURNING_RIGHT	180
 
 # define M_PI           3.14159265358979323846
-
-#define STARTING_COORDINATE_X	15
-#define STARTING_COORDINATE_Y	10
+#define STARTING_HEADING_ANGLE	 0
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -51,8 +49,13 @@ extern uint8_t currentPosCols;
 
 //! The angle at which the robot is heading.
 //! We start in upward direction, so it is 90 deg.
-static float angleHeading = 90.0;
+static float angleHeading = STARTING_HEADING_ANGLE;
 static float centerOfCircle[2] = {0.0};
+
+//! Radius field of the circles, which are dependent on the rotation of the servo
+static float radius[7] = {
+		17.5, 30.3, 65.3, 0, 65.3, 30.3, 17.5
+};
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -65,25 +68,63 @@ static float centerOfCircle[2] = {0.0};
 //**************************************************************************************************
  //* STATIC FUNCTIONS
 //**************************************************************************************************
-static void calc_new_position(float *current_x, float *current_y, uint32_t distance)
+static float calcNewDistance(uint32_t prevNoWheelRot, float radius, uint8_t turningSide)
+{
+	// distance = 2*pi*r
+	// r = ~1.7
+	// One rotation is ~10.5cm, so one HalfWheelRotation is 5cm
+
+	// Get distance from previous position
+	uint32_t newRotations = HalfWheelRotations - prevNoWheelRot;
+
+	// Distance of LEFT WHEEL traveled from previous position
+	uint32_t newDistanceLW = newRotations * 5;
+	// If the wheel moves a full turn, add one cm to distance due PI is float
+	if ((HalfWheelRotations % 2) == 0)
+	{
+		newDistanceLW += newRotations;
+	}
+
+	float newDistance = 0;
+	if (turningSide != GO_DIRECT)
+	{
+		// Calculate phi angle, which is in radians heading angle
+		float phi = newDistanceLW / radius;
+
+		float distanceLeftCenterWheel = 4.5; // 45mm
+		if (turningSide == TURNING_LEFT)
+		{
+			radius += distanceLeftCenterWheel;
+			angleHeading += phi;
+		}
+		else if (turningSide == TURNING_RIGHT)
+		{
+			radius -= distanceLeftCenterWheel;
+			angleHeading -= phi;
+		}
+
+		newDistance = phi * radius;
+	}
+	else
+	{
+		newDistance = newDistanceLW;
+	}
+
+	return newDistance;
+}
+
+
+static void calcNewPosition(float *current_x, float *current_y, float distance, uint8_t turningSide, float oldHeadingAngle)
 {
 	static uint8_t previousSteer = GO_DIRECT;
-
-	// TODO: get r from the knowledge of steering angle (table)
-	int r = 5;
-	float dir = 2 * M_PI * r / 4;
-	// init angle is heading angle
-	int init_angle = 0;
-	int wheel_angle = (currentSteer > GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
 
 	// If we have changed the steering and we are steering to some side, we need to calculate
 	// the center of a circle.
 	if (currentSteer != previousSteer && currentSteer != GO_DIRECT)
 	{
-		int angle = wheel_angle - init_angle;
-		centerOfCircle[X] = *current_x - r * cos(angle*M_PI/180);
-		centerOfCircle[Y] = *current_y - r * sin(angle*M_PI/180);
-	    PRINTF("Center of circle coordinates: %d, %d\r\n", (int)centerOfCircle[X], (int)centerOfCircle[Y]);
+		int angle = turningSide - oldHeadingAngle;
+		centerOfCircle[X] = *current_x - radius[currentSteer] * cos(angle*M_PI/180);
+		centerOfCircle[Y] = *current_y - radius[currentSteer] * sin(angle*M_PI/180);
 	}
 
 	// We are steering to some side
@@ -93,25 +134,25 @@ static void calc_new_position(float *current_x, float *current_y, uint32_t dista
 		float theta = atan2(*current_y - centerOfCircle[Y], *current_x - centerOfCircle[X]);
 
 		// Calculate the angular displacement
-		float delta_theta = dir / r;
+		float deltaTheta = distance / radius[currentSteer];
 
 		// Calculate the final angle
-		float final_theta;
-		if (wheel_angle == TURNING_LEFT)
+		float finalTheta;
+		if (turningSide == TURNING_LEFT)
 		{
-			final_theta = theta + delta_theta;
+			finalTheta = theta + deltaTheta;
 		}
 		else
 		{
-			final_theta = theta - delta_theta;
+			finalTheta = theta - deltaTheta;
 		}
 
 		// Calculate the x and y coordinates of the endpoint
 		// We don't need to add result to current position, bcs
 		// we are counting with the center, which tells us
 		// the coordinates
-		*current_x = centerOfCircle[X] + r * cos(final_theta);
-		*current_y = centerOfCircle[Y] + r * sin(final_theta);
+		*current_x = centerOfCircle[X] + radius[currentSteer] * cos(finalTheta);
+		*current_y = centerOfCircle[Y] + radius[currentSteer] * sin(finalTheta);
 	}
 	// We are going direct
 	else
@@ -121,6 +162,98 @@ static void calc_new_position(float *current_x, float *current_y, uint32_t dista
 	}
 	previousSteer = currentSteer;
 }
+
+static map_move_direction getDirection(uint8_t moveToNewBlock_x, uint8_t moveToNewBlock_y, float current_x,
+		float current_y, float prev_x, float prev_y)
+{
+	map_move_direction direction = move_unknown;
+
+
+	/*if (moveToNewBlock_x != currentPosCols && moveToNewBlock_y != currentPosRows)
+	{
+		// Up-left
+		if (moveToNewBlock_y < currentPosRows && moveToNewBlock_x < currentPosCols)
+		{
+			direction = move_upLeft;
+		}
+
+		// Up-right
+		else if (moveToNewBlock_y < currentPosRows && moveToNewBlock_x > currentPosCols)
+		{
+			direction = move_upRight;
+		}
+
+		// Down-left
+		else if (moveToNewBlock_y > currentPosRows && moveToNewBlock_x < currentPosCols)
+		{
+			direction = move_downLeft;
+		}
+		// Down-right
+		else if (moveToNewBlock_y > currentPosRows && moveToNewBlock_x > currentPosCols)
+		{
+			direction = move_downRight;
+		}
+	}
+	else if (moveToNewBlock_x != currentPosCols || moveToNewBlock_y != currentPosRows)
+	{*/
+		/* ! 2D fields in C are computed from top-left as [0, 0].
+		 * But if we move upwards, we will have higher number.
+		 * -------------------------------------------------------
+		 * e.g. we will be facing up, we will travel 5cm (one field is 4cm..)
+		 * So we will have coordinates [0, 5]. But we need to travel up, so
+		 * we have higher number in the coordinate system, but in the 2D field
+		 * we will move up one square (from [1,1] in the beginning to [1, 0].
+		 */
+		// Up
+		if (current_y > prev_y && moveToNewBlock_y != currentPosRows)
+		{
+			direction |= move_up;
+		}
+		// Down
+		if (current_y < prev_y && moveToNewBlock_y != currentPosRows)
+		{
+			direction |= move_down;
+		}
+		// Left
+		if (current_x < prev_x && moveToNewBlock_x != currentPosCols)
+		{
+			direction |= move_left;
+		}
+		// Right
+		if (current_x > prev_x && moveToNewBlock_x != currentPosCols)
+		{
+			direction |= move_right;
+		}
+
+
+
+		// Up-left
+		if (direction & move_up && direction & move_left)
+		{
+			direction = move_upLeft;
+		}
+
+		// Up-right
+		else if (direction & move_up && direction & move_right)
+		{
+			direction = move_upRight;
+		}
+
+		// Down-left
+		else if (direction & move_down && direction & move_left)
+		{
+			direction = move_downLeft;
+		}
+		// Down-right
+		else if (direction & move_down && direction & move_right)
+		{
+			direction = move_downRight;
+		}
+	/*}*/
+
+	return direction;
+}
+
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
@@ -138,100 +271,44 @@ static void calc_new_position(float *current_x, float *current_y, uint32_t dista
 //!*************************************************************************************************
 void mapping()
 {
-	static float current_x = STARTING_COORDINATE_X;
-	static float current_y = STARTING_COORDINATE_Y;
+	static uint32_t totalDistanceTraveled = 0;
+	static float current_x =  MAP_BLOCK_SIZE * MAP_COLUMNS / 2;
+	static float current_y =  MAP_BLOCK_SIZE * MAP_ROWS / 2;
+	static float prev_x = MAP_BLOCK_SIZE * MAP_COLUMNS / 2;
+	static float prev_y = MAP_BLOCK_SIZE * MAP_ROWS / 2;
+	static uint32_t prevNoWheelRot = 0; 	// Number of half-wheel rotations from previous mapping
+	static float prevHeadingAngle = STARTING_HEADING_ANGLE;
+	static uint32_t distanceNotMapped = 0; 		// Distance traveled from previous mapping
+	float currentRadius = radius[currentSteer];
+	uint8_t turningSide = (currentSteer > GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
 
-	// distance = 2*pi*r
-	// r = ~1.7
-	// One rotation is ~10.5cm, so one HalfWheelRotation is 5cm
-	uint32_t newRotations = 0;
-	static uint32_t newDistance = 0; 	// Distance traveled from previous mapping
-	static uint32_t prevNoWheelRot = 0; // Number of half-wheel rotations from previous mapping
+	float newDistance = calcNewDistance(prevNoWheelRot, currentRadius, turningSide);
+	distanceNotMapped += (int)newDistance;
+	totalDistanceTraveled += (int)newDistance;
 
-	// Get distance from previous position
-	newRotations = HalfWheelRotations - prevNoWheelRot;
-	newDistance += newRotations * 5;
+	calcNewPosition(&current_x, &current_y, newDistance, turningSide, prevHeadingAngle);
 
-	// If the wheel moves a full turn, add one cm to distance due PI is float
-	if ((HalfWheelRotations % 2) == 0)
-	{
-		newDistance += newRotations;
-	}
-	calc_new_position(&current_x, &current_y, newDistance);
-
-	PRINTF("Endpoint coordinates: %d, %d\r\n", (int)current_x, (int)current_y);
-
-	uint8_t moveToNewBlock_x = (int)ceil(current_x) / MAP_BLOCK_SIZE;
-	uint8_t moveToNewBlock_y = (int)ceil(current_y) / MAP_BLOCK_SIZE;
+	uint8_t moveToNewBlock_x = ((int)floor(current_x) / MAP_BLOCK_SIZE) % MAP_COLUMNS;
+	uint8_t moveToNewBlock_y = ((int)floor(current_y) / MAP_BLOCK_SIZE) % MAP_ROWS;
 
 	// Move in map when traveled to new block
-	while (newDistance > MAP_BLOCK_SIZE)
+	//while (distanceNotMapped > MAP_BLOCK_SIZE)
+	if (moveToNewBlock_y > MAP_ROWS / 2)
 	{
-		// Check movement in the corner to next field
-		if (moveToNewBlock_x != currentPosCols && moveToNewBlock_y != currentPosRows)
+		moveToNewBlock_y = MAP_ROWS / 2 - (moveToNewBlock_y - MAP_ROWS / 2);
+	}
+	else if  (moveToNewBlock_y < MAP_ROWS / 2)
+	{
+		moveToNewBlock_y = MAP_ROWS / 2 - (moveToNewBlock_y - MAP_ROWS / 2);
+	}
+
+	if (moveToNewBlock_x != currentPosCols || moveToNewBlock_y != currentPosRows)
+	{
+		distanceNotMapped -= MAP_BLOCK_SIZE;
+		map_move_direction direction = getDirection(moveToNewBlock_x, moveToNewBlock_y, current_x, current_y, prev_x, prev_y);
+		if (direction != move_unknown)
 		{
-			// Up-left
-			if (moveToNewBlock_y > currentPosRows && moveToNewBlock_x > currentPosCols)
-			{
-				moveInMap(move_upLeft);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-
-			// Up-right
-			else if (moveToNewBlock_y > currentPosRows && moveToNewBlock_x > currentPosCols)
-			{
-				moveInMap(move_upRight);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-
-			// Down-left
-			else if (moveToNewBlock_y < currentPosRows && moveToNewBlock_x < currentPosCols)
-			{
-				moveInMap(move_downLeft);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-			// Down-right
-			else if (moveToNewBlock_y < currentPosRows && moveToNewBlock_x < currentPosCols)
-			{
-				moveInMap(move_downRight);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-		}
-		else if (moveToNewBlock_x != currentPosRows || moveToNewBlock_y != currentPosCols)
-		{
-			// Up
-			/* ! 2D fields in C are computed from top-left as [0, 0].
-			 * But if we move upwards, we will have higher number.
-			 * -------------------------------------------------------
-			 * e.g. we will be facing up, we will travel 5cm (one field is 4cm..)
-			 * So we will have coordinates [0, 5]. But we need to travel up, so
-			 * we have higher number in the coordinate system, but in the 2D field
-			 * we will move up one square (from [1,1] in the beginning to [1, 0].
-			 */
-
-			if (moveToNewBlock_y > currentPosRows)
-			{
-				moveInMap(move_up);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-			// Down
-			else if (moveToNewBlock_y < currentPosRows)
-			{
-				moveInMap(move_down);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-			// Left
-			else if (moveToNewBlock_x < currentPosCols)
-			{
-				moveInMap(move_left);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
-			// Right
-			else if (moveToNewBlock_x > currentPosCols)
-			{
-				moveInMap(move_right);
-				newDistance -= MAP_BLOCK_SIZE;
-			}
+			moveInMap(direction);
 		}
 		else
 		{
@@ -240,6 +317,13 @@ void mapping()
 	}
 
 	prevNoWheelRot = HalfWheelRotations;
+	prevHeadingAngle = angleHeading;
+	prev_x = current_x;
+	prev_y = current_y;
+	PRINTF("Heading angle: %i\r\n", (int)(angleHeading*180/M_PI));
+	PRINTF("Distance traveled: %d\r\n", totalDistanceTraveled);
+	PRINTF("Coordinates: %d, %d\r\n", (int)current_x, (int)current_y);
+    PRINTF("Center of circle coordinates: %d, %d\r\n", (int)centerOfCircle[X], (int)centerOfCircle[Y]);
 }
 
 

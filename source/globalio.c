@@ -45,5 +45,5 @@ uint8_t currentSpeed = ENGINE_STOP;
 //! Current position in steer array.
 //! 0 = max left
 //! 3 = direct
-//! 7 = max right
+//! 6 = max right
 uint8_t currentSteer = GO_DIRECT;

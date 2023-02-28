@@ -126,23 +126,23 @@ static void checkLines()
 //**************************************************************************************************
 void routine(void)
 {
-	PRINTF("----------------\r\n");
 	HalfWheelRotations++;
-	PRINTF("Number of wheel half-rotations: %i\r\n", HalfWheelRotations);
-	printBlock();
-
 	//checkLines();
 	//controlUnit();
 
 	if (HalfWheelRotations == 1)
 	{
-		turnRight();
+		turnRightCustom(3);
 	}
 	if (HalfWheelRotations == 20)
 	{
 		turnRight();
 	}
 
-	mapping();
+	static int i = 0;
+	PRINTF("Cycle: %i\r\n", i++);
+ 	mapping();
+ 	printBlock();
+	PRINTF("-------------------------------------\r\n");
 }
 

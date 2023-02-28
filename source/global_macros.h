@@ -28,9 +28,11 @@ extern "C" {
 /*************************************/
 
 //* User defined, how many rows should one map block have
-#define MAP_ROWS		3
+//! Keep it odd!
+#define MAP_ROWS		9
 //* User defined, how many columns should one map block have
-#define MAP_COLUMNS	3
+	//! Keep it odd!
+#define MAP_COLUMNS		9
 
 //* First useable row
 #define MAP_BLOCK_MIN_ROW	0
@@ -101,11 +103,11 @@ extern "C" {
 #define MAX_FORWARD_ENGINE_LIMIT	6
 #define MAX_REVERSE_ENGINE_LIMIT	0
 
-#define MAX_STEER_RIGHT		7
+#define MAX_STEER_RIGHT		6
 #define MAX_STEER_LEFT		0
 
 #define ENGINE_STOP			1	// Pulse width for STOP is the second value in the speed field
-#define GO_DIRECT			((MAX_STEER_RIGHT - 1) / 2)
+#define GO_DIRECT			(MAX_STEER_RIGHT / 2)
 
 /************************************
  * TYPEDEFS
