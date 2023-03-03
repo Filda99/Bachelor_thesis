@@ -68,15 +68,10 @@ void setWheelToInitPosition()
 //!*************************************************************************************************
 void controlUnit()
 {
-	//PRINTF("Control unit: \r\n");
-
 	switch(LineDetected)
 	{
 		case LineNone:
 		{
-			//PRINTF("\t- Line detected: None \r\n");
-			//PRINTF("\t-> Go direct. \r\n");
-
 			// If car goes straight for too long
 			if (HalfWheelRotations > MAX_DISTANCE_WITHOUT_LINE)
 			{
@@ -97,7 +92,6 @@ void controlUnit()
 
 		case LineLeft:
 		{
-			//PRINTF("\t- Line detected: Left \r\n");
 			if (prevTurning == LineLeft)
 			{
 				lineCnt++;

@@ -58,28 +58,12 @@ extern map_block *currentBlockInMap;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-static void printBlock()
-{
-	PRINTF("Current block looks like this:\r\n");
-	for (int i = 0; i < MAP_ROWS; i++)
-	{
-		for (int j = 0; j < MAP_COLUMNS; j++)
-		{
-			PRINTF(" %d |", currentBlockInMap->currentBlock[i][j]);
-		}
-		PRINTF("\r\n");
-	}
-}
-
 //!*************************************************************************************************
 //! void checkLine(void)
 //!
 //! @description
-//! Check left, right and center sensors value.
-//! If the value is greater than COLOR_TRESHOLD, LineDetected is set to that side.
-//! That means that we detected line under the sensor.
+//! Get the data from the camera and based on that decide how much and where to turn.
 //!
-//! Function after 100 cycles enables interrupts for main sensors.
 //!
 //! @param    None
 //!
@@ -87,38 +71,7 @@ static void printBlock()
 //!*************************************************************************************************
 static void checkLines()
 {
-	static int enableIrq = 0;
-	bool lineDetected = false;
 
-	if (LeftSensorValue < COLOR_TRESHOLD)
-	{
-		LineDetected = LineLeft;
-		lineDetected = true;
-	}
-	/*if (RightSensorValue < COLOR_TRESHOLD)
-	{
-		LineDetected |= LineRight;
-		lineDetected = true;
-	}
-	if (CenterSensorValue < COLOR_TRESHOLD)
-	{
-		// TODO: LineDetected |= LineCenter;
-		lineDetected = true;
-	}*/
-
-
-	if (!lineDetected)
-	{
-		LineDetected = LineNone;
-	}
-
-	if(enableIrq >= 10)
-	{
-		EnableIRQ(MAIN_SEN_TPM_IRQ);
-		enableIrq = 0;
-	}
-	enableIrq++;
-	PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
 }
 
 //**************************************************************************************************
@@ -126,7 +79,7 @@ static void checkLines()
 //**************************************************************************************************
 
 //!*************************************************************************************************
-//! void function(void)
+//! void routine(void)
 //!
 //! @description
 //! Function
@@ -137,23 +90,7 @@ static void checkLines()
 //!*************************************************************************************************
 void routine(void)
 {
-	HalfWheelRotations++;
-	//checkLines();
-	//controlUnit();
-
-	if (HalfWheelRotations == 1)
-	{
-		turnRightCustom(3);
-	}
-	if (HalfWheelRotations == 26)
-	{
-		turnLeftCustom(6);
-	}
-
-	static int i = 0;
-	PRINTF("Cycle: %i\r\n", i++);
- 	mapping();
- 	printBlock();
-	PRINTF("-------------------------------------\r\n");
+	checkLines();
+	controlUnit();
 }
 
