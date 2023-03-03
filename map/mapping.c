@@ -104,21 +104,21 @@ static float calcNewDistance(uint8_t turningSide)
 	if (turningSide != GO_DIRECT)
 	{
 		// Calculate phi angle, which is in radians heading angle
-		float phi = newDistanceLW / radius;
+		float phi = newDistanceLW / currentRadius;
 
 		float distanceLeftCenterWheel = 4.5; // 45mm
 		if (turningSide == TURNING_LEFT)
 		{
-			radius += distanceLeftCenterWheel;
+			currentRadius += distanceLeftCenterWheel;
 			angleHeading += phi;
 		}
 		else if (turningSide == TURNING_RIGHT)
 		{
-			radius -= distanceLeftCenterWheel;
+			currentRadius -= distanceLeftCenterWheel;
 			angleHeading -= phi;
 		}
 
-		newDistance = phi * radius;
+		newDistance = phi * currentRadius;
 	}
 	else
 	{
@@ -152,7 +152,7 @@ static void calcNewPosition(float *current_x, float *current_y, float distance, 
 	// the center of a circle.
 	if (currentSteer != previousSteer && currentSteer != GO_DIRECT)
 	{
-		int angle = turningSide - oldHeadingAngle;
+		int angle = turningSide - prevHeadingAngle;
 		centerOfCircle[X] = *current_x - radius[currentSteer] * cos(angle*M_PI/180);
 		centerOfCircle[Y] = *current_y - radius[currentSteer] * sin(angle*M_PI/180);
 	}
