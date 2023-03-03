@@ -1,39 +1,20 @@
 /**
- ********************************************************************************
- * @file    routine.c
- * @author  user
- * @date    Jul 18, 2022
- * @brief
- ********************************************************************************
+ ***************************************************************************************************
+ * @file    ${file_name}
+ * @author  ${user}
+ * @date    ${date}
+ * @brief   
+ ***************************************************************************************************
  */
 
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "routine.h"
-#include "MKL25Z4.h"
-#include "global_macros.h"
-
-#include "fsl_tpm.h"
-#include "fsl_gpio.h"
-#include "fsl_debug_console.h"
-
-#include "motors/engines.h"
-#include "control_unit.h"
-#include "map/mapping.h"
-#include "map/map_operations.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern line_location_t LineDetected;
-extern unsigned int LeftSensorValue;
-extern unsigned int CenterSensorValue;
-extern unsigned int RightSensorValue;
 
-// todo: remove. This is only for program without car.
-extern unsigned int HalfWheelRotations;
-extern map_block *currentBlockInMap;
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -58,28 +39,12 @@ extern map_block *currentBlockInMap;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-//!*************************************************************************************************
-//! void checkLine(void)
-//!
-//! @description
-//! Get the data from the camera and based on that decide how much and where to turn.
-//!
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void checkLines()
-{
-
-}
-
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
 //!*************************************************************************************************
-//! void routine(void)
+//! void function(void)
 //!
 //! @description
 //! Function
@@ -88,9 +53,3 @@ static void checkLines()
 //!
 //! @return   None
 //!*************************************************************************************************
-void routine(void)
-{
-	checkLines();
-	controlUnit();
-}
-

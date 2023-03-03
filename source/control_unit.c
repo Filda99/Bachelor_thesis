@@ -1,39 +1,26 @@
 /**
- ********************************************************************************
- * @file    routine.c
+ ***************************************************************************************************
+ * @file    control_unit.c
  * @author  user
- * @date    Jul 18, 2022
+ * @date    Dec 1, 2022
  * @brief
- ********************************************************************************
+ ***************************************************************************************************
  */
 
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "routine.h"
-#include "MKL25Z4.h"
 #include "global_macros.h"
-
-#include "fsl_tpm.h"
-#include "fsl_gpio.h"
-#include "fsl_debug_console.h"
-
 #include "motors/engines.h"
-#include "control_unit.h"
-#include "map/mapping.h"
-#include "map/map_operations.h"
+#include "MKL25Z4.h"
+#include "fsl_debug_console.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern line_location_t LineDetected;
-extern unsigned int LeftSensorValue;
-extern unsigned int CenterSensorValue;
-extern unsigned int RightSensorValue;
-
-// todo: remove. This is only for program without car.
+extern unsigned char LineDetected;
 extern unsigned int HalfWheelRotations;
-extern map_block *currentBlockInMap;
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -45,6 +32,8 @@ extern map_block *currentBlockInMap;
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+static line_location_t prevTurning = LineNone;
+static uint8_t lineCnt = 0;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -58,39 +47,115 @@ extern map_block *currentBlockInMap;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-//!*************************************************************************************************
-//! void checkLine(void)
-//!
-//! @description
-//! Get the data from the camera and based on that decide how much and where to turn.
-//!
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void checkLines()
-{
-
-}
-
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
-//!*************************************************************************************************
-//! void routine(void)
-//!
-//! @description
-//! Function
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-void routine(void)
+void setWheelToInitPosition()
 {
-	checkLines();
-	controlUnit();
+	addSpeed();
 }
 
+//!*************************************************************************************************
+//! void controlUnit(void)
+//!
+//! @description
+//! TBD
+//!
+//! @param	None
+//!
+//! @return	None
+//!*************************************************************************************************
+void controlUnit()
+{
+	switch(LineDetected)
+	{
+		case LineNone:
+		{
+			// If car goes straight for too long
+			if (HalfWheelRotations > MAX_DISTANCE_WITHOUT_LINE)
+			{
+				PRINTF("\t-> Distance without interrupt -> STOP. \r\n");
+				stopCar();
+			}
+			// If there is no line for some time, add speed
+			else if (HalfWheelRotations > CNT_OUT_OF_LANE)
+			{
+				PRINTF("\t-> Add speed. \r\n");
+				//addSpeed();
+				goDirect();
+			}
+
+			prevTurning = LineNone;
+			break;
+		}
+
+		case LineLeft:
+		{
+			if (prevTurning == LineLeft)
+			{
+				lineCnt++;
+			}
+			else
+			{
+				lineCnt = 0;
+			}
+
+			if (lineCnt > MAX_CNT_ON_LINE)
+			{
+				PRINTF("\t-> Turning right! \r\n");
+				turnRight();
+				slackUpSpeedCustom(2);
+			}
+
+			prevTurning = LineLeft;
+			break;
+		}
+
+		case LineRight:
+		{
+			if (prevTurning == LineRight)
+			{
+				lineCnt++;
+			}
+			else
+			{
+				lineCnt = 0;
+			}
+
+			if (lineCnt > MAX_CNT_ON_LINE)
+			{
+				turnLeft();
+				slackUpSpeed();
+			}
+
+			prevTurning = LineRight;
+			break;
+		}
+
+		case LineCenter_Left:
+		{
+			turnRightCustom(MAX_STEER_RIGHT);
+			slackUpSpeedCustom(2);
+			LineDetected &= ~LineCenter_Left;
+			break;
+		}
+
+		case LineCenter_Right:
+		{
+			turnLeftCustom(MAX_STEER_LEFT);
+			slackUpSpeedCustom(2);
+			LineDetected &= ~LineCenter_Right;
+			break;
+		}
+
+		case LineCenter_None:
+		{
+			// todo: go backwards until some sensor detects line
+			goDirect();
+			goBackwards();
+			break;
+		}
+	}
+
+}

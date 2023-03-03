@@ -1,14 +1,14 @@
 /**
  ********************************************************************************
- * @file    startup_board.h
+ * @file    control_unit.h
  * @author  user
- * @date    Nov 25, 2022
+ * @date    Dec 1, 2022
  * @brief   
  ********************************************************************************
  */
 
-#ifndef STARTUP_BOARD_H_
-#define STARTUP_BOARD_H_
+#ifndef CONTROL_UNIT_H_
+#define CONTROL_UNIT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,8 +33,8 @@ extern "C" {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void startupBoard(void);
-void startupInit(void);
+void controlUnit(void);
+void setWheelToInitPosition(void);
 
 #ifdef __cplusplus
 }

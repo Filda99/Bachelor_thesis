@@ -1,16 +1,16 @@
 /**
- ********************************************************************************
+ ***************************************************************************************************
  * @file    startup_board.c
  * @author  user
  * @date    Nov 25, 2022
  * @brief   
- ********************************************************************************
+ ***************************************************************************************************
  */
 
 
-/************************************
- * INCLUDES
- ************************************/
+//**************************************************************************************************
+//* INCLUDES
+//**************************************************************************************************
 #include "startup_peripherals.h"
 #include "MKL25Z4.h"
 #include "fsl_tpm.h"
@@ -20,66 +20,187 @@
 #include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
+#include "common.h"
 
-/************************************
- * EXTERN VARIABLES
- ************************************/
+//**************************************************************************************************
+//* EXTERN VARIABLES
+//**************************************************************************************************
 
-/************************************
- * PRIVATE MACROS AND DEFINES
- ************************************/
-/* Get source clock for TPM driver */
+//**************************************************************************************************
+//* PRIVATE MACROS AND DEFINES
+//**************************************************************************************************
+
+// Get source clock for TPM driver
 #define TPM_SOURCE_CLOCK 		CLOCK_GetFreq(kCLOCK_PllFllSelClk)
 #define I2C_MASTER_CLK_FREQ 	CLOCK_GetFreq(I2C0_CLK_SRC)
-#define GPIO_HALL_IRQn			PORTA_IRQn
-#define GPIO_COLOR_MAIN_IRQn	PORTD_IRQn
+#define GPIO_HALL_IRQn			PORTD_IRQn
+#define GPIO_COLOR_MAIN_IRQn	PORTA_IRQn
 
-/************************************
- * PRIVATE TYPEDEFS
- ************************************/
+#define LEFT_TPM_IC				kTPM_Chnl_0
+#define RIGHT_TPM_IC			kTPM_Chnl_4
+#define CENTER_TPM_IC			kTPM_Chnl_3
 
-/************************************
- * STATIC VARIABLES
- ************************************/
+//**************************************************************************************************
+//* PRIVATE TYPEDEFS
+//**************************************************************************************************
 
-/************************************
- * GLOBAL VARIABLES
- ************************************/
+//**************************************************************************************************
+//* STATIC VARIABLES
+//**************************************************************************************************
 
-/************************************
- * STATIC FUNCTION PROTOTYPES
- ************************************/
+//**************************************************************************************************
+//* GLOBAL VARIABLES
+//**************************************************************************************************
 
-/************************************
- * STATIC FUNCTIONS
- ************************************/
+//**************************************************************************************************
+//* STATIC FUNCTION PROTOTYPES
+//**************************************************************************************************
+
+//**************************************************************************************************
+//* STATIC FUNCTIONS
+//**************************************************************************************************
+
+
+//!*************************************************************************************************
+//! static void initMotors()
+//!
+//! @description
+//! Function initialize motors.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void initMotors()
+{
+	PRINTF("\t\t- Motors initialization started.");
+	static float initDutyCycleStep = 0.06;
+
+	float initDutyCycle = 2.88;
+
+	delay_ms(400);
+
+	for (int i = 0; i < 100; i++)
+	{
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, initDutyCycle);
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, initDutyCycle);
+		delay_ms(2);
+
+		initDutyCycle += initDutyCycleStep;
+		if( (i % 10) == 0) PRINTF(".");
+	}
+
+	// After inicialization, stop motors
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
+	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
+	delay_ms(50);
+	PRINTF("\r\n\t\t- Motors initialization complete.\r\n");
+}
+
+static void initServo()
+{
+	PRINTF("\t\t- Servo initialization started.\r\n");
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.37);
+	delay_ms(100);
+	PRINTF("\t\t- Servo initialization complete.\r\n");
+}
+
+//!*************************************************************************************************
+//! static void init_tsi(void)
+//!
+//! @description
+//! Function enables capacitive touch sensor on the MCU.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void init_tsi(void)
+{
+	SIM->SCGC5 |= SIM_SCGC5_TSI_MASK;
+	TSI0->GENCS = TSI_GENCS_TSIEN_MASK | TSI_GENCS_MODE(0) | TSI_GENCS_REFCHRG(4) | TSI_GENCS_DVOLT(0) | TSI_GENCS_EXTCHRG(7);
+	TSI0->DATA = TSI_DATA_TSICH(9) | TSI_DATA_TSICNT_MASK | TSI_DATA_SWTS_MASK;
+}
+
+//!*************************************************************************************************
+//! static void init_leds()
+//!
+//! @description
+//! Function enables leds on the MCU.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void init_leds(void)
+{
+	SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;
+	PORTB->PCR[18] = PORT_PCR_MUX(1);
+	PORTB->PCR[19] = PORT_PCR_MUX(1);
+	PORTD->PCR[1] = PORT_PCR_MUX(1);
+	GPIOB->PDDR |= (1 << 18) | (1 << 19);
+	GPIOD->PDDR |= (1<<1);
+}
+
+
+//!*************************************************************************************************
+//! static void startupPWM(void)
+//!
+//! @description
+//! Function sets appropriate parameters and starts pwm with duty cycle for stopping.
+//! This starts both motors and servo.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 static void startupPWM(void)
 {
+	PRINTF("\t- Motor and servo pwm initialization.\r\n");
+	// Motors
+	// todo: Motor Configuration
 	tpm_config_t tpmInfo;
 	tpm_chnl_pwm_signal_param_t tpmParam[2];
 
 	// Configure tpm params with frequency 24kHZ
 	tpmParam[0].chnlNumber = kTPM_Chnl_0;
 	tpmParam[0].level = kTPM_HighTrue;
-	tpmParam[0].dutyCyclePercent = 7.365;
 
 	tpmParam[1].chnlNumber = kTPM_Chnl_1;
 	tpmParam[1].level = kTPM_HighTrue;
-	tpmParam[1].dutyCyclePercent = 7.365;
+
+	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
+	CLOCK_SetTpmClock(1U);
+
+	TPM_GetDefaultConfig(&tpmInfo);
+	tpmInfo.prescale = kTPM_Prescale_Divide_16;
+	TPM_Init(TPM1, &tpmInfo);
+
+	TPM_SetupPwm(TPM1, tpmParam, 2U, kTPM_CenterAlignedPwm, 50U,
+			TPM_SOURCE_CLOCK);
+	TPM_StartTimer(TPM1, kTPM_SystemClock);
+
+	// Servo
+	tpm_chnl_pwm_signal_param_t tpmParamSer;
+
+	// Configure tpm params with frequency 24kHZ
+	tpmParamSer.chnlNumber = kTPM_Chnl_5;
+	tpmParamSer.level = kTPM_HighTrue;
+	tpmParamSer.dutyCyclePercent = 7.37;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
 
 	TPM_GetDefaultConfig(&tpmInfo);
 	tpmInfo.prescale = kTPM_Prescale_Divide_32;
-	// Initialize TPM module
-	TPM_Init(TPM1, &tpmInfo);
+	TPM_Init(TPM0, &tpmInfo);
 
-	TPM_SetupPwm(TPM1, tpmParam, 2U, kTPM_EdgeAlignedPwm, 50U,
+	TPM_SetupPwm(TPM0, &tpmParamSer, 1U, kTPM_EdgeAlignedPwm, 50U,
 			TPM_SOURCE_CLOCK);
-	TPM_StartTimer(TPM1, kTPM_SystemClock);
+	TPM_StartTimer(TPM0, kTPM_SystemClock);
 }
 
+/*
 static void startupI2C(void)
 {
     // ULTRASONIC masterXfer.slaveAddress = 0x57U;
@@ -99,9 +220,21 @@ static void startupI2C(void)
 		redColor[1]++;
 	}
 }
+*/
 
+//!*************************************************************************************************
+//! static void startupInterrupts(void)
+//!
+//! @description
+//! Function starts interrupts for HALL sensor on the left wheel.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 static void startupInterrupts(void)
 {
+	PRINTF("\t- Hall interrupt initialization.\r\n");
 	port_pin_config_t config;
 	port_interrupt_t portInterrupt;
 
@@ -110,48 +243,80 @@ static void startupInterrupts(void)
 	config.pullSelect = kPORT_PullUp;
 	portInterrupt = kPORT_InterruptFallingEdge;
 
-	PORT_SetMultiplePinsConfig(GPIO_HALL, HALL_IRQ_MASK, &config);
-	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_LEFT, portInterrupt);
-	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_RIGHT, portInterrupt);
+	PORT_SetPinConfig(GPIO_HALL, HALL_PIN, &config);
+	PORT_SetPinInterruptConfig(GPIO_HALL, HALL_PIN, portInterrupt);
 
 	EnableIRQ(GPIO_HALL_IRQn);
-
-	// Color sensor minor interrupt
-	config.mux = kPORT_MuxAsGpio;
-	config.pullSelect = kPORT_PullUp;
-	portInterrupt = kPORT_InterruptFallingEdge;
-
-	PORT_SetMultiplePinsConfig(GPIO_COLOR_MINOR_SEN, COLOR_MINOR_IRQ_MASK, &config);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, LEFT_MINOR_SEN, portInterrupt);
-	PORT_SetPinInterruptConfig(GPIO_COLOR_MINOR_SEN, RIGHT_MINOR_SEN, portInterrupt);
-
-	EnableIRQ(GPIO_COLOR_MAIN_IRQn);
 }
 
+
+//!*************************************************************************************************
+//! static void startupSensorCapture()
+//!
+//! @description
+//! Function sets input compare(input capture) function for color sensors.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 static void startupSensorCapture()
 {
+	PRINTF("\t- Color sensor initialization.\r\n");
+	tpm_config_t tpmInfo;
+
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
 
-	tpm_config_t tpmInfo;
-
 	TPM_GetDefaultConfig(&tpmInfo);
-	tpmInfo.prescale = kTPM_Prescale_Divide_32;
-	// Initialize TPM module
-	TPM_Init(TPM0, &tpmInfo);
+	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
 
-	TPM_SetupInputCapture(TPM0, kTPM_Chnl_0, kTPM_RiseAndFallEdge);
-	TPM_SetupInputCapture(TPM0, kTPM_Chnl_1, kTPM_RiseAndFallEdge);
-	TPM_SetupInputCapture(TPM0, kTPM_Chnl_2, kTPM_RiseAndFallEdge);
+	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
+	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RisingEdge);
+	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RisingEdge);
+
+    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl0InterruptEnable);
+    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl4InterruptEnable);
+    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl3InterruptEnable);
+    EnableIRQ(MAIN_SEN_TPM_IRQ);
+
+
+	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
+
+	// todo: GPIO C4 set to HIGH, GPIO C5 set to LOW
 }
 
-/************************************
- * GLOBAL FUNCTIONS
- ************************************/
+
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
+
+void startupInit(void)
+{
+	init_leds();
+	init_tsi();
+}
+
+//!*************************************************************************************************
+//! void startupBoard(void)
+//!
+//! @description
+//! Function starts all used functionalities, which have not yet been launched in pin_mux.c.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void startupBoard(void)
 {
-	//startupI2C();
-	//startupPWM();
-	startupSensorCapture();
+	PRINTF("Startup board and peripherals.\r\n");
+	startupPWM();
+	//initMotors();
+	//initServo();
+
 	startupInterrupts();
+	startupSensorCapture();
+
+	//startupI2C();
+	PRINTF("Startup board and peripherals complete.\r\n");
 }

@@ -7,57 +7,137 @@
  ********************************************************************************
  */
 
-/************************************
- * INCLUDES
- ************************************/
+//**************************************************************************************************
+//* INCLUDES
+//**************************************************************************************************
 #include "fsl_port.h"
 #include "global_macros.h"
 #include "fsl_gpio.h"
 #include "MKL25Z4.h"
+#include "fsl_debug_console.h"
+#include "motors/engines.h"
 
-/************************************
- * EXTERN VARIABLES
- ************************************/
-extern uint32_t noOfRotations;
+//**************************************************************************************************
+//* EXTERN VARIABLES
+//**************************************************************************************************
+extern unsigned int HalfWheelRotations;
+extern unsigned int LeftSensorValue;
+extern bool InitStop;
 
-/************************************
- * PRIVATE MACROS AND DEFINES
- ************************************/
-#define GPIO_HALL_IRQHandler	PORTA_IRQHandler
-#define GPIO_COLOR_MAIN_IRQHandler	PORTD_IRQHandler
+//**************************************************************************************************
+//* PRIVATE MACROS AND DEFINES
+//**************************************************************************************************
+#define GPIO_HALL_IRQHandler		PORTD_IRQHandler
+#define GPIO_COLOR_MINOR_IRQHandler	PORTA_IRQHandler
+#define GPIO_COLOR_MAIN_IRQHandler	TPM0_IRQHandler
+#define FIELD_SIZE 20
 
-/************************************
- * PRIVATE TYPEDEFS
- ************************************/
+#define LEFT_TPM_IC					kTPM_Chnl_0
+#define RIGHT_TPM_IC				kTPM_Chnl_4
+#define CENTER_TPM_IC				kTPM_Chnl_3
 
-/************************************
- * STATIC VARIABLES
- ************************************/
-static uint32_t timerLeftSensor = 0;
+#define MAX_UINT16	65535
 
-/************************************
- * GLOBAL VARIABLES
- ************************************/
+//**************************************************************************************************
+//* PRIVATE TYPEDEFS
+//**************************************************************************************************
 
-/************************************
- * STATIC FUNCTION PROTOTYPES
- ************************************/
+//**************************************************************************************************
+//* STATIC VARIABLES
+//**************************************************************************************************
 
-/************************************
- * STATIC FUNCTIONS
- ************************************/
+//**************************************************************************************************
+//* GLOBAL VARIABLES
+//**************************************************************************************************
 
-/************************************
- * GLOBAL FUNCTIONS
- ************************************/
+//**************************************************************************************************
+//* STATIC FUNCTION PROTOTYPES
+//**************************************************************************************************
+
+//**************************************************************************************************
+//* STATIC FUNCTIONS
+//**************************************************************************************************
+
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
 void GPIO_HALL_IRQHandler()
 {
-	noOfRotations++;
+	// Interrupt every half spin (two magnets)
+	HalfWheelRotations++;
 	PORT_ClearPinsInterruptFlags(GPIO_HALL, HALL_IRQ_MASK);
+
+	// TBD
+	/*if (InitStop)
+	{
+		stopCar();
+		HalfWheelRotations = 0;
+		InitStop = false;
+	}*/
+}
+
+
+// TODO: Pokud se vyvola preruseni, zjisti od koho a zjisti CnV a uloz do glob. prom.
+void GPIO_COLOR_MAIN_IRQHandler()
+{
+	//uint32_t pinInterrupt = GPIO_GetPinsInterruptFlags(PTD);
+	uint32_t pinInterrupt = TPM_GetStatusFlags(MAIN_SEN_TPM_BASE);
+
+
+	if(pinInterrupt & kTPM_Chnl0Flag)
+	{
+		static uint32_t firstCapture = 0;
+		static uint32_t secondCapture = 0;
+
+		static uint32_t colorDetection[FIELD_SIZE] = {0, };
+		static uint8_t head = 0;
+
+		static bool rising = true;
+
+		if (rising)
+		{
+			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+		}
+		else
+		{
+			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			uint32_t pulseWidth = secondCapture - firstCapture;
+			if (pulseWidth > 10000)
+			{
+				uint32_t firstPart = MAX_UINT16 - firstCapture;
+				pulseWidth = secondCapture + firstPart;
+			}
+
+
+			if(head != FIELD_SIZE)
+			{
+				colorDetection[head] = pulseWidth;
+				head++;
+			}
+			else
+			{
+				colorDetection[head] = pulseWidth;
+
+				uint32_t color = 0;
+				for (int i = 0; i < FIELD_SIZE; i++)
+				{
+					color += colorDetection[i];
+				}
+				LeftSensorValue = color/FIELD_SIZE;
+				head = 0;
+				DisableIRQ(MAIN_SEN_TPM_IRQ);
+			}
+		}
+		rising = !rising;
+		MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
+		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl0Flag);
+	}
+
+
 }
 
 // TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
-void GPIO_COLOR_MAIN_IRQHandler()
+void GPIO_COLOR_MINOR_IRQHandler()
 {
 
 }

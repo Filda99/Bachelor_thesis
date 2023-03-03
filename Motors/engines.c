@@ -11,23 +11,22 @@
  * INCLUDES
  ************************************/
 #include "engines.h"
-#include "fsl_tpm.h"
-#include "global_macros.h"
+#include "../drivers/fsl_tpm.h"
+#include "../source/global_macros.h"
+#include "../source/common.h"
 
 /************************************
  * EXTERN VARIABLES
  ************************************/
+extern bool IsCmdToStopCar;
+extern bool InitStop;
+extern uint8_t currentSpeed;
+extern uint8_t currentSteer;
 
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define MAX_SPEED_FORWARDS	11
-#define MAX_SPEED_BACKWARDS	0
-#define MAX_STEER_LEFT		0
-#define MAX_STEER_RIGHT		7
-
-#define STOP_SPEED			5
-#define GO_DIRECT			3
+#define STOP			7.365
 
 /************************************
  * PRIVATE TYPEDEFS
@@ -39,17 +38,7 @@
 float leftMotorSpeed;
 float rightMotorSpeed;
 
-//! Current position in speed array.
-//! 0 = max backwards
-//! 5 = stop engines
-//! 11 = max forwards
-static int currentSpeed = 5;
 
-//! Current position in steer array.
-//! 0 = max left
-//! 3 = direct
-//! 7 = max right
-static int currentSteer = 3;
 
 /************************************
  * GLOBAL VARIABLES
@@ -64,16 +53,16 @@ static int currentSteer = 3;
  ************************************/
 static void getDutyCycle(float setSpeed)
 {
-	float RightMotorSpeed = setSpeed;
+	rightMotorSpeed = setSpeed;
 	// Car wants to move forwards
-	if (RightMotorSpeed > STOP)
+	if (rightMotorSpeed > STOP)
 	{
-		leftMotorSpeed = STOP - (RightMotorSpeed - STOP);
+		leftMotorSpeed = STOP - (rightMotorSpeed - STOP);
 	}
 	// Backwards
-	else if (RightMotorSpeed < STOP)
+	else if (rightMotorSpeed < STOP)
 	{
-		leftMotorSpeed = STOP + (RightMotorSpeed - STOP);
+		leftMotorSpeed = STOP + (rightMotorSpeed - STOP);
 	}
 	// Stop state
 	else
@@ -83,30 +72,40 @@ static void getDutyCycle(float setSpeed)
 }
 
 
-/************************************
- * GLOBAL FUNCTIONS
- ************************************/
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
+
+//!*************************************************************************************************
+//! void setMotorSpeed(int speed)
+//!
+//! @description
+//! Update PWM duty cycle based on variables rightMotorSpeed and leftMotorSpeed.
+//!
+//! @param	speed	Number which points to position in SpeedMap array.
+//!
+//! @return	None
+//!*************************************************************************************************
 void setMotorSpeed(int speed)
 {
 	float setSpeed = SpeedMap[speed];
 	getDutyCycle(setSpeed);
 
 	// Set left motor duty cycle.
-	// chnl_0 == PTA13
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
-			kTPM_EdgeAlignedPwm, rightMotorSpeed);
+			kTPM_EdgeAlignedPwm, leftMotorSpeed);
 
 	// Set right motor duty cycle.
-	// chnl_1 == PTA12
 	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
-			kTPM_EdgeAlignedPwm, leftMotorSpeed);
+			kTPM_EdgeAlignedPwm, rightMotorSpeed);
+
+	delay_ms(50);
 }
 
 void setMotorSteer(int steer)
 {
 	float setSteer = SteerMap[steer];
-	// TODO: get right pin to connect servo to
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_2,
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5,
 				kTPM_EdgeAlignedPwm, setSteer);
 }
 
@@ -115,7 +114,7 @@ void setMotorSteer(int steer)
 //-------------------
 void addSpeed()
 {
-	if (currentSpeed == MAX_SPEED_FORWARDS) return;
+	if (currentSpeed == MAX_FORWARD_ENGINE_LIMIT) return;
 
 	currentSpeed++;
 	setMotorSpeed(currentSpeed);
@@ -123,9 +122,9 @@ void addSpeed()
 
 void addSpeedCustom(int speed)
 {
-	if ((currentSpeed + speed) >= MAX_SPEED_FORWARDS)
+	if ((currentSpeed + speed) >= MAX_FORWARD_ENGINE_LIMIT)
 	{
-		currentSpeed = MAX_SPEED_FORWARDS;
+		currentSpeed = MAX_FORWARD_ENGINE_LIMIT;
 	}
 	else
 	{
@@ -137,17 +136,21 @@ void addSpeedCustom(int speed)
 
 void slackUpSpeed()
 {
-	if (currentSpeed == MAX_SPEED_BACKWARDS) return;
+	if (currentSpeed == MAX_REVERSE_ENGINE_LIMIT) return;
 
 	currentSpeed--;
+	if(currentSpeed < ENGINE_STOP)
+	{
+		currentSpeed = ENGINE_STOP + 1;
+	}
 	setMotorSpeed(currentSpeed);
 }
 
 void slackUpSpeedCustom(int speed)
 {
-	if ((currentSpeed - speed) <= MAX_SPEED_BACKWARDS)
+	if ((currentSpeed - speed) < ENGINE_STOP)
 	{
-		currentSpeed = MAX_SPEED_BACKWARDS;
+		currentSpeed = ENGINE_STOP + 1;
 	}
 	else
 	{
@@ -157,9 +160,23 @@ void slackUpSpeedCustom(int speed)
 	setMotorSpeed(currentSpeed);
 }
 
+void goBackwards()
+{
+	currentSpeed = MAX_REVERSE_ENGINE_LIMIT;
+	setMotorSpeed(currentSpeed);
+}
+
 void stopCar()
 {
-	currentSpeed = STOP_SPEED;
+	currentSpeed = ENGINE_STOP;
+	setMotorSpeed(currentSpeed);
+}
+
+void hardStop()
+{
+	IsCmdToStopCar = true;
+
+	currentSpeed = ENGINE_STOP;
 	setMotorSpeed(currentSpeed);
 }
 

@@ -1,99 +1,137 @@
-/*
- * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/**
+ ***************************************************************************************************
+ * @file    main.c
+ * @author  user
+ * @date    Jul 18, 2022
+ * @brief
+ ***************************************************************************************************
  */
 
-/************************************
- * INCLUDES
- ************************************/
+//**************************************************************************************************
+//* INCLUDES
+//**************************************************************************************************
+#include "map/map_operations.h"
 #include "fsl_debug_console.h"
+#include "fsl_device_registers.h"
 #include "board.h"
 #include "startup_board.h"
 #include "pin_mux.h"
 #include "routine.h"
 #include "fsl_port.h"
+#include "MKL25Z4.h"
+#include "control_unit.h"
+#include "motors/engines.h"
+#include "common.h"
 
-/************************************
- * EXTERN VARIABLES
- ************************************/
-extern uint32_t noOfRotations;
+//**************************************************************************************************
+//* EXTERN VARIABLES
+//**************************************************************************************************
+extern unsigned LeftSensorValue;
+extern unsigned char LineDetected;
+extern bool IsCmdToStopCar;
 
-/************************************
- * PRIVATE MACROS AND DEFINES
- ************************************/
+//**************************************************************************************************
+//* PRIVATE MACROS AND DEFINES
+//**************************************************************************************************
+#define LED_BLUE_TURN_ON() GPIOD->PCOR |= (1<<1)
+#define LED_BLUE_TURN_OFF() GPIOD->PSOR |= (1<<1)
 
-/************************************
- * PRIVATE TYPEDEFS
- ************************************/
+//**************************************************************************************************
+//* PRIVATE TYPEDEFS
+//**************************************************************************************************
 
-/************************************
- * STATIC VARIABLES
- ************************************/
+//**************************************************************************************************
+//* STATIC VARIABLES
+//**************************************************************************************************
 
-/************************************
- * GLOBAL VARIABLES
- ************************************/
+//**************************************************************************************************
+//* GLOBAL VARIABLES
+//**************************************************************************************************
 
-/************************************
- * STATIC FUNCTION PROTOTYPES
- ************************************/
+//**************************************************************************************************
+//* STATIC FUNCTION PROTOTYPES
+//**************************************************************************************************
 
-/************************************
- * STATIC FUNCTIONS
- ************************************/
-static void wait(int ms)
-{
-	for(volatile int i = ms * 247; i > 0; i--);
-}
+//**************************************************************************************************
+//* STATIC FUNCTIONS
+//**************************************************************************************************
 
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
 
-/************************************
- * GLOBAL FUNCTIONS
- ************************************/
-/*!
- * @brief Main function
- */
+//!*************************************************************************************************
+//! int main(void)
+//!
+//! @description
+//! Main function.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 int main(void)
 {
-	/* Board pin, clock, debug console init */
 	BOARD_InitPins();
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
-	wait(30000);
-	startupBoard();
-	wait(600);
-	PRINTF("All peripherals have been started.\r\n");
 
-	while(1)
+	startupInit();
+	uint16_t touch_value;
+	uint8_t nextAction = 0;
+
+	PRINTF("Waiting for initialization -> Press capacitive sensor.\r\n");
+
+	while (1)
 	{
-		//routine();
-	    PRINTF("Rotations: %i\r\n", noOfRotations);
-	    wait(1000);
+		// Get data from touch sensor
+		TSI0->DATA |= TSI_DATA_SWTS_MASK;
+		while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
+		{
+		}
+		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
+		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
+
+		// Wait for initialization
+		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
+		{
+			LED_RED_ON();
+			LED_GREEN_OFF();
+			LED_BLUE_TURN_OFF();
+
+			nextAction++;
+		}
+		// Initial initialization
+		else if (touch_value > 2 && touch_value < 10 && (nextAction == 1))
+		{
+			PRINTF("-----------------\r\n");
+			LED_RED_ON();
+			LED_GREEN_ON();
+
+			startupBoard();
+			// todo: Reach the starting line
+			//setWheelToInitPosition();
+
+			nextAction++;
+			PRINTF("Waiting for routine -> Press capacitive sensor.\r\n");
+		}
+		// Start routine
+		else if (touch_value > 2 && touch_value < 10 && (nextAction == 2))
+		{
+			PRINTF("-----------------\r\n");
+			PRINTF("Starting routine.\r\n");
+			LED_RED_OFF();
+			addSpeed();
+
+			while (!IsCmdToStopCar)
+			{
+				routine();
+			}
+
+			// If car stopped, wait for command to continue.
+			nextAction = 2;
+		}
 	}
 }
+

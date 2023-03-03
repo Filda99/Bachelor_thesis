@@ -1,39 +1,21 @@
 /**
- ********************************************************************************
- * @file    routine.c
+ ***************************************************************************************************
+ * @file    common1.c
  * @author  user
- * @date    Jul 18, 2022
- * @brief
- ********************************************************************************
+ * @date    Feb 7, 2023
+ * @brief   
+ ***************************************************************************************************
  */
 
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "routine.h"
-#include "MKL25Z4.h"
-#include "global_macros.h"
-
-#include "fsl_tpm.h"
-#include "fsl_gpio.h"
-#include "fsl_debug_console.h"
-
-#include "motors/engines.h"
-#include "control_unit.h"
-#include "map/mapping.h"
-#include "map/map_operations.h"
+#include "fsl_common.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern line_location_t LineDetected;
-extern unsigned int LeftSensorValue;
-extern unsigned int CenterSensorValue;
-extern unsigned int RightSensorValue;
 
-// todo: remove. This is only for program without car.
-extern unsigned int HalfWheelRotations;
-extern map_block *currentBlockInMap;
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -58,28 +40,12 @@ extern map_block *currentBlockInMap;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-//!*************************************************************************************************
-//! void checkLine(void)
-//!
-//! @description
-//! Get the data from the camera and based on that decide how much and where to turn.
-//!
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void checkLines()
-{
-
-}
-
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
 //!*************************************************************************************************
-//! void routine(void)
+//! void delay_ms(uint32_t ms)
 //!
 //! @description
 //! Function
@@ -88,9 +54,32 @@ static void checkLines()
 //!
 //! @return   None
 //!*************************************************************************************************
-void routine(void)
+void delay_ms(uint32_t ms)
 {
-	checkLines();
-	controlUnit();
+    uint32_t i;
+    for (i = 0; i < (SystemCoreClock / 14000 * ms); i++)
+    {
+        __asm("NOP");
+    }
 }
 
+//!*************************************************************************************************
+//! void delay(uint32_t delay)
+//!
+//! @description
+//! Function will probably not be used. Maybe in the application, when it is flashed to the
+//! controller == without debbuging (not working with debug).
+//!
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+void delay(uint32_t delay)
+{
+  uint32_t currentTime = 0;
+  currentTime = SysTick->VAL;
+  while ((SysTick->VAL - currentTime) > delay) {
+    // do nothing
+  }
+}
