@@ -23,6 +23,8 @@
 #include "motors/engines.h"
 #include "common.h"
 
+#include "peripherals/vl53l0x_api.h"
+
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
@@ -128,26 +130,6 @@ int main(void)
 			while (!IsCmdToStopCar)
 			{
 				routine();
-
-				/*PRINTF("Go direct.\r\n");
-				goDirect();
-				delay_ms(100);
-
-				// DEBUG: Control servo
-				PRINTF("Go left 3 times.\r\n");
-				for (int i = 0; i < 3; i++)
-				{
-					turnLeft();
-					delay_ms(100);
-				}
-				PRINTF("Go right 6 times.\r\n");
-				for (int i = 0; i < 6; i++)
-				{
-					turnRight();
-					delay_ms(100);
-				}*/
-
-
 			}
 
 			// If car stopped, wait for command to continue.
