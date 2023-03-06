@@ -19,9 +19,7 @@
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
-#define I2C_MASTER_CLOCK_FREQUENCY (12000000)
-#define I2C_MASTER_SLAVE_ADDR_7BIT (0x52U)
-#define I2C_MASTER_TX_CMD (0x01U)
+#define I2C_MASTER_CLOCK_FREQUENCY 12000000
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -34,7 +32,6 @@
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
-i2c_master_config_t masterConfig;
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -49,113 +46,114 @@ i2c_master_config_t masterConfig;
 //**************************************************************************************************
 
 //!*************************************************************************************************
-//! void function(void)
+//! void i2c_init(uint8_t slave_addr, uint8_t *data, size_t dataSize)
 //!
 //! @description
-//! Function
+//! Function initialize i2c slave device.
 //!
-//! @param    None
+//! @note	Function will wait until slave device corresponds.
+//!
+//! @param    uint8_t deviceAddr	Address of device we want to communicate.
+//! @param    uint8_t *data			Initialization data, which should be written.
+//! @param    size_t dataSize		Size of sending data.
 //!
 //! @return   None
 //!*************************************************************************************************
-
-
-
-void i2c_init_my(void)
+void i2cInit(uint8_t deviceAddr, uint8_t *data, size_t dataSize)
 {
-    i2c_master_transfer_t masterXfer;
-
+    i2c_master_config_t masterConfig;
     I2C_MasterGetDefaultConfig(&masterConfig);
     masterConfig.baudRate_Bps = 400000;
     I2C_MasterInit(I2C1, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
 
-    masterXfer.flags = kI2C_TransferDefaultFlag;
-    masterXfer.slaveAddress = I2C_MASTER_SLAVE_ADDR_7BIT;
-    masterXfer.direction = kI2C_Write;
-    masterXfer.subaddress = I2C_MASTER_TX_CMD;
-    masterXfer.subaddressSize = 1;
-    masterXfer.data = NULL;
-    masterXfer.dataSize = 0;
-
-    I2C_MasterTransferBlocking(I2C1, &masterXfer);
-}
-
-void I2C_WriteByte(uint8_t reg, uint8_t data)
-{
-    uint8_t buf[2];
     i2c_master_transfer_t masterXfer;
-
-    buf[0] = reg;
-    buf[1] = data;
-
-    masterXfer.slaveAddress = I2C_MASTER_SLAVE_ADDR_7BIT;
-    masterXfer.direction = kI2C_Write;
-    masterXfer.subaddress = 0U;
-    masterXfer.subaddressSize = 0U;
-    masterXfer.data = buf;
-    masterXfer.dataSize = 2U;
     masterXfer.flags = kI2C_TransferDefaultFlag;
+    masterXfer.slaveAddress = deviceAddr;
+    masterXfer.direction = kI2C_Write;
+    masterXfer.subaddress = 0;
+    masterXfer.subaddressSize = 0;
+    masterXfer.data = data;
+    masterXfer.dataSize = dataSize;
 
     I2C_MasterTransferBlocking(I2C1, &masterXfer);
 }
 
-void i2c_write_reg(uint8_t deviceAddr, uint8_t regAddr, uint8_t value)
+//!*************************************************************************************************
+//! void i2cWrite(uint8_t deviceAddr, uint8_t reg_addr, uint8_t regAddr, uint8_t value)
+//!
+//! @description
+//! Function calls api function for sending data (one byte) to the slave device.
+//!
+//! @param    uint8_t deviceAddr	Address of device we want to communicate.
+//! @param    uint8_t regAddr		Slave register address, if needed to write to specific reg.
+//! @param    uint8_t data			One byte of data to be send.
+//!
+//! @code
+//! uint8_t regAddr = 0x52;
+//! uint8_t regAddr = 0;	// If we don't want to read data from specific register
+//! uint8_t data = 1;		// One byte of data to be send
+//! i2cWrite(regAddr, regAddr, data);
+//!
+//! @return   kStatus_Fail if data was send unsuccessfully, kStatus_Success otherwise.
+//!*************************************************************************************************
+status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
 {
     i2c_master_transfer_t transfer;
-    uint8_t txBuff[2];
+    uint8_t buff[2];
 
-    txBuff[0] = regAddr;
-    txBuff[1] = value;
+    buff[0] = regAddr;
+    buff[1] = data;
 
     transfer.flags = kI2C_TransferDefaultFlag;
     transfer.slaveAddress = deviceAddr;
     transfer.direction = kI2C_Write;
     transfer.subaddress = 0;
     transfer.subaddressSize = 0;
-    transfer.data = txBuff;
+    transfer.data = buff;
     transfer.dataSize = 2;
 
-    I2C_MasterTransferBlocking(I2C1, &transfer);
+    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+	{
+		return kStatus_Fail;
+	}
+
+	return kStatus_Success;
 }
 
-
-uint8_t I2C_ReadByte(uint8_t reg)
+//!*************************************************************************************************
+//! status_t i2c_read(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t dataLen)
+//!
+//! @description
+//! Function calls api function for reading data (one byte) from the slave device.
+//!
+//! @note	Buffer data has to be initialize before function is called.
+//!
+//! @param    uint8_t deviceAddr	Address of device we want to communicate.
+//! @param    uint8_t regAddr		Slave register address, if needed to get data from specific reg.
+//! @param    uint8_t data			Data buffer, where should be data stored after received.
+//! @param    uint32_t dataLen		Size of how much data do we want.
+//!
+//! @code
+//! uint8_t deviceAddr = 0x52;
+//! uint8_t regAddr = 0;	// If we don't want to read data from specific register
+//! uint8_t data[5] = {0,};
+//! i2cRead(deviceAddr, regAddr, data, sizeof(data));
+//!
+//! @return   kStatus_Fail if data was received unsuccessfully, kStatus_Success otherwise.
+//!*************************************************************************************************
+status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t dataLen)
 {
-    uint8_t buf[1];
-    i2c_master_transfer_t masterXfer;
+	if (!data)
+	{
+		return kStatus_Fail;
+	}
 
-    masterXfer.slaveAddress = I2C_MASTER_SLAVE_ADDR_7BIT;
-    masterXfer.direction = kI2C_Write;
-    masterXfer.subaddress = reg;
-    masterXfer.subaddressSize = 1;
-    masterXfer.data = NULL;
-    masterXfer.dataSize = 0;
-    masterXfer.flags = kI2C_TransferDefaultFlag;
-
-    I2C_MasterTransferBlocking(I2C1, &masterXfer);
-
-    masterXfer.slaveAddress = I2C_MASTER_SLAVE_ADDR_7BIT;
-    masterXfer.direction = kI2C_Read;
-    masterXfer.subaddress = 0U;
-    masterXfer.subaddressSize = 0U;
-    masterXfer.data = buf;
-    masterXfer.dataSize = 1U;
-    masterXfer.flags = kI2C_TransferDefaultFlag;
-
-    I2C_MasterTransferBlocking(I2C1, &masterXfer);
-
-    return buf[0];
-}
-
-status_t i2c_read_reg(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint32_t data_len)
-{
-    i2c_master_transfer_t transfer = {0};
-
+    i2c_master_transfer_t transfer;
     /* Send register address to read from */
     transfer.flags = kI2C_TransferDefaultFlag;
-    transfer.slaveAddress = dev_addr;
+    transfer.slaveAddress = deviceAddr;
     transfer.direction = kI2C_Write;
-    transfer.subaddress = reg_addr;
+    transfer.subaddress = regAddr;
     transfer.subaddressSize = 1;
     transfer.data = NULL;
     transfer.dataSize = 0;
@@ -169,7 +167,7 @@ status_t i2c_read_reg(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint32_
     transfer.subaddress = 0;
     transfer.subaddressSize = 0;
     transfer.data = data;
-    transfer.dataSize = data_len;
+    transfer.dataSize = dataLen;
     if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
     {
         return kStatus_Fail;
@@ -177,8 +175,5 @@ status_t i2c_read_reg(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint32_
 
     return kStatus_Success;
 }
-
-
-
 
 
