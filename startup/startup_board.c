@@ -36,9 +36,6 @@
 #define GPIO_HALL_IRQn			PORTD_IRQn
 #define GPIO_COLOR_MAIN_IRQn	PORTA_IRQn
 
-#define LEFT_TPM_IC				kTPM_Chnl_0
-#define RIGHT_TPM_IC			kTPM_Chnl_4
-#define CENTER_TPM_IC			kTPM_Chnl_3
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -200,28 +197,6 @@ static void startupPWM(void)
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
 }
 
-/*
-static void startupI2C(void)
-{
-    // ULTRASONIC masterXfer.slaveAddress = 0x57U;
-	i2c_master_config_t config;
-
-	I2C_MasterGetDefaultConfig(&config);
-
-	uint32_t srcClk = I2C_MASTER_CLK_FREQ;
-	I2C_MasterInit(I2C0, &config, srcClk);
-
-	bool ColorSensor = ISL_ColorSensorInit();
-
-	if(ColorSensor)
-	{
-		uint8_t redColor[2];
-		ISL_readRed(redColor);
-		redColor[1]++;
-	}
-}
-*/
-
 //!*************************************************************************************************
 //! static void startupInterrupts(void)
 //!
@@ -250,41 +225,6 @@ static void startupInterrupts(void)
 }
 
 
-//!*************************************************************************************************
-//! static void startupSensorCapture()
-//!
-//! @description
-//! Function sets input compare(input capture) function for color sensors.
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void startupSensorCapture()
-{
-	PRINTF("\t- Color sensor initialization.\r\n");
-	tpm_config_t tpmInfo;
-
-	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
-	CLOCK_SetTpmClock(1U);
-
-	TPM_GetDefaultConfig(&tpmInfo);
-	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
-
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RisingEdge);
-
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl0InterruptEnable);
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl4InterruptEnable);
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl3InterruptEnable);
-    EnableIRQ(MAIN_SEN_TPM_IRQ);
-
-
-	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
-
-	// todo: GPIO C4 set to HIGH, GPIO C5 set to LOW
-}
 
 
 //**************************************************************************************************
@@ -311,12 +251,10 @@ void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
 	startupPWM();
-	//initMotors();
-	//initServo();
+	initMotors();
+	initServo();
 
 	startupInterrupts();
-	startupSensorCapture();
 
-	//startupI2C();
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

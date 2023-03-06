@@ -20,20 +20,11 @@
 
 #include "motors/engines.h"
 #include "control_unit.h"
-#include "map/mapping.h"
-#include "map/map_operations.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern line_location_t LineDetected;
-extern unsigned int LeftSensorValue;
-extern unsigned int CenterSensorValue;
-extern unsigned int RightSensorValue;
 
-// todo: remove. This is only for program without car.
-extern unsigned int HalfWheelRotations;
-extern map_block *currentBlockInMap;
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************

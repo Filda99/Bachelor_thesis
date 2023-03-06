@@ -18,7 +18,6 @@
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern unsigned char LineDetected;
 extern unsigned int HalfWheelRotations;
 
 //**************************************************************************************************
@@ -68,7 +67,8 @@ void setWheelToInitPosition()
 //!*************************************************************************************************
 void controlUnit()
 {
-	switch(LineDetected)
+	// todo: rewrite control unit
+	/*switch(LineDetected)
 	{
 		case LineNone:
 		{
@@ -156,6 +156,6 @@ void controlUnit()
 			goBackwards();
 			break;
 		}
-	}
+	}*/
 
 }
