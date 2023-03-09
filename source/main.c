@@ -21,6 +21,7 @@
 #include "control_unit.h"
 #include "motors/engines.h"
 #include "common.h"
+#include "startup_peripherals.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -109,6 +110,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
+			startupPeripherals();
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
 

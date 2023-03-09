@@ -16,11 +16,11 @@
 #include "fsl_tpm.h"
 #include "fsl_i2c.h"
 #include "board.h"
-#include "fsl_debug_console.h"
 #include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
 #include "common.h"
+#include "fsl_debug_console.h"
 #include "peripherals/i2c.h"
 
 //**************************************************************************************************
@@ -58,51 +58,6 @@
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-
-//!*************************************************************************************************
-//! static void initMotors()
-//!
-//! @description
-//! Function initialize motors.
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void initMotors()
-{
-	PRINTF("\t\t- Motors initialization started.");
-	static float initDutyCycleStep = 0.06;
-
-	float initDutyCycle = 2.88;
-
-	delay_ms(400);
-
-	for (int i = 0; i < 100; i++)
-	{
-		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, initDutyCycle);
-		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, initDutyCycle);
-		delay_ms(2);
-
-		initDutyCycle += initDutyCycleStep;
-		if( (i % 10) == 0) PRINTF(".");
-	}
-
-	// After inicialization, stop motors
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
-	delay_ms(50);
-	PRINTF("\r\n\t\t- Motors initialization complete.\r\n");
-}
-
-static void initServo()
-{
-	PRINTF("\t\t- Servo initialization started.\r\n");
-	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.37);
-	delay_ms(100);
-	PRINTF("\t\t- Servo initialization complete.\r\n");
-}
-
 //!*************************************************************************************************
 //! static void init_tsi(void)
 //!
@@ -139,7 +94,6 @@ static void init_leds(void)
 	GPIOB->PDDR |= (1 << 18) | (1 << 19);
 	GPIOD->PDDR |= (1<<1);
 }
-
 
 //!*************************************************************************************************
 //! static void startupPWM(void)
@@ -225,17 +179,21 @@ static void startupInterrupts(void)
 	EnableIRQ(GPIO_HALL_IRQn);
 }
 
-static void startupI2C()
-{
-
-}
-
-
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
+//!*************************************************************************************************
+//! void startupInit(void)
+//!
+//! @description
+//! Function starts touch sensor and led.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void startupInit(void)
 {
 	init_leds();
@@ -256,12 +214,7 @@ void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
 	startupPWM();
-	initMotors();
-	initServo();
-
 	startupInterrupts();
-
-	startupI2C();
 
 	PRINTF("Startup board and peripherals complete.\r\n");
 }
