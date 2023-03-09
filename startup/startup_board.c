@@ -21,6 +21,7 @@
 #include "fsl_port.h"
 #include "global_macros.h"
 #include "common.h"
+#include "peripherals/i2c.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -224,6 +225,10 @@ static void startupInterrupts(void)
 	EnableIRQ(GPIO_HALL_IRQn);
 }
 
+static void startupI2C()
+{
+
+}
 
 
 
@@ -255,6 +260,8 @@ void startupBoard(void)
 	initServo();
 
 	startupInterrupts();
+
+	startupI2C();
 
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

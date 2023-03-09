@@ -59,11 +59,11 @@
 //!
 //! @return   None
 //!*************************************************************************************************
-void i2cInit(uint8_t deviceAddr, uint8_t *data, size_t dataSize)
+void i2cInit(uint8_t deviceAddr, uint32_t baudRate, uint8_t *data, size_t dataSize)
 {
     i2c_master_config_t masterConfig;
     I2C_MasterGetDefaultConfig(&masterConfig);
-    masterConfig.baudRate_Bps = 400000;
+    masterConfig.baudRate_Bps = baudRate;
     I2C_MasterInit(I2C1, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
 
     i2c_master_transfer_t masterXfer;
