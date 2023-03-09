@@ -20,6 +20,7 @@
 
 #include "motors/engines.h"
 #include "control_unit.h"
+#include "math.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -36,6 +37,11 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+
+//! Two vectors, which represents traffic lanes
+vector vLeft, vRight = {
+		.initial = {0, }, .final = {0, }
+};
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -65,6 +71,31 @@ static void checkLines()
 
 }
 
+//!*************************************************************************************************
+//! void checkLine(void)
+//!
+//! @description
+//! Get the data from the camera and based on that decide how much and where to turn.
+//!
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+static void vectorCalculation()
+{
+	// Get delta y, which one is longer will be main vector
+	uint32_t deltaYLeft = vLeft.final.y - vLeft.initial.y;
+	uint32_t deltaYRight = vRight.final.y - vRight.initial.y;
+
+	vector masterVector = (deltaYLeft > deltaYRight) ? vLeft : vRight;
+
+	// Get angle of a turn
+	uint32_t deltaX = masterVector.final.x - masterVector.initial.x;
+	uint32_t deltaY = masterVector.final.x - masterVector.initial.x;
+	float angle = atan2(deltaX /deltaY);
+}
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
@@ -82,6 +113,7 @@ static void checkLines()
 void routine(void)
 {
 	checkLines();
+	vectorCalculation();
 	controlUnit();
 }
 
