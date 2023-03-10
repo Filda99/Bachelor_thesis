@@ -88,26 +88,26 @@ static void printBlock()
 static void checkLines()
 {
 	static int enableIrq = 0;
-	bool lineDetected = false;
+	bool isLineDetected = false;
 
 	if (LeftSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected = LineLeft;
-		lineDetected = true;
+		isLineDetected = true;
 	}
 	/*if (RightSensorValue < COLOR_TRESHOLD)
 	{
 		LineDetected |= LineRight;
-		lineDetected = true;
+		isLineDetected = true;
 	}
 	if (CenterSensorValue < COLOR_TRESHOLD)
 	{
 		// TODO: LineDetected |= LineCenter;
-		lineDetected = true;
+		isLineDetected = true;
 	}*/
 
 
-	if (!lineDetected)
+	if (!isLineDetected)
 	{
 		LineDetected = LineNone;
 	}

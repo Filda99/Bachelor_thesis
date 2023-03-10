@@ -40,8 +40,11 @@ typedef enum _block_direction
 //* GLOBAL VARIABLES
 //**************************************************************************************************
 map_block *currentBlockInMap;
-uint8_t currentPosRows = MAP_ROWS / 2;
-uint8_t currentPosCols = MAP_COLUMNS / 2;
+
+curr_pos_map currPosInBlk = {
+		MAP_ROWS / 2,
+		MAP_COLUMNS / 2
+};
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -240,7 +243,7 @@ void createMap()
 {
 	currentBlockInMap = malloc(sizeof(*currentBlockInMap));
 	initNewBlock(currentBlockInMap);
-	currentBlockInMap->currentBlock[currentPosRows][currentPosCols] = map_CurrentPosition;
+	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
 //!*************************************************************************************************
@@ -285,7 +288,7 @@ void deleteMap()
 //! But if we are on the border and want to move across it, we have to allocate a new block and 
 //! update our position in the field.
 //!
-//! IMPORTANT! If we move up relative to our previous position, we have to reduce currentPosRow
+//! IMPORTANT! If we move up relative to our previous position, we have to reduce currPosInBlkRow
 //! by one. That is due 2D field indexing in C!
 //!
 //! @param    None
@@ -294,201 +297,201 @@ void deleteMap()
 //!*************************************************************************************************
 void moveInMap(map_move_direction direction)
 {
-	currentBlockInMap->currentBlock[currentPosRows][currentPosCols] = map_Track;
+	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_Track;
 	switch (direction)
 	{
 		case move_up:
 			// If we can move in block, move up
-			if (currentPosRows != MAP_BLOCK_MIN_ROW)
+			if (currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 			{
-				currentPosRows--;
+				currPosInBlk.Row--;
 			}
 			else
 			{
 				// Create new block up and move to its last row.
 				moveInBlocks(newBlock_up);
-				currentPosRows = MAP_BLOCK_MAX_ROW;
+				currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 			}
 			break;
 
 		case move_upLeft:
 			// If we can move in block, move up and left
-			if (currentPosCols != MAP_BLOCK_MIN_COL
-					&& currentPosRows != MAP_BLOCK_MIN_ROW)
+			if (currPosInBlk.Col != MAP_BLOCK_MIN_COL
+					&& currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 			{
-				currentPosCols--;
-				currentPosRows--;
+				currPosInBlk.Col--;
+				currPosInBlk.Row--;
 			}
 			else
 			{
 				// Move to the block on the left
-				if (currentPosCols == MAP_BLOCK_MIN_COL &&
-						currentPosRows != MAP_BLOCK_MIN_ROW)
+				if (currPosInBlk.Col == MAP_BLOCK_MIN_COL &&
+						currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 				{
 					moveInBlocks(newBlock_left);
-					currentPosRows--;
-					currentPosCols = MAP_BLOCK_MAX_COL;
+					currPosInBlk.Row--;
+					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 				}
 				// Move to the block above us
-				else if (currentPosCols != MAP_BLOCK_MIN_COL &&
-						currentPosRows == MAP_BLOCK_MIN_ROW)
+				else if (currPosInBlk.Col != MAP_BLOCK_MIN_COL &&
+						currPosInBlk.Row == MAP_BLOCK_MIN_ROW)
 				{
 					moveInBlocks(newBlock_up);
-					currentPosRows = MAP_BLOCK_MAX_ROW;
-					currentPosCols--;
+					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
+					currPosInBlk.Col--;
 				}
 				// Move to the upper left block
 				else
 				{
 					moveInBlocks(newBlock_up);
 					moveInBlocks(newBlock_left);
-					currentPosCols = MAP_BLOCK_MAX_COL;
-					currentPosRows = MAP_BLOCK_MAX_ROW;
+					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
+					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 				}
 			}
 			break;
 
 		case move_left:
 			// If we can move in block, move left
-			if (currentPosCols != MAP_BLOCK_MIN_COL)
+			if (currPosInBlk.Col != MAP_BLOCK_MIN_COL)
 			{
-				currentPosCols--;
+				currPosInBlk.Col--;
 			}
 			else
 			{
 				createNewBlock(newBlock_left);
-				currentPosCols = MAP_BLOCK_MAX_COL;
+				currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 			}
 			break;
 
 		case move_downLeft:
-			if (currentPosCols != MAP_BLOCK_MIN_COL
-					&& currentPosRows != MAP_BLOCK_MAX_ROW)
+			if (currPosInBlk.Col != MAP_BLOCK_MIN_COL
+					&& currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 			{
-				currentPosCols--;
-				currentPosRows++;
+				currPosInBlk.Col--;
+				currPosInBlk.Row++;
 			}
 			else
 			{
 				// Move to the block on the left
-				if (currentPosCols == MAP_BLOCK_MIN_COL &&
-						currentPosRows != MAP_BLOCK_MAX_ROW)
+				if (currPosInBlk.Col == MAP_BLOCK_MIN_COL &&
+						currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 				{
 					moveInBlocks(newBlock_left);
-					currentPosRows--;
-					currentPosCols = MAP_BLOCK_MAX_COL;
+					currPosInBlk.Row--;
+					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 				}
 				// Move to the block below us
-				else if (currentPosCols != MAP_BLOCK_MIN_COL &&
-						currentPosRows == MAP_BLOCK_MAX_ROW)
+				else if (currPosInBlk.Col != MAP_BLOCK_MIN_COL &&
+						currPosInBlk.Row == MAP_BLOCK_MAX_ROW)
 				{
 					moveInBlocks(newBlock_down);
-					currentPosRows = MAP_BLOCK_MIN_ROW;
-					currentPosCols--;
+					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
+					currPosInBlk.Col--;
 				}
 				// Move to the block to the left below us
 				else
 				{
 					createNewBlock(newBlock_down);
 					createNewBlock(newBlock_left);
-					currentPosCols = MAP_BLOCK_MAX_COL;
-					currentPosRows = MAP_BLOCK_MIN_ROW;
+					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
+					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 				}
 			}
 			break;
 
 		case move_down:
-			if (currentPosRows != MAP_BLOCK_MAX_ROW)
+			if (currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 			{
-				currentPosRows++;
+				currPosInBlk.Row++;
 			}
 			else
 			{
 				createNewBlock(newBlock_down);
-				currentPosRows = MAP_BLOCK_MIN_ROW;
+				currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 			}
 			break;
 
 		case move_downRight:
-			if (currentPosCols != MAP_BLOCK_MAX_COL
-					&& currentPosRows != MAP_BLOCK_MAX_ROW)
+			if (currPosInBlk.Col != MAP_BLOCK_MAX_COL
+					&& currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 			{
-				currentPosCols++;
-				currentPosRows++;
+				currPosInBlk.Col++;
+				currPosInBlk.Row++;
 			}
 			else
 			{
 				// Move to the block on the right
-				if (currentPosCols == MAP_BLOCK_MAX_COL &&
-						currentPosRows != MAP_BLOCK_MAX_ROW)
+				if (currPosInBlk.Col == MAP_BLOCK_MAX_COL &&
+						currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 				{
 					moveInBlocks(newBlock_right);
-					currentPosCols = MAP_BLOCK_MIN_COL;
-					currentPosRows--;
+					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
+					currPosInBlk.Row--;
 				}
 				// Move to the block below us
-				else if (currentPosCols != MAP_BLOCK_MAX_COL &&
-						currentPosRows == MAP_BLOCK_MAX_ROW)
+				else if (currPosInBlk.Col != MAP_BLOCK_MAX_COL &&
+						currPosInBlk.Row == MAP_BLOCK_MAX_ROW)
 				{
 					moveInBlocks(newBlock_down);
-					currentPosRows = MAP_BLOCK_MIN_ROW;
-					currentPosCols--;
+					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
+					currPosInBlk.Col--;
 				}
 				// Move to the block to the right below us
 				else
 				{
 					createNewBlock(newBlock_down);
 					createNewBlock(newBlock_right);
-					currentPosCols = MAP_BLOCK_MIN_COL;
-					currentPosRows = MAP_BLOCK_MIN_ROW;
+					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
+					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 				}
 			}
 			break;
 
 		case move_right:
-			if (currentPosCols != MAP_BLOCK_MAX_COL)
+			if (currPosInBlk.Col != MAP_BLOCK_MAX_COL)
 			{
-				currentPosCols++;
+				currPosInBlk.Col++;
 			}
 			else
 			{
 				createNewBlock(newBlock_right);
-				currentPosCols = MAP_BLOCK_MIN_COL;
+				currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 			}
 			break;
 
 		case move_upRight:
-			if (currentPosCols != MAP_BLOCK_MAX_COL
-					&& currentPosRows != MAP_BLOCK_MIN_ROW)
+			if (currPosInBlk.Col != MAP_BLOCK_MAX_COL
+					&& currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 			{
-				currentPosCols++;
-				currentPosRows--;
+				currPosInBlk.Col++;
+				currPosInBlk.Row--;
 			}
 			else
 			{
 				// Move to the block on the right
-				if (currentPosCols == MAP_BLOCK_MAX_COL &&
-						currentPosRows != MAP_BLOCK_MIN_ROW)
+				if (currPosInBlk.Col == MAP_BLOCK_MAX_COL &&
+						currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 				{
 					moveInBlocks(newBlock_right);
-					currentPosCols = MAP_BLOCK_MIN_COL;
-					currentPosRows--;
+					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
+					currPosInBlk.Row--;
 				}
 				// Move to the block above us
-				else if (currentPosCols != MAP_BLOCK_MAX_COL &&
-						currentPosRows == MAP_BLOCK_MIN_ROW)
+				else if (currPosInBlk.Col != MAP_BLOCK_MAX_COL &&
+						currPosInBlk.Row == MAP_BLOCK_MIN_ROW)
 				{
 					moveInBlocks(newBlock_up);
-					currentPosRows = MAP_BLOCK_MAX_ROW;
-					currentPosCols++;
+					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
+					currPosInBlk.Col++;
 				}
 				// Move to the upper left block
 				else
 				{
 					moveInBlocks(newBlock_up);
 					moveInBlocks(newBlock_right);
-					currentPosCols = MAP_BLOCK_MIN_COL;
-					currentPosRows = MAP_BLOCK_MAX_ROW;
+					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
+					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 				}
 			}
 			break;
@@ -496,5 +499,5 @@ void moveInMap(map_move_direction direction)
 		default:
 			break;
 	}
-	currentBlockInMap->currentBlock[currentPosRows][currentPosCols] = map_CurrentPosition;
+	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }

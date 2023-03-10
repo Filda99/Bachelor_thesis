@@ -72,7 +72,7 @@ extern bool IsCmdToStopCar;
 //!
 //! @return   None
 //!*************************************************************************************************
-int main2(void)
+int main(void)
 {
 	BOARD_InitPins();
 	BOARD_BootClockRUN();

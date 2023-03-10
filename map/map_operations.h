@@ -27,7 +27,7 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 
-//* Map field possible objects
+//* Map possible objects
 typedef enum _map_object {
   map_Empty = 0U,	///< We don't know, what is here yet
   map_CurrentPosition,
@@ -60,6 +60,13 @@ typedef enum
 	move_upLeft,
 	move_left = 16,
 }map_move_direction;
+
+//* Current position in the map block
+typedef struct
+{
+	int Row;
+	int Col;
+}curr_pos_map;
 
 /************************************
  * EXPORTED VARIABLES
