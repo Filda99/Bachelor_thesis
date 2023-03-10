@@ -60,10 +60,13 @@ static float radius[7] = {
 		17.5, 30.3, 65.3, 0, 65.3, 30.3, 17.5
 };
 
+//! Calculated new position in a map.
 coordinates newPos  = {
 		.x = MAP_BLOCK_SIZE * MAP_COLUMNS / 2,
 		.y = MAP_BLOCK_SIZE * MAP_ROWS / 2
 };
+
+//! Saved position in a map from previous calculation.
 coordinates prevPos = {
 		.x = MAP_BLOCK_SIZE * MAP_COLUMNS / 2,
 		.y = MAP_BLOCK_SIZE * MAP_ROWS / 2
