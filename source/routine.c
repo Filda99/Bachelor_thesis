@@ -10,6 +10,7 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include <motors/engines.h>
 #include "routine.h"
 #include "MKL25Z4.h"
 #include "global_macros.h"
@@ -18,7 +19,6 @@
 #include "fsl_gpio.h"
 #include "fsl_debug_console.h"
 
-#include "motors/engines.h"
 #include "control_unit.h"
 #include "map/mapping.h"
 #include "map/map_operations.h"

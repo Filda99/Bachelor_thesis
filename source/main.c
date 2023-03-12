@@ -10,6 +10,7 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include <motors/engines.h>
 #include "map/map_operations.h"
 #include "fsl_debug_console.h"
 #include "fsl_device_registers.h"
@@ -20,7 +21,6 @@
 #include "fsl_port.h"
 #include "MKL25Z4.h"
 #include "control_unit.h"
-#include "motors/engines.h"
 #include "common.h"
 
 #include "peripherals/i2c.h"
