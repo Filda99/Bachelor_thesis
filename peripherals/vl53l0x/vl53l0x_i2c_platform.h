@@ -57,8 +57,8 @@ typedef unsigned char bool_t;
 
 #define    COMMS_BUFFER_SIZE    64  // MUST be the same size as the SV task buffer
 
-#define    BYTES_PER_WORD        2
-#define    BYTES_PER_DWORD       4
+#define    BYTES_PER_VL_WORD        2
+#define    BYTES_PER_VL_DWORD       4
 
 #define    VL53L0X_MAX_STRING_LENGTH_PLT       256
 
