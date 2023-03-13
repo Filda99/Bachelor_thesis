@@ -1,6 +1,5 @@
 #include "vl53l0x_i2c_platform.h"
 #include "vl53l0x_platform.h"
-#include "GI2C1.h"
 
 /**
  * @brief  Initialise platform comms.
@@ -11,6 +10,8 @@
  * @return status - status 0 = ok, 1 = error
  *
  */
+
+#define ERR_OK	0
 
 int32_t VL53L0X_comms_initialise(uint8_t  comms_type, uint16_t comms_speed_khz){
 

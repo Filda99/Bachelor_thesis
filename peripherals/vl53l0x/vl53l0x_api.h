@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright © 2016, STMicroelectronics International N.V.
+ Copyright ï¿½ 2016, STMicroelectronics International N.V.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ extern "C"
 #else
 #   define VL53L0X_API
 #endif
+
 
 /** @defgroup VL53L0X_cut11_group VL53L0X cut1.1 Function Definition
  *  @brief    VL53L0X cut1.1 Function Definition
