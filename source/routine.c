@@ -23,6 +23,8 @@
 #include "map/mapping.h"
 #include "map/map_operations.h"
 
+#include "peripherals/vl53l0x/vl53l0x.h"
+
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
@@ -141,14 +143,9 @@ void routine(void)
 	//checkLines();
 	//controlUnit();
 
-	if (HalfWheelRotations == 1)
-	{
-		turnRightCustom(3);
-	}
-	if (HalfWheelRotations == 26)
-	{
-		turnLeftCustom(6);
-	}
+	uint16_t data;
+	VL53L0X_MeasureSingle(&data);
+	PRINTF("Measured data: %i\r\n", data);
 
 	static int i = 0;
 	PRINTF("Cycle: %i\r\n", i++);

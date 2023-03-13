@@ -14,6 +14,7 @@
 #include "fsl_debug_console.h"
 #include "global_macros.h"
 #include "common.h"
+#include "peripherals/vl53l0x/vl53l0x.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -150,4 +151,6 @@ void startupPeripherals()
 
 	initMotors();
 	initServo();
+
+	VL53L0X_Init();
 }

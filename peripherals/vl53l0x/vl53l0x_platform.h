@@ -30,9 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _VL53L0X_PLATFORM_H_
 #define _VL53L0X_PLATFORM_H_
 
-#include "vl53l0x_def.h"
-#include "vl53l0x_platform_log.h"
-#include "vl53l0x_i2c_platform.h"
+#include <peripherals/vl53l0x/vl53l0x_def.h>
+#include <peripherals/vl53l0x/vl53l0x_i2c_platform.h>
+#include <peripherals/vl53l0x/vl53l0x_platform_log.h>
 
 #ifdef __cplusplus
 extern "C" {

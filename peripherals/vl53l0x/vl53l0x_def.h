@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright © 2016, STMicroelectronics International N.V.
+Copyright ï¿½ 2016, STMicroelectronics International N.V.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -87,8 +87,8 @@ extern "C" {
 #define VL53L0X_MAX_STRING_LENGTH 32
 
 
-#include "vl53l0x_device.h"
-#include "vl53l0x_types.h"
+#include <peripherals/vl53l0x/vl53l0x_device.h>
+#include <peripherals/vl53l0x/vl53l0x_types.h>
 
 
 /****************************************

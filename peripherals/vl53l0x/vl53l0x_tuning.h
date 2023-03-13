@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright © 2016, STMicroelectronics International N.V.
+Copyright ï¿½ 2016, STMicroelectronics International N.V.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _VL53L0X_TUNING_H_
 #define _VL53L0X_TUNING_H_
 
-#include "vl53l0x_def.h"
+#include <peripherals/vl53l0x/vl53l0x_def.h>
 
 
 #ifdef __cplusplus

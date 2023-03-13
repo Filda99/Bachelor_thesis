@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright © 2016, STMicroelectronics International N.V.
+Copyright ï¿½ 2016, STMicroelectronics International N.V.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VL53L0X_API_STRINGS_H_
 #define VL53L0X_API_STRINGS_H_
 
-#include "vl53l0x_def.h"
-#include "vl53l0x_platform.h"
+#include <peripherals/vl53l0x/vl53l0x_def.h>
+#include <peripherals/vl53l0x/vl53l0x_platform.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -29,9 +29,9 @@
 #ifndef _VL53L0X_API_H_
 #define _VL53L0X_API_H_
 
-#include "vl53l0x_api_strings.h"
-#include "vl53l0x_def.h"
-#include "vl53l0x_platform.h"
+#include <peripherals/vl53l0x/vl53l0x_api_strings.h>
+#include <peripherals/vl53l0x/vl53l0x_def.h>
+#include <peripherals/vl53l0x/vl53l0x_platform.h>
 
 #ifdef __cplusplus
 extern "C"

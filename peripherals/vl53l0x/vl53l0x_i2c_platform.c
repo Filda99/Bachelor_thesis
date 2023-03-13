@@ -1,5 +1,6 @@
-#include "vl53l0x_i2c_platform.h"
-#include "vl53l0x_platform.h"
+#include <peripherals/vl53l0x/vl53l0x_i2c_platform.h>
+#include <peripherals/vl53l0x/vl53l0x_platform.h>
+#include "peripherals/i2c.h"
 
 /**
  * @brief  Initialise platform comms.
@@ -61,9 +62,9 @@ int32_t VL53L0X_comms_close(void){
 
 int32_t VL53L0X_write_multi(uint8_t address, uint8_t index, uint8_t  *pdata, int32_t count)
 {
-  uint8_t res;
+	int32_t res;
 
-  res = GI2C1_WriteAddress(address, &index, sizeof(index), pdata, count);
+  res = i2cWrite(address, index, pdata);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -96,9 +97,9 @@ int32_t VL53L0X_write_multi(uint8_t address, uint8_t index, uint8_t  *pdata, int
 
 int32_t VL53L0X_read_multi(uint8_t address,  uint8_t index, uint8_t  *pdata, int32_t count)
 {
-  uint8_t res;
+	int32_t res;
 
-  res = GI2C1_ReadAddress(address, &index, sizeof(index), pdata, count);
+  res = i2cRead(address, &index, pdata, count);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -133,7 +134,7 @@ int32_t VL53L0X_write_byte(uint8_t address,  uint8_t index, uint8_t data)
 {
   uint8_t res;
 
-  res = GI2C1_WriteAddress(address, &index, sizeof(index), &data, sizeof(data));
+  res = i2cWrite(address, index, &data);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -168,7 +169,7 @@ int32_t VL53L0X_write_word(uint8_t address,  uint8_t index, uint16_t  data)
 {
   uint8_t res;
 
-  res = GI2C1_WriteAddress(address, &index, sizeof(index), (uint8_t*)&data, sizeof(data));
+  res = i2cWrite(address, index, &data);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -203,7 +204,7 @@ int32_t VL53L0X_write_dword(uint8_t address, uint8_t index, uint32_t  data)
 {
   uint8_t res;
 
-  res = GI2C1_WriteAddress(address, &index, sizeof(index), (uint8_t*)&data, sizeof(data));
+  res = i2cWrite(address, index, data);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -237,7 +238,7 @@ int32_t VL53L0X_read_byte(uint8_t address,  uint8_t index, uint8_t  *pdata)
 {
   uint8_t res;
 
-  res = GI2C1_ReadAddress(address, &index, sizeof(index), pdata, 1);
+  res = i2cRead(address, index, pdata, 1);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -270,9 +271,9 @@ int32_t VL53L0X_read_byte(uint8_t address,  uint8_t index, uint8_t  *pdata)
 
 int32_t VL53L0X_read_word(uint8_t address,  uint8_t index, uint16_t *pdata)
 {
-  uint8_t res;
+	int32_t	res;
 
-  res = GI2C1_ReadAddress(address, &index, sizeof(index), (uint8_t*)pdata, 2);
+  res = i2cRead(address, index, (uint8_t*)pdata, 2);
   if (res!=ERR_OK) {
     return 1; /* error */
   }
@@ -307,7 +308,7 @@ int32_t VL53L0X_read_dword(uint8_t address, uint8_t index, uint32_t *pdata)
 {
   uint8_t res;
 
-  res = GI2C1_ReadAddress(address, &index, sizeof(index), (uint8_t*)pdata, 4);
+  res = i2cRead(address, index, (uint8_t*)pdata, 4);
   if (res!=ERR_OK) {
     return 1; /* error */
   }

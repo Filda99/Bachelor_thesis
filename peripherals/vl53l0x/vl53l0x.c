@@ -3,11 +3,10 @@
  *
  */
 
-#include "vl53l0x.h"
-
-#include "vl53l0x_api.h"
-#include "vl53l0x_platform.h"
-#include "vl53l0x_i2c_platform.h"
+#include <peripherals/vl53l0x/vl53l0x.h>
+#include <peripherals/vl53l0x/vl53l0x_api.h>
+#include <peripherals/vl53l0x/vl53l0x_i2c_platform.h>
+#include <peripherals/vl53l0x/vl53l0x_platform.h>
 #include "stdbool.h"
 #include "utilities/fsl_debug_console.h"
 
