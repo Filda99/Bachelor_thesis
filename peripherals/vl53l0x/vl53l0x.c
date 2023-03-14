@@ -9,6 +9,7 @@
 #include <peripherals/vl53l0x/vl53l0x_platform.h>
 #include "stdbool.h"
 #include "utilities/fsl_debug_console.h"
+#include "peripherals/i2c.h"
 
 #define ERR_FAILED	1
 #define ERR_OK		0
@@ -68,12 +69,12 @@ uint8_t VL53L0X_Init(void) {
   MyDevice.comms_type      =  1;
   MyDevice.comms_speed_khz =  400;
 
-  err_code = VL53L0X_comms_initialise(I2C, MyDevice.comms_speed_khz);
+ /* err_code = VL53L0X_comms_initialise(I2C, MyDevice.comms_speed_khz);
   if(err_code!=VL53L0X_ERROR_NONE) {
     PRINTF("ERROR: VL53L0X_comms_initialise(): %d\r\n", err_code);
     return ERR_FAILED;
   }
-
+*/
   err_code = VL53L0X_DataInit(&MyDevice);
   if(err_code!=VL53L0X_ERROR_NONE) {
     PRINTF("ERROR: DataInit(): %d\r\n", err_code);
@@ -85,12 +86,12 @@ uint8_t VL53L0X_Init(void) {
     PRINTF("ERROR: StaticInit: %d\r\n", err_code);
     return ERR_FAILED;
   }
-
+/*
   VL53L0X_PerformRefSpadManagement(&MyDevice, &refSpadCount, &isApertureSpads);
   if(err_code!=VL53L0X_ERROR_NONE) {
     PRINTF("ERROR: SpadCal: %d\r\n", err_code);
     return ERR_FAILED;
-  }
+  }*/
 
   err_code = VL53L0X_PerformRefCalibration(&MyDevice, &vhvCalibrationValue, &phaseCalibrationValue);
   if(err_code!=VL53L0X_ERROR_NONE) {

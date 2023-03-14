@@ -11,6 +11,7 @@
 //* INCLUDES
 //**************************************************************************************************
 #include "fsl_i2c.h"
+#include "global_macros.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -19,7 +20,6 @@
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
-#define I2C_MASTER_CLOCK_FREQUENCY 12000000
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -44,39 +44,6 @@
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
-
-//!*************************************************************************************************
-//! void i2c_init(uint8_t slave_addr, uint8_t *data, size_t dataSize)
-//!
-//! @description
-//! Function initialize i2c slave device.
-//!
-//! @note	Function will wait until slave device corresponds.
-//!
-//! @param    uint8_t deviceAddr	Address of device we want to communicate.
-//! @param    uint8_t *data			Initialization data, which should be written.
-//! @param    size_t dataSize		Size of sending data.
-//!
-//! @return   None
-//!*************************************************************************************************
-void i2cInit(uint8_t deviceAddr, uint8_t *data, size_t dataSize)
-{
-    i2c_master_config_t masterConfig;
-    I2C_MasterGetDefaultConfig(&masterConfig);
-    masterConfig.baudRate_Bps = 400000;
-    I2C_MasterInit(I2C1, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
-
-    i2c_master_transfer_t masterXfer;
-    masterXfer.flags = kI2C_TransferDefaultFlag;
-    masterXfer.slaveAddress = deviceAddr;
-    masterXfer.direction = kI2C_Write;
-    masterXfer.subaddress = 0;
-    masterXfer.subaddressSize = 0;
-    masterXfer.data = data;
-    masterXfer.dataSize = dataSize;
-
-    I2C_MasterTransferBlocking(I2C1, &masterXfer);
-}
 
 //!*************************************************************************************************
 //! void i2cWrite(uint8_t deviceAddr, uint8_t reg_addr, uint8_t regAddr, uint8_t value)
@@ -112,7 +79,7 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
     transfer.data = buff;
     transfer.dataSize = 2;
 
-    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
 	{
 		return kStatus_Fail;
 	}
@@ -157,7 +124,7 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
     transfer.subaddressSize = 1;
     transfer.data = NULL;
     transfer.dataSize = 0;
-    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
     {
         return kStatus_Fail;
     }
@@ -168,7 +135,7 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
     transfer.subaddressSize = 0;
     transfer.data = data;
     transfer.dataSize = dataLen;
-    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
     {
         return kStatus_Fail;
     }

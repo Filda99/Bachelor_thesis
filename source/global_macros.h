@@ -109,6 +109,11 @@ extern "C" {
 #define ENGINE_STOP			1	// Pulse width for STOP is the second value in the speed field
 #define GO_DIRECT			(MAX_STEER_RIGHT / 2)
 
+/*************************************/
+// I2C
+/*************************************/
+#define USING_I2C	I2C0
+
 /************************************
  * TYPEDEFS
  ************************************/

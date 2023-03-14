@@ -29,6 +29,9 @@
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
+#define I2C_MASTER_CLOCK_FREQUENCY CLOCK_GetFreq(kCLOCK_CoreSysClk)
+
+#define PORT_PCR_ODE_MASK                   0x00000200u
 
 // Get source clock for TPM driver
 #define TPM_SOURCE_CLOCK 		CLOCK_GetFreq(kCLOCK_PllFllSelClk)
@@ -178,6 +181,41 @@ static void startupInterrupts(void)
 	EnableIRQ(GPIO_HALL_IRQn);
 }
 
+//!*************************************************************************************************
+//! void i2c_init(void)
+//!
+//! @description
+//! Function initialize i2c master device.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
+void i2cInit(void)
+{
+	i2c_master_config_t masterConfig;
+    I2C_MasterGetDefaultConfig(&masterConfig);
+    masterConfig.baudRate_Bps = 200000;
+    I2C_MasterInit(USING_I2C, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
+
+
+
+
+    /*i2c_master_config_t config = {
+    .enableMaster = true,
+    .enableStopHold = false,
+    .baudRate_Bps = 50000,
+    .glitchFilterWidth = 0
+    };
+    I2C_MasterInit(USING_I2C, &config, 12000000U);
+
+    I2C_Enable(USING_I2C, true);*/
+
+
+
+
+}
+
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
@@ -205,6 +243,7 @@ void startupBoard(void)
 
 	startupPWM();
 	startupInterrupts();
+	i2cInit();
 
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

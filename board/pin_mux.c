@@ -64,14 +64,14 @@ BOARD_InitPins:
   - {pin_num: '77', peripheral: TPM0, signal: 'CH, 4', pin_signal: PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4, direction: INPUT}
   - {pin_num: '75', peripheral: GPIOD, signal: 'GPIO, 2', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO, direction: INPUT, gpio_interrupt: kPORT_InterruptFallingEdge}
   - {pin_num: '62', peripheral: GPIOC, signal: 'GPIO, 5', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT, direction: OUTPUT}
-  - {pin_num: '67', peripheral: I2C1, signal: SCL, pin_signal: PTC10/I2C1_SCL}
-  - {pin_num: '68', peripheral: I2C1, signal: SDA, pin_signal: PTC11/I2C1_SDA}
   - {pin_num: '61', peripheral: GPIOC, signal: 'GPIO, 4', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3, direction: OUTPUT, gpio_init_state: 'true'}
   - {pin_num: '31', peripheral: GPIOA, signal: 'GPIO, 5', pin_signal: PTA5/USB_CLKIN/TPM0_CH2, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge, pull_enable: disable}
   - {pin_num: '30', peripheral: GPIOA, signal: 'GPIO, 4', pin_signal: TSI0_CH5/PTA4/I2C1_SDA/TPM0_CH1/NMI_b, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge,
     pull_enable: disable}
   - {pin_num: '80', peripheral: GPIOD, signal: 'GPIO, 7', pin_signal: PTD7/SPI1_MISO/UART0_TX/SPI1_MOSI, direction: INPUT, gpio_interrupt: kPORT_InterruptRisingEdge}
   - {pin_num: '78', peripheral: TPM0, signal: 'CH, 5', pin_signal: ADC0_SE6b/PTD5/SPI1_SCK/UART2_TX/TPM0_CH5, direction: OUTPUT}
+  - {pin_num: '65', peripheral: I2C0, signal: SCL, pin_signal: CMP0_IN2/PTC8/I2C0_SCL/TPM0_CH4, pull_enable: enable}
+  - {pin_num: '66', peripheral: I2C0, signal: SDA, pin_signal: CMP0_IN3/PTC9/I2C0_SDA/TPM0_CH5, pull_enable: enable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -173,17 +173,37 @@ void BOARD_InitPins(void)
                      /* Pull Enable: Internal pullup or pulldown resistor is not enabled on the corresponding pin. */
                      | PORT_PCR_PE(kPORT_PullDisable));
 
-    /* PORTC10 (pin 67) is configured as I2C1_SCL */
-    PORT_SetPinMux(PORTC, 10U, kPORT_MuxAlt2);
-
-    /* PORTC11 (pin 68) is configured as I2C1_SDA */
-    PORT_SetPinMux(PORTC, 11U, kPORT_MuxAlt2);
-
     /* PORTC4 (pin 61) is configured as PTC4 */
     PORT_SetPinMux(BOARD_INITPINS_S0S2COLORSEN_PORT, BOARD_INITPINS_S0S2COLORSEN_PIN, kPORT_MuxAsGpio);
 
     /* PORTC5 (pin 62) is configured as PTC5 */
     PORT_SetPinMux(BOARD_INITPINS_S1S3COLORSEN_PORT, BOARD_INITPINS_S1S3COLORSEN_PIN, kPORT_MuxAsGpio);
+
+    const port_pin_config_t portc8_pin65_config = {/* Internal pull-up resistor is enabled */
+                                                   kPORT_PullUp,
+                                                   /* Slow slew rate is configured */
+                                                   kPORT_SlowSlewRate,
+                                                   /* Passive filter is disabled */
+                                                   kPORT_PassiveFilterDisable,
+                                                   /* Low drive strength is configured */
+                                                   kPORT_LowDriveStrength,
+                                                   /* Pin is configured as I2C0_SCL */
+                                                   kPORT_MuxAlt2};
+    /* PORTC8 (pin 65) is configured as I2C0_SCL */
+    PORT_SetPinConfig(PORTC, 8U, &portc8_pin65_config);
+
+    const port_pin_config_t portc9_pin66_config = {/* Internal pull-up resistor is enabled */
+                                                   kPORT_PullUp,
+                                                   /* Slow slew rate is configured */
+                                                   kPORT_SlowSlewRate,
+                                                   /* Passive filter is disabled */
+                                                   kPORT_PassiveFilterDisable,
+                                                   /* Low drive strength is configured */
+                                                   kPORT_LowDriveStrength,
+                                                   /* Pin is configured as I2C0_SDA */
+                                                   kPORT_MuxAlt2};
+    /* PORTC9 (pin 66) is configured as I2C0_SDA */
+    PORT_SetPinConfig(PORTC, 9U, &portc9_pin66_config);
 
     /* PORTD0 (pin 73) is configured as TPM0_CH0 */
     PORT_SetPinMux(BOARD_INITPINS_LEFTMAINSEN_PORT, BOARD_INITPINS_LEFTMAINSEN_PIN, kPORT_MuxAlt4);

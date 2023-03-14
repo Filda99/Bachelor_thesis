@@ -24,6 +24,10 @@
 #include "common.h"
 
 #include "peripherals/i2c.h"
+#include "startup_peripherals.h"
+
+#include "peripherals/vl53l0x/vl53l0x.h"
+#include "peripherals/vl53l0x/vl53l0x_api.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -85,6 +89,9 @@ int main(void)
 
 	PRINTF("Waiting for initialization -> Press capacitive sensor.\r\n");
 
+	startupBoard();
+	startupPeripherals();
+
 	while (1)
 	{
 		// Get data from touch sensor
@@ -112,6 +119,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
+			startupPeripherals();
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
 			createMap();
