@@ -29,6 +29,7 @@
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
+#define M_PI 3.1415926536
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -80,9 +81,9 @@ static void checkLines()
 //!
 //! @param    None
 //!
-//! @return   None
+//! @return   Returns angle of how much should we will face.
 //!*************************************************************************************************
-static void vectorCalculation()
+static float vectorCalculation()
 {
 	// Get delta y, which one is longer will be main vector
 	uint32_t deltaYLeft = vLeft.final.y - vLeft.initial.y;
@@ -92,8 +93,8 @@ static void vectorCalculation()
 
 	// Get angle of a turn
 	uint32_t deltaX = masterVector.final.x - masterVector.initial.x;
-	uint32_t deltaY = masterVector.final.x - masterVector.initial.x;
-	float angle = atan2(deltaX /deltaY);
+	uint32_t deltaY = masterVector.final.y - masterVector.initial.y;
+	return (atan(deltaY / deltaX) * 180 / M_PI);
 }
 
 //**************************************************************************************************
