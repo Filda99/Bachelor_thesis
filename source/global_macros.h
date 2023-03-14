@@ -87,7 +87,6 @@ typedef enum _line_location {
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
 
-
 #ifdef __cplusplus
 }
 #endif

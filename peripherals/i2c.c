@@ -120,6 +120,7 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
 	return kStatus_Success;
 }
 
+
 //!*************************************************************************************************
 //! status_t i2c_read(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t dataLen)
 //!
