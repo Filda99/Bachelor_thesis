@@ -14,11 +14,14 @@
 #include "motors/engines.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
+#include "routine.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
 extern unsigned int HalfWheelRotations;
+extern vector masterVector;
+extern vector vLeft, vRight;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -46,10 +49,94 @@ static uint8_t lineCnt = 0;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+
+//!*************************************************************************************************
+//! static void turningByAngle(float angle)
+//!
+//! @description
+//! Function will calculate if we should start turning by the given angle.
+//! If the angle is greater than we just can go direct, start turning to that side.
+//!
+//! @param	float angle		Angle of the curve we are heading
+//!
+//! @return	None
+//!*************************************************************************************************
+static void turningByAngle(float angle)
+{
+	static uint16_t counter = 0;
+	static float prevAngle = 90.0;	// TODO
+
+	if (angle >= 85 && angle <= 95)
+	{
+		goDirect();
+	}
+	// Turning left
+	else if (angle >= 75 && angle <= 85)
+	{
+		turnLeft();
+	}
+	// Turning left
+	else if (angle >= 60 && angle <= 75)
+	{
+		turnLeftCustom(2);
+	}
+	// Turning left
+	else if (angle <= 60)
+	{
+		turnLeftCustom(MAX_STEER_LEFT);
+	}
+
+	// Turning right
+	else if (angle >= 95 && angle <= 105)
+	{
+		turnRight();
+	}
+	// Turning right
+	else if (angle >= 105 && angle <= 120)
+	{
+		turnRightCustom(2);
+	}
+	// Turning right
+	else if (angle >= 120)
+	{
+		turnRightCustom(MAX_STEER_RIGHT);
+	}
+
+	if (counter++ > 50)
+	{
+		addSpeed();
+	}
+
+	prevAngle = angle;
+}
+
+//!*************************************************************************************************
+//! static void turningByPosition()
+//!
+//! @description
+//! Function will start turning, if we are way out from the center.
+//!
+//! @param	None
+//!
+//! @return	None
+//!*************************************************************************************************
+static void turningByPosition()
+{
+	if (vLeft.initial.x >= MAX_LEFT_X)
+	{
+		turnRight();
+	}
+	else if (vRight.initial.x <= MAX_RIGHT_X)
+	{
+		turnLeft();
+	}
+}
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
+// TODO
 void setWheelToInitPosition()
 {
 	addSpeed();
@@ -65,97 +152,8 @@ void setWheelToInitPosition()
 //!
 //! @return	None
 //!*************************************************************************************************
-void controlUnit()
+void controlUnit(float angle)
 {
-	// todo: rewrite control unit
-	/*switch(LineDetected)
-	{
-		case LineNone:
-		{
-			// If car goes straight for too long
-			if (HalfWheelRotations > MAX_DISTANCE_WITHOUT_LINE)
-			{
-				PRINTF("\t-> Distance without interrupt -> STOP. \r\n");
-				stopCar();
-			}
-			// If there is no line for some time, add speed
-			else if (HalfWheelRotations > CNT_OUT_OF_LANE)
-			{
-				PRINTF("\t-> Add speed. \r\n");
-				//addSpeed();
-				goDirect();
-			}
-
-			prevTurning = LineNone;
-			break;
-		}
-
-		case LineLeft:
-		{
-			if (prevTurning == LineLeft)
-			{
-				lineCnt++;
-			}
-			else
-			{
-				lineCnt = 0;
-			}
-
-			if (lineCnt > MAX_CNT_ON_LINE)
-			{
-				PRINTF("\t-> Turning right! \r\n");
-				turnRight();
-				slackUpSpeedCustom(2);
-			}
-
-			prevTurning = LineLeft;
-			break;
-		}
-
-		case LineRight:
-		{
-			if (prevTurning == LineRight)
-			{
-				lineCnt++;
-			}
-			else
-			{
-				lineCnt = 0;
-			}
-
-			if (lineCnt > MAX_CNT_ON_LINE)
-			{
-				turnLeft();
-				slackUpSpeed();
-			}
-
-			prevTurning = LineRight;
-			break;
-		}
-
-		case LineCenter_Left:
-		{
-			turnRightCustom(MAX_STEER_RIGHT);
-			slackUpSpeedCustom(2);
-			LineDetected &= ~LineCenter_Left;
-			break;
-		}
-
-		case LineCenter_Right:
-		{
-			turnLeftCustom(MAX_STEER_LEFT);
-			slackUpSpeedCustom(2);
-			LineDetected &= ~LineCenter_Right;
-			break;
-		}
-
-		case LineCenter_None:
-		{
-			// todo: go backwards until some sensor detects line
-			goDirect();
-			goBackwards();
-			break;
-		}
-	}*/
-
+	turningByAngle(angle);
+	turningByPosition();
 }

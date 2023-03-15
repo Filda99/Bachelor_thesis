@@ -212,8 +212,10 @@ void startupInit(void)
 void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
+
 	startupPWM();
 	startupInterrupts();
+	i2cInit(400000);	// 400kHz
 
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

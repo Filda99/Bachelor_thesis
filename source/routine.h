@@ -26,17 +26,6 @@ extern "C" {
 /************************************
  * TYPEDEFS
  ************************************/
-typedef struct
-{
-	uint32_t x;
-	uint32_t y;
-}point;
-
-typedef struct
-{
-	point initial;
-	point final;
-}vector;
 
 /************************************
  * EXPORTED VARIABLES

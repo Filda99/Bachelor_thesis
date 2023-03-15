@@ -55,6 +55,10 @@ extern "C" {
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	40
 
+// TODO: rozmery kamery
+#define MAX_LEFT_X	250
+#define MAX_RIGHT_X	450
+
 /*************************************/
 // Engine
 /*************************************/
@@ -66,6 +70,16 @@ extern "C" {
 
 #define ENGINE_STOP			1	// Pulse width for STOP is the second value in the speed field
 #define GO_DIRECT			(MAX_STEER_RIGHT / 2)
+
+/*************************************/
+// Math
+/*************************************/
+#define M_PI 3.1415926536
+
+/*************************************/
+// I2C
+/*************************************/
+#define CAM_I2C	I2C0
 
 /************************************
  * TYPEDEFS

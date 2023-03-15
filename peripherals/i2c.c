@@ -11,6 +11,7 @@
 //* INCLUDES
 //**************************************************************************************************
 #include "fsl_i2c.h"
+#include "global_macros.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -59,23 +60,14 @@
 //!
 //! @return   None
 //!*************************************************************************************************
-void i2cInit(uint8_t deviceAddr, uint32_t baudRate, uint8_t *data, size_t dataSize)
+void i2cInit(uint32_t baudRate)
 {
     i2c_master_config_t masterConfig;
     I2C_MasterGetDefaultConfig(&masterConfig);
     masterConfig.baudRate_Bps = baudRate;
-    I2C_MasterInit(I2C1, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
+    I2C_MasterInit(CAM_I2C, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
 
-    i2c_master_transfer_t masterXfer;
-    masterXfer.flags = kI2C_TransferDefaultFlag;
-    masterXfer.slaveAddress = deviceAddr;
-    masterXfer.direction = kI2C_Write;
-    masterXfer.subaddress = 0;
-    masterXfer.subaddressSize = 0;
-    masterXfer.data = data;
-    masterXfer.dataSize = dataSize;
-
-    I2C_MasterTransferBlocking(I2C1, &masterXfer);
+    I2C_Enable(CAM_I2C, true);
 }
 
 //!*************************************************************************************************
@@ -112,7 +104,7 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
     transfer.data = buff;
     transfer.dataSize = 2;
 
-    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(CAM_I2C, &transfer) != kStatus_Success)
 	{
 		return kStatus_Fail;
 	}
@@ -158,7 +150,7 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
     transfer.subaddressSize = 1;
     transfer.data = NULL;
     transfer.dataSize = 0;
-    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(CAM_I2C, &transfer) != kStatus_Success)
     {
         return kStatus_Fail;
     }
@@ -169,7 +161,7 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
     transfer.subaddressSize = 0;
     transfer.data = data;
     transfer.dataSize = dataLen;
-    if (I2C_MasterTransferBlocking(I2C1, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(CAM_I2C, &transfer) != kStatus_Success)
     {
         return kStatus_Fail;
     }
