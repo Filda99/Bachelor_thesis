@@ -22,6 +22,7 @@
 extern unsigned int HalfWheelRotations;
 extern vector masterVector;
 extern vector vLeft, vRight;
+extern uint8_t currentSteer;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -56,6 +57,7 @@ static uint8_t lineCnt = 0;
 //! @description
 //! Function will calculate if we should start turning by the given angle.
 //! If the angle is greater than we just can go direct, start turning to that side.
+//! If we go for
 //!
 //! @param	float angle		Angle of the curve we are heading
 //!
@@ -64,50 +66,64 @@ static uint8_t lineCnt = 0;
 static void turningByAngle(float angle)
 {
 	static uint16_t counter = 0;
-	static float prevAngle = 90.0;	// TODO
+	static uint8_t prevSteer = currentSteer;
+
+	if (prevSteer != currentSteer)
+	{
+		counter = 0;
+	}
 
 	if (angle >= 85 && angle <= 95)
 	{
 		goDirect();
+		if (counter++ > 50)
+		{
+			addSpeed();
+		}
 	}
-	// Turning left
-	else if (angle >= 75 && angle <= 85)
+	else
 	{
-		turnLeft();
-	}
-	// Turning left
-	else if (angle >= 60 && angle <= 75)
-	{
-		turnLeftCustom(2);
-	}
-	// Turning left
-	else if (angle <= 60)
-	{
-		turnLeftCustom(MAX_STEER_LEFT);
+		slackUpSpeed();
+		// Turning left
+		if (angle >= 75 && angle <= 85)
+		{
+			turnLeft();
+		}
+		// Turning left
+		else if (angle >= 60 && angle <= 75)
+		{
+			turnLeftCustom(2);
+			slackUpSpeed();
+			slackUpSpeedOnWheel(1);
+		}
+		// Turning left
+		else if (angle <= 60)
+		{
+			turnLeftCustom(MAX_STEER_LEFT);
+			slackUpSpeedOnWheel(2);
+		}
+
+		// Turning right
+		else if (angle >= 95 && angle <= 105)
+		{
+			turnRight();
+		}
+		// Turning right
+		else if (angle >= 105 && angle <= 120)
+		{
+			turnRightCustom(2);
+			slackUpSpeedOnWheel(1);
+		}
+		// Turning right
+		else if (angle >= 120)
+		{
+			turnRightCustom(MAX_STEER_RIGHT);
+			slackUpSpeed();
+			slackUpSpeedOnWheel(2);
+		}
 	}
 
-	// Turning right
-	else if (angle >= 95 && angle <= 105)
-	{
-		turnRight();
-	}
-	// Turning right
-	else if (angle >= 105 && angle <= 120)
-	{
-		turnRightCustom(2);
-	}
-	// Turning right
-	else if (angle >= 120)
-	{
-		turnRightCustom(MAX_STEER_RIGHT);
-	}
-
-	if (counter++ > 50)
-	{
-		addSpeed();
-	}
-
-	prevAngle = angle;
+	prevSteer = currentSteer;
 }
 
 //!*************************************************************************************************
