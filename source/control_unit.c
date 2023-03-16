@@ -15,13 +15,15 @@
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 #include "routine.h"
+#include "vector.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
+
 extern unsigned int HalfWheelRotations;
-extern vector masterVector;
-extern vector vLeft, vRight;
+extern struct vector masterVector;
+extern struct vector vLeft, vRight;
 extern uint8_t currentSteer;
 
 //**************************************************************************************************
@@ -66,7 +68,7 @@ static uint8_t lineCnt = 0;
 static void turningByAngle(float angle)
 {
 	static uint16_t counter = 0;
-	static uint8_t prevSteer = currentSteer;
+	static uint8_t prevSteer = GO_DIRECT;
 
 	if (prevSteer != currentSteer)
 	{

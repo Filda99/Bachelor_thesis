@@ -33,7 +33,7 @@ extern "C" {
 //**************************************************************************************************
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
-void i2cInit(uint8_t deviceAddr, uint8_t *data, size_t dataSize);
+void i2cInit(uint8_t deviceAddr);
 status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data);
 status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t dataLen);
 

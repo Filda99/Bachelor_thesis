@@ -33,7 +33,7 @@ extern "C" {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void controlUnit(void);
+void controlUnit(float angle);
 void setWheelToInitPosition(void);
 
 #ifdef __cplusplus

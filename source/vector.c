@@ -12,6 +12,8 @@
 //**************************************************************************************************
 #include "vector.h"
 #include "math.h"
+#include "stdint.h"
+#include "global_macros.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -35,10 +37,10 @@
 //**************************************************************************************************
 
 //! Main vector, which is calculated in vectorCalculation() func.
-vector masterVector;
+struct vector masterVector;
 
 //! Two vectors, which represents traffic lanes
-vector vLeft, vRight = {
+struct vector vLeft, vRight = {
 		.initial = {0, }, .final = {0, }
 };
 

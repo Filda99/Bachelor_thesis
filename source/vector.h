@@ -27,15 +27,15 @@ extern "C" {
 //**************************************************************************************************
 typedef struct
 {
-	uint32_t x;
-	uint32_t y;
+	unsigned int x;
+	unsigned int y;
 }point;
 
-typedef struct
+struct vector
 {
 	point initial;
 	point final;
-}vector;
+};
 
 //**************************************************************************************************
 //* EXPORTED VARIABLES
