@@ -32,7 +32,7 @@
 #define _BOARD_H_
 
 #include "clock_config.h"
-#include "fsl_gpio.h"
+#include "../drivers/fsl_gpio.h"
 
 /*******************************************************************************
  * Definitions

@@ -10,12 +10,12 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "fsl_port.h"
+#include "../drivers/fsl_port.h"
 #include "global_macros.h"
-#include "fsl_gpio.h"
-#include "MKL25Z4.h"
-#include "fsl_debug_console.h"
-#include "motors/engines.h"
+#include "../drivers/fsl_gpio.h"
+#include "../CMSIS/MKL25Z4.h"
+#include "../utilities/fsl_debug_console.h"
+#include "../motors/engines.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES

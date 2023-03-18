@@ -42,7 +42,7 @@ board: FRDM-KL25Z
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 
-#include "fsl_smc.h"
+#include "../drivers/fsl_smc.h"
 #include "clock_config.h"
 
 /*******************************************************************************

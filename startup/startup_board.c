@@ -12,15 +12,15 @@
 //* INCLUDES
 //**************************************************************************************************
 #include "startup_peripherals.h"
-#include "MKL25Z4.h"
-#include "fsl_tpm.h"
-#include "fsl_i2c.h"
-#include "board.h"
-#include "fsl_debug_console.h"
-#include "peripherals/isl29125.h"
-#include "fsl_port.h"
-#include "global_macros.h"
-#include "common.h"
+#include "../CMSIS/MKL25Z4.h"
+#include "../drivers/fsl_tpm.h"
+#include "../drivers/fsl_i2c.h"
+#include "../board/board.h"
+#include "../utilities/fsl_debug_console.h"
+#include "../peripherals/isl29125.h"
+#include "../drivers/fsl_port.h"
+#include "../source/global_macros.h"
+#include "../source/common.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES

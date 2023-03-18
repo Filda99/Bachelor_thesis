@@ -7,8 +7,8 @@
 
 
 #include <stdio.h>
-#include "fsl_i2c.h"
-#include "fsl_debug_console.h"
+#include "../drivers/fsl_i2c.h"
+#include "../utilities/fsl_debug_console.h"
 
 #define M5_I2C_ADDRESS 0x57
 

@@ -11,8 +11,8 @@
  * INCLUDES
  ************************************/
 #include "isl29125.h"
-#include "fsl_i2c.h"
-#include "MKL25Z4.h"
+#include "../drivers/fsl_i2c.h"
+#include "../CMSIS/MKL25Z4.h"
 
 /************************************
  * EXTERN VARIABLES

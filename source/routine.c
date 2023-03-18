@@ -11,17 +11,19 @@
 //* INCLUDES
 //**************************************************************************************************
 #include "routine.h"
-#include "MKL25Z4.h"
+#include "../CMSIS/MKL25Z4.h"
 #include "global_macros.h"
 
-#include "fsl_tpm.h"
-#include "fsl_gpio.h"
-#include "fsl_debug_console.h"
+#include "../drivers/fsl_tpm.h"
+#include "../drivers/fsl_gpio.h"
+#include "../utilities/fsl_debug_console.h"
 
-#include "motors/engines.h"
+#include "../motors/engines.h"
 #include "control_unit.h"
-#include "map/mapping.h"
-#include "map/map_operations.h"
+
+
+//#include "map/mapping.h"
+//#include "map/map_operations.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -33,7 +35,10 @@ extern unsigned int RightSensorValue;
 
 // todo: remove. This is only for program without car.
 extern unsigned int HalfWheelRotations;
-extern map_block *currentBlockInMap;
+
+//extern map_block *currentBlockInMap;
+
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************

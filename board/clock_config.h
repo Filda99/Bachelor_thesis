@@ -6,7 +6,7 @@
 #ifndef _CLOCK_CONFIG_H_
 #define _CLOCK_CONFIG_H_
 
-#include "fsl_common.h"
+#include "../drivers/fsl_common.h"
 
 /*******************************************************************************
  * Definitions

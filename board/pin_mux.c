@@ -32,9 +32,9 @@ pin_labels:
  */
 /* clang-format on */
 
-#include "fsl_common.h"
-#include "fsl_port.h"
-#include "fsl_gpio.h"
+#include "../drivers/fsl_common.h"
+#include "../drivers/fsl_port.h"
+#include "../drivers/fsl_gpio.h"
 #include "pin_mux.h"
 
 /* FUNCTION ************************************************************************************************************
