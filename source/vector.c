@@ -1,31 +1,23 @@
 /**
- ********************************************************************************
- * @file    routine.c
+ ***************************************************************************************************
+ * @file    vector.c
  * @author  user
- * @date    Jul 18, 2022
- * @brief
- ********************************************************************************
+ * @date    Mar 15, 2023
+ * @brief   
+ ***************************************************************************************************
  */
 
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "routine.h"
-#include "MKL25Z4.h"
-#include "global_macros.h"
-
-#include "fsl_tpm.h"
-#include "fsl_gpio.h"
-#include "fsl_debug_console.h"
-
-#include "motors/engines.h"
-#include "control_unit.h"
 #include "vector.h"
+#include "math.h"
+#include "stdint.h"
+#include "global_macros.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern struct vector vLeft, vRight;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -39,9 +31,19 @@ extern struct vector vLeft, vRight;
 //* STATIC VARIABLES
 //**************************************************************************************************
 
+
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
+
+//! Main vector, which is calculated in vectorCalculation() func.
+struct vector masterVector;
+
+//! Two vectors, which represents traffic lanes
+struct vector vLeft, vRight = {
+		.initial = {0, }, .final = {0, }
+};
+
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -50,6 +52,11 @@ extern struct vector vLeft, vRight;
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
+
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
+
 
 //!*************************************************************************************************
 //! void checkLine(void)
@@ -60,39 +67,18 @@ extern struct vector vLeft, vRight;
 //!
 //! @param    None
 //!
-//! @return   None
+//! @return   Returns angle of how much should we will face.
 //!*************************************************************************************************
-static void checkLines()
+float vectorCalculation()
 {
-	vLeft.initial.x = 0;
-	vLeft.initial.y = 0;
-	vLeft.final.x = 0;
-	vLeft.final.y = 0;
+	// Get delta y, which one is longer will be main vector
+	uint32_t deltaYLeft = vLeft.final.y - vLeft.initial.y;
+	uint32_t deltaYRight = vRight.final.y - vRight.initial.y;
 
-	vRight.initial.x = 0;
-	vRight.initial.y = 0;
-	vRight.final.x = 0;
-	vRight.final.y = 0;
+	masterVector = (deltaYLeft > deltaYRight) ? vLeft : vRight;
+
+	// Get angle of a turn
+	uint32_t deltaX = masterVector.final.x - masterVector.initial.x;
+	uint32_t deltaY = masterVector.final.y - masterVector.initial.y;
+	return (atan(deltaY / deltaX) * 180 / M_PI);
 }
-
-//**************************************************************************************************
-//* GLOBAL FUNCTIONS
-//**************************************************************************************************
-
-//!*************************************************************************************************
-//! void routine(void)
-//!
-//! @description
-//! Function
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-void routine(void)
-{
-	checkLines();
-	float angle = vectorCalculation();
-	controlUnit(angle);
-}
-

@@ -10,18 +10,18 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-//#include "map/map_operations.h"
-#include "../utilities/fsl_debug_console.h"
-#include "../CMSIS/fsl_device_registers.h"
-#include "../board/board.h"
-#include "../startup/startup_board.h"
-#include "../board/pin_mux.h"
+#include "fsl_debug_console.h"
+#include "fsl_device_registers.h"
+#include "board.h"
+#include "startup_board.h"
+#include "pin_mux.h"
 #include "routine.h"
-#include "../drivers/fsl_port.h"
-#include "../CMSIS/MKL25Z4.h"
+#include "fsl_port.h"
+#include "MKL25Z4.h"
 #include "control_unit.h"
-#include "../motors/engines.h"
-//#include "common.h"
+#include "motors/engines.h"
+#include "common.h"
+#include "startup_peripherals.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -110,6 +110,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
+			startupPeripherals();
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
 

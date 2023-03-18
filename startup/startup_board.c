@@ -7,20 +7,20 @@
  ***************************************************************************************************
  */
 
-
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
 #include "startup_peripherals.h"
-#include "../CMSIS/MKL25Z4.h"
-#include "../drivers/fsl_tpm.h"
-#include "../drivers/fsl_i2c.h"
-#include "../board/board.h"
-#include "../utilities/fsl_debug_console.h"
-#include "../peripherals/isl29125.h"
-#include "../drivers/fsl_port.h"
-#include "../source/global_macros.h"
-#include "../source/common.h"
+#include "MKL25Z4.h"
+#include "fsl_tpm.h"
+#include "fsl_i2c.h"
+#include "board.h"
+#include "peripherals/isl29125.h"
+#include "fsl_port.h"
+#include "global_macros.h"
+#include "common.h"
+#include "fsl_debug_console.h"
+#include "peripherals/i2c.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -36,9 +36,6 @@
 #define GPIO_HALL_IRQn			PORTD_IRQn
 #define GPIO_COLOR_MAIN_IRQn	PORTA_IRQn
 
-#define LEFT_TPM_IC				kTPM_Chnl_0
-#define RIGHT_TPM_IC			kTPM_Chnl_4
-#define CENTER_TPM_IC			kTPM_Chnl_3
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -59,51 +56,6 @@
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
-
-
-//!*************************************************************************************************
-//! static void initMotors()
-//!
-//! @description
-//! Function initialize motors.
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void initMotors()
-{
-	PRINTF("\t\t- Motors initialization started.");
-	static float initDutyCycleStep = 0.06;
-
-	float initDutyCycle = 2.88;
-
-	delay_ms(400);
-
-	for (int i = 0; i < 100; i++)
-	{
-		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, initDutyCycle);
-		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, initDutyCycle);
-		delay_ms(2);
-
-		initDutyCycle += initDutyCycleStep;
-		if( (i % 10) == 0) PRINTF(".");
-	}
-
-	// After inicialization, stop motors
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
-	delay_ms(50);
-	PRINTF("\r\n\t\t- Motors initialization complete.\r\n");
-}
-
-static void initServo()
-{
-	PRINTF("\t\t- Servo initialization started.\r\n");
-	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.37);
-	delay_ms(100);
-	PRINTF("\t\t- Servo initialization complete.\r\n");
-}
 
 //!*************************************************************************************************
 //! static void init_tsi(void)
@@ -141,7 +93,6 @@ static void init_leds(void)
 	GPIOB->PDDR |= (1 << 18) | (1 << 19);
 	GPIOD->PDDR |= (1<<1);
 }
-
 
 //!*************************************************************************************************
 //! static void startupPWM(void)
@@ -200,28 +151,6 @@ static void startupPWM(void)
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
 }
 
-/*
-static void startupI2C(void)
-{
-    // ULTRASONIC masterXfer.slaveAddress = 0x57U;
-	i2c_master_config_t config;
-
-	I2C_MasterGetDefaultConfig(&config);
-
-	uint32_t srcClk = I2C_MASTER_CLK_FREQ;
-	I2C_MasterInit(I2C0, &config, srcClk);
-
-	bool ColorSensor = ISL_ColorSensorInit();
-
-	if(ColorSensor)
-	{
-		uint8_t redColor[2];
-		ISL_readRed(redColor);
-		redColor[1]++;
-	}
-}
-*/
-
 //!*************************************************************************************************
 //! static void startupInterrupts(void)
 //!
@@ -250,47 +179,20 @@ static void startupInterrupts(void)
 }
 
 
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
+
 //!*************************************************************************************************
-//! static void startupSensorCapture()
+//! void startupInit(void)
 //!
 //! @description
-//! Function sets input compare(input capture) function for color sensors.
+//! Function starts touch sensor and led.
 //!
 //! @param    None
 //!
 //! @return   None
 //!*************************************************************************************************
-static void startupSensorCapture()
-{
-	PRINTF("\t- Color sensor initialization.\r\n");
-	tpm_config_t tpmInfo;
-
-	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
-	CLOCK_SetTpmClock(1U);
-
-	TPM_GetDefaultConfig(&tpmInfo);
-	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
-
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RisingEdge);
-
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl0InterruptEnable);
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl4InterruptEnable);
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl3InterruptEnable);
-    EnableIRQ(MAIN_SEN_TPM_IRQ);
-
-
-	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
-
-	// todo: GPIO C4 set to HIGH, GPIO C5 set to LOW
-}
-
-
-//**************************************************************************************************
-//* GLOBAL FUNCTIONS
-//**************************************************************************************************
-
 void startupInit(void)
 {
 	init_leds();
@@ -310,13 +212,10 @@ void startupInit(void)
 void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
+
 	startupPWM();
-	//initMotors();
-	//initServo();
-
 	startupInterrupts();
-	startupSensorCapture();
+	i2cInit(400000);	// 400kHz
 
-	//startupI2C();
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

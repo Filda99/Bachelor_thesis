@@ -28,6 +28,12 @@ extern uint8_t currentSteer;
  ************************************/
 #define STOP			7.365
 
+#define TURNING_LEFT	0
+#define TURNING_RIGHT	180
+
+//! Denominator of a division
+#define SLACK_DIV_AMOUNT	5
+
 /************************************
  * PRIVATE TYPEDEFS
  ************************************/
@@ -37,8 +43,6 @@ extern uint8_t currentSteer;
  ************************************/
 float leftMotorSpeed;
 float rightMotorSpeed;
-
-
 
 /************************************
  * GLOBAL VARIABLES
@@ -72,10 +76,6 @@ static void getDutyCycle(float setSpeed)
 }
 
 
-//**************************************************************************************************
-//* GLOBAL FUNCTIONS
-//**************************************************************************************************
-
 //!*************************************************************************************************
 //! void setMotorSpeed(int speed)
 //!
@@ -86,28 +86,59 @@ static void getDutyCycle(float setSpeed)
 //!
 //! @return	None
 //!*************************************************************************************************
-void setMotorSpeed(int speed)
+static void setMotorSpeed(int speed, uint8_t wheelSide,uint8_t slackWheel)
 {
 	float setSpeed = SpeedMap[speed];
 	getDutyCycle(setSpeed);
 
-	// Set left motor duty cycle.
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
-			kTPM_EdgeAlignedPwm, leftMotorSpeed);
+	float slackValue = slackWheel / SLACK_DIV_AMOUNT;
 
-	// Set right motor duty cycle.
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
-			kTPM_EdgeAlignedPwm, rightMotorSpeed);
+	if (wheelSide == TURNING_LEFT)
+	{
+		// Set left motor duty cycle.
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
+				kTPM_EdgeAlignedPwm, leftMotorSpeed - slackValue);
+
+		// Set right motor duty cycle.
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
+				kTPM_EdgeAlignedPwm, rightMotorSpeed);
+	}
+	else if (wheelSide == TURNING_RIGHT)
+	{
+		// Set left motor duty cycle.
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
+				kTPM_EdgeAlignedPwm, leftMotorSpeed);
+
+		// Set right motor duty cycle.
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
+				kTPM_EdgeAlignedPwm, rightMotorSpeed - slackValue);
+	}
+	else
+	{
+		// Set left motor duty cycle.
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
+				kTPM_EdgeAlignedPwm, leftMotorSpeed);
+
+		// Set right motor duty cycle.
+		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
+				kTPM_EdgeAlignedPwm, rightMotorSpeed);
+	}
 
 	delay_ms(50);
 }
 
-void setMotorSteer(int steer)
+static void setMotorSteer(int steer)
 {
 	float setSteer = SteerMap[steer];
 	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5,
 				kTPM_EdgeAlignedPwm, setSteer);
 }
+
+
+//**************************************************************************************************
+//* GLOBAL FUNCTIONS
+//**************************************************************************************************
+
 
 //-------------------
 //------ SPEED ------
@@ -117,7 +148,7 @@ void addSpeed()
 	if (currentSpeed == MAX_FORWARD_ENGINE_LIMIT) return;
 
 	currentSpeed++;
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
 }
 
 void addSpeedCustom(int speed)
@@ -131,7 +162,7 @@ void addSpeedCustom(int speed)
 		currentSpeed += speed;
 	}
 
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
 }
 
 void slackUpSpeed()
@@ -143,7 +174,7 @@ void slackUpSpeed()
 	{
 		currentSpeed = ENGINE_STOP + 1;
 	}
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
 }
 
 void slackUpSpeedCustom(int speed)
@@ -157,19 +188,25 @@ void slackUpSpeedCustom(int speed)
 		currentSpeed -= speed;
 	}
 
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
+}
+
+void slackUpSpeedOnWheel(uint8_t slackAmount)
+{
+	uint8_t turningSide = (currentSteer > GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
+	setMotorSpeed(currentSpeed, turningSide, slackAmount);
 }
 
 void goBackwards()
 {
 	currentSpeed = MAX_REVERSE_ENGINE_LIMIT;
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
 }
 
 void stopCar()
 {
 	currentSpeed = ENGINE_STOP;
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
 }
 
 void hardStop()
@@ -177,7 +214,7 @@ void hardStop()
 	IsCmdToStopCar = true;
 
 	currentSpeed = ENGINE_STOP;
-	setMotorSpeed(currentSpeed);
+	setMotorSpeed(currentSpeed, 0, 0);
 }
 
 

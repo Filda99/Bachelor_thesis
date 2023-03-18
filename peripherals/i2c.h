@@ -1,14 +1,14 @@
 /**
  ***************************************************************************************************
- * @file    common.h
+ * @file    i2c.h
  * @author  user
- * @date    Feb 7, 2023
+ * @date    Mar 4, 2023
  * @brief   
  ***************************************************************************************************
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef I2C_H_
+#define I2C_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,10 +33,12 @@ extern "C" {
 //**************************************************************************************************
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
-void delay_ms(unsigned int ms);
+void i2cInit(uint8_t deviceAddr);
+status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data);
+status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t dataLen);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* COMMON_H_ */
+#endif /* I2C_H_ */
