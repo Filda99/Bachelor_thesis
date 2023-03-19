@@ -13,6 +13,7 @@
 #include "map/map_operations.h"
 #include "stdlib.h"
 #include <stdbool.h>
+#include "utilities/fsl_debug_console.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -36,6 +37,15 @@ typedef enum _block_direction
 //* STATIC VARIABLES
 //**************************************************************************************************
 
+//! Field of directions, where we went
+static map_move_direction *path = NULL;
+static uint16_t pathFieldCapacity = 0;
+
+static int maxBlockX = 0;
+static int minBlockX = 0;
+static int maxBlockY = 0;
+static int minBlockY = 0;
+
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
@@ -53,6 +63,32 @@ curr_pos_map currPosInBlk = {
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
+
+//!*************************************************************************************************
+//! static void add_elements(map_move_direction** array, int* capacity, int num_elements)
+//!
+//! @description
+//! Function dynamically allocates given field.
+//!
+//! @param	map_move_direction** array	Pointer to array to be allocated
+//! @param	int* capacity				Number of allocated items in the array
+//! @param	int num_elements			Number for how much should we allocate
+//!
+//! @return   None
+//!*************************************************************************************************
+static void add_elements(map_move_direction** array, int* capacity, int num_elements)
+{
+    int new_capacity = *capacity + num_elements;
+    map_move_direction* new_array = realloc(*array, new_capacity * sizeof(int));
+
+    if (new_array == NULL) {
+        PRINTF("Error: Unable to allocate enough memory\r\n");
+        exit(1);
+    }
+
+    *array = new_array;
+    *capacity = new_capacity;
+}
 
 //!*************************************************************************************************
 //! static void initNewBlock(map_block *newBlock)
@@ -250,6 +286,7 @@ void createMap()
 	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 	currentBlockInMap->corX = 0;
 	currentBlockInMap->corY = 0;
+	add_elements(&path, &pathFieldCapacity, 10);
 }
 
 //!*************************************************************************************************
