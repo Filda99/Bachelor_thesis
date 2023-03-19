@@ -15,6 +15,8 @@
 #include "../source/global_macros.h"
 #include "../source/common.h"
 
+#include "utilities/fsl_debug_console.h"
+
 /************************************
  * EXTERN VARIABLES
  ************************************/
@@ -225,6 +227,7 @@ void turnRight()
 {
 	if(currentSteer == MAX_STEER_RIGHT) return;
 
+	PRINTF("Turning Right\r\n");
 	currentSteer++;
 	setMotorSteer(currentSteer);
 }
@@ -240,6 +243,7 @@ void turnRightCustom(int steer)
 		currentSteer += steer;
 	}
 
+	PRINTF("Turning Right\r\n");
 	setMotorSteer(currentSteer);
 }
 
@@ -247,6 +251,7 @@ void turnLeft()
 {
 	if(currentSteer == MAX_STEER_LEFT) return;
 
+	PRINTF("Turning Left\r\n");
 	currentSteer--;
 	setMotorSteer(currentSteer);
 }
@@ -262,11 +267,13 @@ void turnLeftCustom(int steer)
 		currentSteer += steer;
 	}
 
+	PRINTF("Turning Left\r\n");
 	setMotorSteer(currentSteer);
 }
 
 void goDirect()
 {
+	PRINTF("Going direct\r\n");
 	currentSteer = GO_DIRECT;
 	setMotorSteer(currentSteer);
 }
