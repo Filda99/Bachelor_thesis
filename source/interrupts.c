@@ -104,7 +104,7 @@ void GPIO_COLOR_MAIN_IRQHandler()
 			uint32_t pulseWidth = secondCapture - firstCapture;
 			if (pulseWidth > 10000)
 			{
-				uint32_t firstPart = MAX_UINT16 - firstCapture;
+				uint32_t firstPart = 30000 - firstCapture;
 				pulseWidth = secondCapture + firstPart;
 			}
 

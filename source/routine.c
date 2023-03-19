@@ -92,21 +92,21 @@ static void checkLines()
 	static int enableIrq = 0;
 	bool isLineDetected = false;
 
-	if (LeftSensorValue < COLOR_TRESHOLD)
+	if (LeftSensorValue > COLOR_TRESHOLD)
 	{
 		LineDetected = LineLeft;
 		isLineDetected = true;
 	}
-	/*if (RightSensorValue < COLOR_TRESHOLD)
+	if (RightSensorValue > COLOR_TRESHOLD)
 	{
 		LineDetected |= LineRight;
 		isLineDetected = true;
 	}
-	if (CenterSensorValue < COLOR_TRESHOLD)
+	if (CenterSensorValue > COLOR_TRESHOLD)
 	{
 		// TODO: LineDetected |= LineCenter;
 		isLineDetected = true;
-	}*/
+	}
 
 
 	if (!isLineDetected)
@@ -139,18 +139,18 @@ static void checkLines()
 //!*************************************************************************************************
 void routine(void)
 {
-	HalfWheelRotations++;
-	//checkLines();
-	//controlUnit();
+	//HalfWheelRotations++;
+	checkLines();
+	controlUnit();
 
-	uint16_t data;
+	/*uint16_t data;
 	VL53L0X_MeasureSingle(&data);
-	PRINTF("Measured data: %i\r\n", data);
+	PRINTF("Measured data: %i\r\n", data);*/
 
-	static int i = 0;
-	PRINTF("Cycle: %i\r\n", i++);
- 	mapping();
- 	printBlock();
-	PRINTF("-------------------------------------\r\n");
+	//static int i = 0;
+	//PRINTF("Cycle: %i\r\n", i++);
+ 	//mapping();
+ 	//printBlock();
+	//PRINTF("-------------------------------------\r\n");
 }
 

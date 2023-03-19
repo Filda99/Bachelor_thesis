@@ -95,7 +95,7 @@ extern "C" {
 #define CNT_OUT_OF_LANE 80
 
 // If there is white color under sensor, no more than 2500 will occure
-#define COLOR_TRESHOLD	40
+#define COLOR_TRESHOLD	45
 
 /*************************************/
 // Engine

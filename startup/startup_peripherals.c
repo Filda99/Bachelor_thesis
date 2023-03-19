@@ -149,12 +149,15 @@ static void initServo()
  ************************************/
 void startupPeripherals()
 {
-	/*startupSensorCapture();
+	// Servo and motors
+	startupSensorCapture();
 
-	initMotors();
-	initServo();*/
+	//initMotors();
+	initServo();
 
-	VL53L0X_Init();
+	// Laser sensor
+
+	/*VL53L0X_Init();
 
 	VL53L0X_Dev_t device;
 	VL53L0X_RangingMeasurementData_t measurementData;
@@ -162,7 +165,7 @@ void startupPeripherals()
 	device.I2cDevAddr      =  0x29;
 	device.comms_type      =  0;
 	device.comms_speed_khz =  400;
-
+*/
 	// Inicializace senzoru
 	/*VL53L0X_DataInit(&device);
 	VL53L0X_GetDeviceParameters(&device, &deviceParams);
@@ -171,7 +174,7 @@ void startupPeripherals()
 	// Spuštění jednoho měření
 	VL53L0X_StartMeasurement(&device);*/
 
-	while(1)
+	/*while(1)
 	{
 	uint8_t measurementDataReady;
 	while(measurementDataReady == 0)
@@ -180,5 +183,5 @@ void startupPeripherals()
 	}
 	VL53L0X_GetRangingMeasurementData(&device, &measurementData);
 	PRINTF("MM: %i\r\n", measurementData.RangeMilliMeter);
-	}
+	}*/
 }

@@ -111,7 +111,7 @@ void controlUnit()
 			{
 				PRINTF("\t-> Turning right! \r\n");
 				turnRight();
-				slackUpSpeedCustom(2);
+				slackUpSpeed();
 			}
 
 			prevTurning = LineLeft;

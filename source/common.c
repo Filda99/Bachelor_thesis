@@ -57,7 +57,7 @@
 void delay_ms(uint32_t ms)
 {
     uint32_t i;
-    for (i = 0; i < (SystemCoreClock / 14000 * ms); i++)
+//    for (i = 0; i < (SystemCoreClock / 14000 * ms); i++)
     {
         __asm("NOP");
     }
