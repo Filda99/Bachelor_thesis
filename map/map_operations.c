@@ -160,18 +160,22 @@ static void createNewBlock(block_direction direction)
 		case newBlock_up:
 			currentBlockInMap->blockUp = newBlock;
 			newBlock->blockDown = currentBlockInMap;
+			newBlock->corY = ++currentBlockInMap->corY;
 			break;
 		case newBlock_down:
 			currentBlockInMap->blockDown = newBlock;
 			newBlock->blockUp = currentBlockInMap;
+			newBlock->corY = --currentBlockInMap->corY;
 			break;
 		case newBlock_left:
 			currentBlockInMap->blockLeft = newBlock;
 			newBlock->blockRight = currentBlockInMap;
+			newBlock->corX = --currentBlockInMap->corX;
 			break;
 		case newBlock_right:
 			currentBlockInMap->blockRight = newBlock;
 			newBlock->blockLeft = currentBlockInMap;
+			newBlock->corX = ++currentBlockInMap->corX;
 			break;
 
 		default:
@@ -244,6 +248,8 @@ void createMap()
 	currentBlockInMap = malloc(sizeof(*currentBlockInMap));
 	initNewBlock(currentBlockInMap);
 	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
+	currentBlockInMap->corX = 0;
+	currentBlockInMap->corY = 0;
 }
 
 //!*************************************************************************************************

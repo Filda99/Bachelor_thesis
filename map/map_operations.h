@@ -45,6 +45,8 @@ typedef struct map_blk
 	struct map_blk 	*blockDown;
 	struct map_blk 	*blockLeft;
 	struct map_blk 	*blockRight;
+	int	corX;
+	int corY;
 }map_block;
 
 //* Directions for moving in the map
