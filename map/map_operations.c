@@ -28,12 +28,6 @@
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
 
-//* Directions for creating new block
-typedef enum _block_direction
-{
-	newBlock_up = 0U, newBlock_down, newBlock_left, newBlock_right
-} block_direction;
-
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
@@ -117,26 +111,26 @@ static bool doesBlockExists(block_direction direction)
 	bool ret = false;
 	switch (direction)
 	{
-		case newBlock_up:
+		case block_up:
 			if (currentBlockInMap->blockUp != NULL)
 			{
 				ret = true;
 			}
 			break;
-		case newBlock_down:
+		case block_down:
 			if (currentBlockInMap->blockDown != NULL)
 			{
 				ret = true;
 			}
 			break;
-		case newBlock_left:
+		case block_left:
 			if (currentBlockInMap->blockLeft != NULL)
 			{
 				ret = true;
 			}
 			else
 			break;
-		case newBlock_right:
+		case block_right:
 			if (currentBlockInMap->blockRight != NULL)
 			{
 				ret = true;
@@ -167,22 +161,22 @@ static void createNewBlock(block_direction direction)
 	initNewBlock(newBlock);
 	switch (direction)
 	{
-		case newBlock_up:
+		case block_up:
 			currentBlockInMap->blockUp = newBlock;
 			newBlock->blockDown = currentBlockInMap;
 			newBlock->corY = ++currentBlockInMap->corY;
 			break;
-		case newBlock_down:
+		case block_down:
 			currentBlockInMap->blockDown = newBlock;
 			newBlock->blockUp = currentBlockInMap;
 			newBlock->corY = --currentBlockInMap->corY;
 			break;
-		case newBlock_left:
+		case block_left:
 			currentBlockInMap->blockLeft = newBlock;
 			newBlock->blockRight = currentBlockInMap;
 			newBlock->corX = --currentBlockInMap->corX;
 			break;
-		case newBlock_right:
+		case block_right:
 			currentBlockInMap->blockRight = newBlock;
 			newBlock->blockLeft = currentBlockInMap;
 			newBlock->corX = ++currentBlockInMap->corX;
@@ -219,16 +213,16 @@ static void moveBetweenBlocks(block_direction direction)
 	{
 		switch (direction)
 		{
-			case newBlock_up:
+			case block_up:
 				currentBlockInMap = currentBlockInMap->blockUp;
 				break;
-			case newBlock_down:
+			case block_down:
 				currentBlockInMap = currentBlockInMap->blockDown;
 				break;
-			case newBlock_left:
+			case block_left:
 				currentBlockInMap = currentBlockInMap->blockLeft;
 				break;
-			case newBlock_right:
+			case block_right:
 				currentBlockInMap = currentBlockInMap->blockRight;
 				break;
 
@@ -325,7 +319,7 @@ void moveInMap(map_move_direction direction)
 			else
 			{
 				// Create new block up and move to its last row.
-				moveBetweenBlocks(newBlock_up);
+				moveBetweenBlocks(block_up);
 				currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 			}
 			break;
@@ -344,7 +338,7 @@ void moveInMap(map_move_direction direction)
 				if (currPosInBlk.Col == MAP_BLOCK_MIN_COL &&
 						currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 				{
-					moveBetweenBlocks(newBlock_left);
+					moveBetweenBlocks(block_left);
 					currPosInBlk.Row--;
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 				}
@@ -352,15 +346,15 @@ void moveInMap(map_move_direction direction)
 				else if (currPosInBlk.Col != MAP_BLOCK_MIN_COL &&
 						currPosInBlk.Row == MAP_BLOCK_MIN_ROW)
 				{
-					moveBetweenBlocks(newBlock_up);
+					moveBetweenBlocks(block_up);
 					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 					currPosInBlk.Col--;
 				}
 				// Move to the upper left block
 				else
 				{
-					moveBetweenBlocks(newBlock_up);
-					moveBetweenBlocks(newBlock_left);
+					moveBetweenBlocks(block_up);
+					moveBetweenBlocks(block_left);
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 				}
@@ -375,7 +369,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(newBlock_left);
+				createNewBlock(block_left);
 				currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 			}
 			break;
@@ -393,7 +387,7 @@ void moveInMap(map_move_direction direction)
 				if (currPosInBlk.Col == MAP_BLOCK_MIN_COL &&
 						currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 				{
-					moveBetweenBlocks(newBlock_left);
+					moveBetweenBlocks(block_left);
 					currPosInBlk.Row--;
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 				}
@@ -401,15 +395,15 @@ void moveInMap(map_move_direction direction)
 				else if (currPosInBlk.Col != MAP_BLOCK_MIN_COL &&
 						currPosInBlk.Row == MAP_BLOCK_MAX_ROW)
 				{
-					moveBetweenBlocks(newBlock_down);
+					moveBetweenBlocks(block_down);
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 					currPosInBlk.Col--;
 				}
 				// Move to the block to the left below us
 				else
 				{
-					createNewBlock(newBlock_down);
-					createNewBlock(newBlock_left);
+					createNewBlock(block_down);
+					createNewBlock(block_left);
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 				}
@@ -423,7 +417,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(newBlock_down);
+				createNewBlock(block_down);
 				currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 			}
 			break;
@@ -441,7 +435,7 @@ void moveInMap(map_move_direction direction)
 				if (currPosInBlk.Col == MAP_BLOCK_MAX_COL &&
 						currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 				{
-					moveBetweenBlocks(newBlock_right);
+					moveBetweenBlocks(block_right);
 					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 					currPosInBlk.Row--;
 				}
@@ -449,15 +443,15 @@ void moveInMap(map_move_direction direction)
 				else if (currPosInBlk.Col != MAP_BLOCK_MAX_COL &&
 						currPosInBlk.Row == MAP_BLOCK_MAX_ROW)
 				{
-					moveBetweenBlocks(newBlock_down);
+					moveBetweenBlocks(block_down);
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 					currPosInBlk.Col--;
 				}
 				// Move to the block to the right below us
 				else
 				{
-					createNewBlock(newBlock_down);
-					createNewBlock(newBlock_right);
+					createNewBlock(block_down);
+					createNewBlock(block_right);
 					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 				}
@@ -471,7 +465,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(newBlock_right);
+				createNewBlock(block_right);
 				currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 			}
 			break;
@@ -489,7 +483,7 @@ void moveInMap(map_move_direction direction)
 				if (currPosInBlk.Col == MAP_BLOCK_MAX_COL &&
 						currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 				{
-					moveBetweenBlocks(newBlock_right);
+					moveBetweenBlocks(block_right);
 					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 					currPosInBlk.Row--;
 				}
@@ -497,15 +491,15 @@ void moveInMap(map_move_direction direction)
 				else if (currPosInBlk.Col != MAP_BLOCK_MAX_COL &&
 						currPosInBlk.Row == MAP_BLOCK_MIN_ROW)
 				{
-					moveBetweenBlocks(newBlock_up);
+					moveBetweenBlocks(block_up);
 					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 					currPosInBlk.Col++;
 				}
 				// Move to the upper left block
 				else
 				{
-					moveBetweenBlocks(newBlock_up);
-					moveBetweenBlocks(newBlock_right);
+					moveBetweenBlocks(block_up);
+					moveBetweenBlocks(block_right);
 					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
 				}

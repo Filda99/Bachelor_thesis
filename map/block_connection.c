@@ -8,6 +8,7 @@
  */
 #include "global_macros.h"
 #include "map_operations.h"
+#include "common/hast_table.h"
 
 //**************************************************************************************************
 //* INCLUDES
@@ -48,20 +49,29 @@ static int getUniqueID(int x, int y)
     return unique_id;
 }
 
-static bool checkID(int id)
+static void connectBlock(map_block *neighbor, block_direction direction)
 {
-	bool idFound = false;
-	/*for(int i = 0; i < pathFieldCapacity; i++)
+	if (direction == block_left)
 	{
-		if (path[i] == id)
-		{
-			idFound = true;
-			break;
-		}
-	}*/
-	return idFound;
+		currentBlockInMap->blockLeft = neighbor;
+		neighbor->blockRight = currentBlockInMap;
+	}
+	else if (direction == block_right)
+	{
+		currentBlockInMap->blockRight = neighbor;
+		neighbor->blockLeft = currentBlockInMap;
+	}
+	else if (direction == block_up)
+	{
+		currentBlockInMap->blockUp = neighbor;
+		neighbor->blockDown = currentBlockInMap;
+	}
+	else if (direction == block_down)
+	{
+		currentBlockInMap->blockDown = neighbor;
+		neighbor->blockUp = currentBlockInMap;
+	}
 }
-
 
 
 //**************************************************************************************************
@@ -77,21 +87,29 @@ void connectToNeighbors()
 	int downNeigborID = getUniqueID(currentBlockInMap->corX, --(currentBlockInMap->corY));
 
 	// Check id's if exist, if yes, connect them to existing block
-	if (checkID(leftNeigborID))
+	map_block* neighbor;
+	neighbor = searchItemInHT(leftNeigborID, --(currentBlockInMap->corX), currentBlockInMap->corY);
+	if (neighbor)
 	{
-		connectBlock(leftNeigborID);
+		connectBlock(neighbor, block_left);
 	}
-	if (checkID(upNeigborID))
+
+	neighbor = searchItemInHT(upNeigborID, currentBlockInMap->corX, ++(currentBlockInMap->corY));
+	if (neighbor)
 	{
-		connectBlock(leftNeigborID);
+		connectBlock(neighbor, block_up);
 	}
-	if (checkID(rightNeigborID))
+
+	neighbor = searchItemInHT(rightNeigborID, ++(currentBlockInMap->corX), currentBlockInMap->corY);
+	if (neighbor)
 	{
-		connectBlock(leftNeigborID);
+		connectBlock(neighbor, block_right);
 	}
-	if (checkID(downNeigborID))
+
+	neighbor = searchItemInHT(downNeigborID, currentBlockInMap->corX, --(currentBlockInMap->corY));
+	if (neighbor)
 	{
-		connectBlock(leftNeigborID);
+		connectBlock(neighbor, block_down);
 	}
 }
 

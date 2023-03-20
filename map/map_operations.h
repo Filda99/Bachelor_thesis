@@ -64,6 +64,12 @@ typedef enum
 	move_left = 16,
 }map_move_direction;
 
+//* Directions for blocks
+typedef enum _block_direction
+{
+	block_up = 0U, block_down, block_left, block_right
+} block_direction;
+
 //* Current position in the map block
 typedef struct
 {
