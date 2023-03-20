@@ -74,7 +74,7 @@ extern "C" {
 // Distance 
 /*************************************/
 // Counter how long are we going straight without any interrupt
-#define MAX_DISTANCE_WITHOUT_LINE	2000
+#define MAX_DISTANCE_WITHOUT_LINE	20000
 
 /*************************************/
 // Line detected counter
@@ -109,12 +109,12 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 typedef enum _line_location {
-	LineLeft  = 1U,		// Line on the left side detected
-	LineRight,			// Line on the right side detected
-	LineCenter_Left,	// Line in the middle detected, on the left before
-	LineCenter_Right,	// Line in the middle detected, on the right before
-	LineCenter_None,	// Line in the middle detected, be we didn't detected any line before
-	LineNone			// No line detected
+	LineLeft  = 0b1,			// Line on the left side detected
+	LineRight = 0b10,			// Line on the right side detected
+	LineCenter_Left = 0b100,	// Line in the middle detected, on the left before
+	LineCenter_Right = 0b1000,	// Line in the middle detected, on the right before
+	LineCenter_None,			// Line in the middle detected, be we didn't detected any line before
+	LineNone					// No line detected
 }line_location_t;
 
 /************************************

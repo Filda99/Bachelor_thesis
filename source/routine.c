@@ -94,19 +94,22 @@ static void checkLines()
 	bool isLineDetected = false;
 	LineDetected = 0;
 
-	if (LeftSensorValue > COLOR_TRESHOLD)
+	if (LeftSensorValue > COLOR_TRESHOLD && LeftSensorValue < 400)
 	{
 		LineDetected = LineLeft;
+		if (CenterSensorValue > COLOR_TRESHOLD && CenterSensorValue < 400)
+		{
+			LineDetected = LineCenter_Left;
+		}
 		isLineDetected = true;
 	}
-	if (RightSensorValue > COLOR_TRESHOLD)
+	if (RightSensorValue > COLOR_TRESHOLD && RightSensorValue < 400)
 	{
 		LineDetected |= LineRight;
-		isLineDetected = true;
-	}
-	if (CenterSensorValue > COLOR_TRESHOLD)
-	{
-		// TODO: LineDetected |= LineCenter;
+		if (CenterSensorValue > COLOR_TRESHOLD && CenterSensorValue < 400)
+		{
+			LineDetected = LineCenter_Right;
+		}
 		isLineDetected = true;
 	}
 
@@ -115,20 +118,6 @@ static void checkLines()
 	{
 		LineDetected = LineNone;
 	}
-
-	/*if(enableIrq >= 10)
-	{
-		EnableIRQ(MAIN_SEN_TPM_IRQ);
-		enableIrq = 0;
-	}
-	enableIrq++;*/
-
-
-	/*PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
-	PRINTF("Right sensor value: %i\r\n", RightSensorValue);*/
-	//PRINTF("Center sensor value: %i\r\n", CenterSensorValue);
-
-
 }
 
 //**************************************************************************************************
