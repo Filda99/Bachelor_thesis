@@ -259,6 +259,7 @@ void createMap()
 	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 	currentBlockInMap->corX = 0;
 	currentBlockInMap->corY = 0;
+	createHashTable(200);
 }
 
 //!*************************************************************************************************

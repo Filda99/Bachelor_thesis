@@ -44,12 +44,12 @@ typedef struct HashTable {
 //**************************************************************************************************
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
-HashTable *create_hash_table(int size);
-void delete_hash_table(HashTable *ht);
-void insert(HashTable *ht, int key, map_block *value);
-map_block *search(HashTable *ht, int key);
-void delete(HashTable *ht, int key);
-void resize_hash_table(HashTable *ht);
+void createHashTable(int size);
+void deleteHashTable();
+void insertToHashTable(int key, map_block *value);
+map_block *searchItemInHT(int key, int x, int y);
+void deleteItemInHT(int key);
+void resizeHashTable();
 int hash(int key, int size);
 
 #ifdef __cplusplus

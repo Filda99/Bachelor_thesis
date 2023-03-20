@@ -31,6 +31,7 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+static HashTable *ht;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -50,15 +51,16 @@
 
 
 // Function implementations
-HashTable *create_hash_table(int size) {
-    HashTable *ht = (HashTable *)malloc(sizeof(HashTable));
+void createHashTable(int size)
+{
+	ht = (HashTable *)malloc(sizeof(HashTable));
     ht->size = size;
     ht->count = 0;
     ht->table = (Node **)calloc(size, sizeof(Node *));
-return ht;
 }
 
-void delete_hash_table(HashTable *ht) {
+void deleteHashTable()
+{
     for (int i = 0; i < ht->size; i++) {
         Node *node = ht->table[i];
         while (node) {
@@ -71,9 +73,10 @@ void delete_hash_table(HashTable *ht) {
     free(ht);
 }
 
-void insert(HashTable *ht, int key, map_block *value) {
+void insertToHashTable(int key, map_block *value)
+{
     if (ht->count >= ht->size * 0.7) {
-        resize_hash_table(ht);
+        resizeHashTable(ht);
     }
     Node *new_node = (Node *)malloc(sizeof(Node));
     new_node->key = key;
@@ -95,11 +98,12 @@ void insert(HashTable *ht, int key, map_block *value) {
     ht->count++;
 }
 
-map_block *search(HashTable *ht, int key) {
+map_block *searchItemInHT(int key, int x, int y)
+{
     int index = hash(key, ht->size);
     Node *node = ht->table[index];
     while (node) {
-        if (node->key == key) {
+        if (node->key == key && node->value->corX == x && node->value->corY == y) {
             return node->value;
         }
         node = node->next;
@@ -107,7 +111,8 @@ map_block *search(HashTable *ht, int key) {
     return NULL;
 }
 
-void delete(HashTable *ht, int key) {
+void deleteItemInHT(int key)
+{
     int index = hash(key, ht->size);
     Node *node = ht->table[index];
     Node *prev = NULL;
@@ -130,7 +135,8 @@ void delete(HashTable *ht, int key) {
     }
 }
 
-void resize_hash_table(HashTable *ht) {
+void resizeHashTable()
+{
     int old_size = ht->size;
     Node **old_table = ht->table;
 
@@ -141,7 +147,7 @@ void resize_hash_table(HashTable *ht) {
     for (int i = 0; i < old_size; i++) {
         Node *node = old_table[i];
         while (node) {
-            insert(ht, node->key, node->value);
+            insertToHashTable(node->key, node->value);
             Node *temp = node;
             node = node->next;
             free(temp);
@@ -149,8 +155,8 @@ void resize_hash_table(HashTable *ht) {
     }
 
     free(old_table);
-    }
+}
 
-    int hash(int key, int size) {
+int hash(int key, int size) {
     return key % size;
 }
