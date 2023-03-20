@@ -86,8 +86,6 @@ static void startupSensorCapture()
 
 
 	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
-
-	// todo: GPIO C4 set to HIGH, GPIO C5 set to LOW
 }
 
 //!*************************************************************************************************

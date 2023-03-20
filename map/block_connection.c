@@ -6,6 +6,8 @@
  * @brief   
  ***************************************************************************************************
  */
+#include "global_macros.h"
+#include "map_operations.h"
 
 //**************************************************************************************************
 //* INCLUDES
@@ -14,6 +16,7 @@
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
+extern map_block *currentBlockInMap;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -48,14 +51,14 @@ static int getUniqueID(int x, int y)
 static bool checkID(int id)
 {
 	bool idFound = false;
-	for(int i = 0; i < pathFieldCapacity; i++)
+	/*for(int i = 0; i < pathFieldCapacity; i++)
 	{
 		if (path[i] == id)
 		{
 			idFound = true;
 			break;
 		}
-	}
+	}*/
 	return idFound;
 }
 
