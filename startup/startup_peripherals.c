@@ -10,10 +10,10 @@
 /************************************
  * INCLUDES
  ************************************/
+#include "common/delay.h"
 #include "fsl_tpm.h"
 #include "fsl_debug_console.h"
 #include "global_macros.h"
-#include "common.h"
 #include "peripherals/vl53l0x/vl53l0x.h"
 #include "peripherals/vl53l0x/vl53l0x_api.h"
 #include "peripherals/vl53l0x/vl53l0x_platform.h"

@@ -13,7 +13,7 @@
 #include "engines.h"
 #include "../drivers/fsl_tpm.h"
 #include "../source/global_macros.h"
-#include "../source/common.h"
+#include "../common/delay.h"
 
 /************************************
  * EXTERN VARIABLES

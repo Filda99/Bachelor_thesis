@@ -11,6 +11,7 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include "common/delay.h"
 #include "startup_peripherals.h"
 #include "MKL25Z4.h"
 #include "fsl_tpm.h"
@@ -20,7 +21,6 @@
 #include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
-#include "common.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
