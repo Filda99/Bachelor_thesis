@@ -147,11 +147,11 @@ void GPIO_COLOR_MAIN_IRQHandler()
 
 		if (rising)
 		{
-			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
 		}
 		else
 		{
-			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
 			uint32_t pulseWidth = secondCapture - firstCapture;
 			if (pulseWidth > 10000)
 			{
@@ -196,11 +196,11 @@ void GPIO_COLOR_MAIN_IRQHandler()
 
 		if (rising)
 		{
-			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
 		}
 		else
 		{
-			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
 			uint32_t pulseWidth = secondCapture - firstCapture;
 			if (pulseWidth > 10000)
 			{

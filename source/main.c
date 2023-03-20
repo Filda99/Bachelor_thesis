@@ -88,9 +88,6 @@ int main(void)
 
 	PRINTF("Waiting for initialization -> Press capacitive sensor.\r\n");
 
-	startupBoard();
-	startupPeripherals();
-
 	while (1)
 	{
 		// Get data from touch sensor

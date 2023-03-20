@@ -120,7 +120,16 @@ static void checkLines()
 		enableIrq = 0;
 	}
 	enableIrq++;
-	PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
+
+	static uint16_t r = 0;
+	if (r++ == 1500)
+	{
+		PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
+		PRINTF("Right sensor value: %i\r\n", RightSensorValue);
+		PRINTF("Center sensor value: %i\r\n", CenterSensorValue);
+		r = 0;
+	}
+
 }
 
 //**************************************************************************************************
