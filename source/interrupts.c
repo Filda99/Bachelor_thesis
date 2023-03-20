@@ -32,7 +32,7 @@ extern bool InitStop;
 #define GPIO_HALL_IRQHandler		PORTD_IRQHandler
 #define GPIO_COLOR_MINOR_IRQHandler	PORTA_IRQHandler
 #define GPIO_COLOR_MAIN_IRQHandler	TPM0_IRQHandler
-#define FIELD_SIZE 20
+#define FIELD_SIZE 5
 
 #define LEFT_TPM_IC					kTPM_Chnl_0
 #define RIGHT_TPM_IC				kTPM_Chnl_4
@@ -88,157 +88,148 @@ void GPIO_COLOR_MAIN_IRQHandler()
 	// Left sensor
 	if (pinInterrupt & kTPM_Chnl0Flag)
 	{
-		static uint32_t firstCapture = 0;
-		static uint32_t secondCapture = 0;
+		static uint32_t firstCaptureLeft = 0;
+		static uint32_t secondCaptureLeft = 0;
 
-		static uint32_t colorDetection[FIELD_SIZE] = {0, };
-		static uint8_t head = 0;
+		static uint32_t colorDetectionLeft[FIELD_SIZE] = {0, };
+		static uint8_t headLeft = 0;
 
-		static bool rising = true;
+		static bool risingLeft = true;
 
-		if (rising)
+		if (risingLeft)
 		{
-			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			firstCaptureLeft = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
 		}
 		else
 		{
-			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
-			uint32_t pulseWidth = secondCapture - firstCapture;
-			if (pulseWidth > 10000)
+			secondCaptureLeft = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			uint32_t pulseWidthLeft = secondCaptureLeft - firstCaptureLeft;
+			if (pulseWidthLeft > 10000)
 			{
-				uint32_t firstPart = 30000 - firstCapture;
-				pulseWidth = secondCapture + firstPart;
+				uint32_t firstPartLeft = 30000 - firstCaptureLeft;
+				pulseWidthLeft = secondCaptureLeft + firstPartLeft;
 			}
 
 
-			if(head != FIELD_SIZE)
+			if(headLeft != FIELD_SIZE)
 			{
-				colorDetection[head] = pulseWidth;
-				head++;
+				colorDetectionLeft[headLeft] = pulseWidthLeft;
+				headLeft++;
 			}
 			else
 			{
-				colorDetection[head] = pulseWidth;
+				colorDetectionLeft[headLeft] = pulseWidthLeft;
 
-				uint32_t color = 0;
+				uint32_t colorLeft = 0;
 				for (int i = 0; i < FIELD_SIZE; i++)
 				{
-					color += colorDetection[i];
+					colorLeft += colorDetectionLeft[i];
 				}
-				LeftSensorValue = color/FIELD_SIZE;
-				head = 0;
+				LeftSensorValue = colorLeft/FIELD_SIZE;
+				headLeft = 0;
 				DisableIRQ(MAIN_SEN_TPM_IRQ);
 			}
 		}
-		rising = !rising;
+		risingLeft = !risingLeft;
 		MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
 		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl0Flag);
 	}
 	// Right sensor
 	else if (pinInterrupt & kTPM_Chnl4Flag)
 	{
-		static uint32_t firstCapture = 0;
-		static uint32_t secondCapture = 0;
+		static uint32_t firstCaptureRight = 0;
+		static uint32_t secondCaptureRight = 0;
 
-		static uint32_t colorDetection[FIELD_SIZE] = {0, };
-		static uint8_t head = 0;
+		static uint32_t colorDetectionRight[FIELD_SIZE] = {0, };
+		static uint8_t headRight = 0;
 
-		static bool rising = true;
+		static bool risingRight = true;
 
-		if (rising)
+		if (risingRight)
 		{
-			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
+			firstCaptureRight = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
 		}
 		else
 		{
-			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
-			uint32_t pulseWidth = secondCapture - firstCapture;
-			if (pulseWidth > 10000)
+			secondCaptureRight = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
+			uint32_t pulseWidthRight = secondCaptureRight - firstCaptureRight;
+			if (pulseWidthRight > 10000)
 			{
-				uint32_t firstPart = 30000 - firstCapture;
-				pulseWidth = secondCapture + firstPart;
+				uint32_t firstPartRight = 30000 - firstCaptureRight;
+				pulseWidthRight = secondCaptureRight + firstPartRight;
 			}
 
 
-			if(head != FIELD_SIZE)
+			if(headRight != FIELD_SIZE)
 			{
-				colorDetection[head] = pulseWidth;
-				head++;
+				colorDetectionRight[headRight] = pulseWidthRight;
+				headRight++;
 			}
 			else
 			{
-				colorDetection[head] = pulseWidth;
+				colorDetectionRight[headRight] = pulseWidthRight;
 
-				uint32_t color = 0;
+				uint32_t colorRight = 0;
 				for (int i = 0; i < FIELD_SIZE; i++)
 				{
-					color += colorDetection[i];
+					colorRight += colorDetectionRight[i];
 				}
-				RightSensorValue = color/FIELD_SIZE;
-				head = 0;
+				RightSensorValue = colorRight/FIELD_SIZE;
+				headRight = 0;
 				DisableIRQ(MAIN_SEN_TPM_IRQ);
 			}
 		}
-		rising = !rising;
+		risingRight = !risingRight;
 		MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
 		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl4Flag);
 	}
 	// Center sensor
 	else if (pinInterrupt & kTPM_Chnl3Flag)
 	{
-		static uint32_t firstCapture = 0;
-		static uint32_t secondCapture = 0;
+		static uint32_t firstCaptureCenter = 0;
+		static uint32_t secondCaptureCenter = 0;
 
-		static uint32_t colorDetection[FIELD_SIZE] = {0, };
-		static uint8_t head = 0;
+		static uint32_t colorDetectionCenter[FIELD_SIZE] = {0, };
+		static uint8_t headCenter = 0;
 
-		static bool rising = true;
+		static bool risingCenter = true;
 
-		if (rising)
+		if (risingCenter)
 		{
-			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
+			firstCaptureCenter = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
 		}
 		else
 		{
-			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
-			uint32_t pulseWidth = secondCapture - firstCapture;
-			if (pulseWidth > 10000)
+			secondCaptureCenter = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
+			uint32_t pulseWidthCenter = secondCaptureCenter - firstCaptureCenter;
+			if (pulseWidthCenter > 3000)
 			{
-				uint32_t firstPart = 30000 - firstCapture;
-				pulseWidth = secondCapture + firstPart;
+				uint32_t firstPartCenter = 30000 - firstCaptureCenter;
+				pulseWidthCenter = secondCaptureCenter + firstPartCenter;
 			}
 
 
-			if(head != FIELD_SIZE)
+			if(headCenter != FIELD_SIZE)
 			{
-				colorDetection[head] = pulseWidth;
-				head++;
+				colorDetectionCenter[headCenter] = pulseWidthCenter;
+				headCenter++;
 			}
 			else
 			{
-				colorDetection[head] = pulseWidth;
+				colorDetectionCenter[headCenter] = pulseWidthCenter;
 
-				uint32_t color = 0;
+				uint32_t colorCenter = 0;
 				for (int i = 0; i < FIELD_SIZE; i++)
 				{
-					color += colorDetection[i];
+					colorCenter += colorDetectionCenter[i];
 				}
-				CenterSensorValue = color/FIELD_SIZE;
-				head = 0;
-				DisableIRQ(MAIN_SEN_TPM_IRQ);
+				CenterSensorValue = colorCenter/FIELD_SIZE;
+				headCenter = 0;
+				//DisableIRQ(MAIN_SEN_TPM_IRQ);
 			}
 		}
-		rising = !rising;
+		risingCenter = !risingCenter;
 		MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
 		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl3Flag);
 	}
-
-
 }
-
-// TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
-void GPIO_COLOR_MINOR_IRQHandler()
-{
-
-}
-

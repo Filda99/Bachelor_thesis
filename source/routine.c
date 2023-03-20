@@ -36,6 +36,7 @@ extern unsigned int RightSensorValue;
 // todo: remove. This is only for program without car.
 extern unsigned int HalfWheelRotations;
 extern map_block *currentBlockInMap;
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -91,6 +92,7 @@ static void checkLines()
 {
 	static int enableIrq = 0;
 	bool isLineDetected = false;
+	LineDetected = 0;
 
 	if (LeftSensorValue > COLOR_TRESHOLD)
 	{
@@ -121,14 +123,11 @@ static void checkLines()
 	}
 	enableIrq++;
 
-	static uint16_t r = 0;
-	if (r++ == 1500)
-	{
-		PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
-		PRINTF("Right sensor value: %i\r\n", RightSensorValue);
-		PRINTF("Center sensor value: %i\r\n", CenterSensorValue);
-		r = 0;
-	}
+
+	PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
+	PRINTF("Right sensor value: %i\r\n", RightSensorValue);
+	//PRINTF("Center sensor value: %i\r\n", CenterSensorValue);
+
 
 }
 

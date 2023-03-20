@@ -86,6 +86,8 @@ static void startupSensorCapture()
 
 
 	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
+
+	delay_ms(100);
 }
 
 //!*************************************************************************************************

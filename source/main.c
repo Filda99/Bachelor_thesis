@@ -116,6 +116,7 @@ int main(void)
 
 			startupBoard();
 			startupPeripherals();
+
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
 			createMap();
