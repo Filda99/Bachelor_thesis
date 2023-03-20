@@ -116,16 +116,16 @@ static void checkLines()
 		LineDetected = LineNone;
 	}
 
-	if(enableIrq >= 10)
+	/*if(enableIrq >= 10)
 	{
 		EnableIRQ(MAIN_SEN_TPM_IRQ);
 		enableIrq = 0;
 	}
-	enableIrq++;
+	enableIrq++;*/
 
 
-	PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
-	PRINTF("Right sensor value: %i\r\n", RightSensorValue);
+	/*PRINTF("Left sensor value: %i\r\n", LeftSensorValue);
+	PRINTF("Right sensor value: %i\r\n", RightSensorValue);*/
 	//PRINTF("Center sensor value: %i\r\n", CenterSensorValue);
 
 

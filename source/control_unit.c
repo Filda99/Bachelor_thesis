@@ -112,6 +112,7 @@ void controlUnit()
 				PRINTF("\t-> Turning right! \r\n");
 				turnRight();
 				slackUpSpeed();
+				lineCnt = 0;
 			}
 
 			prevTurning = LineLeft;
@@ -131,8 +132,10 @@ void controlUnit()
 
 			if (lineCnt > MAX_CNT_ON_LINE)
 			{
+				PRINTF("\t-> Turning left! \r\n");
 				turnLeft();
 				slackUpSpeed();
+				lineCnt = 0;
 			}
 
 			prevTurning = LineRight;

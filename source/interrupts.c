@@ -91,8 +91,8 @@ void GPIO_COLOR_MAIN_IRQHandler()
 		static uint32_t firstCaptureLeft = 0;
 		static uint32_t secondCaptureLeft = 0;
 
-		static uint32_t colorDetectionLeft[FIELD_SIZE] = {0, };
-		static uint8_t headLeft = 0;
+		/*static uint32_t colorDetectionLeft[FIELD_SIZE] = {0, };
+		static uint8_t headLeft = 0;*/
 
 		static bool risingLeft = true;
 
@@ -103,8 +103,15 @@ void GPIO_COLOR_MAIN_IRQHandler()
 		else
 		{
 			secondCaptureLeft = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
-			uint32_t pulseWidthLeft = secondCaptureLeft - firstCaptureLeft;
-			if (pulseWidthLeft > 10000)
+			LeftSensorValue = secondCaptureLeft - firstCaptureLeft;
+			if (LeftSensorValue > 1000)
+			{
+				uint32_t firstPartLeft = 30000 - firstCaptureLeft;
+				LeftSensorValue = secondCaptureLeft + firstPartLeft;
+			}
+
+
+			/*if (pulseWidthLeft > 10000)
 			{
 				uint32_t firstPartLeft = 30000 - firstCaptureLeft;
 				pulseWidthLeft = secondCaptureLeft + firstPartLeft;
@@ -128,7 +135,7 @@ void GPIO_COLOR_MAIN_IRQHandler()
 				LeftSensorValue = colorLeft/FIELD_SIZE;
 				headLeft = 0;
 				DisableIRQ(MAIN_SEN_TPM_IRQ);
-			}
+			}*/
 		}
 		risingLeft = !risingLeft;
 		MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
@@ -140,8 +147,8 @@ void GPIO_COLOR_MAIN_IRQHandler()
 		static uint32_t firstCaptureRight = 0;
 		static uint32_t secondCaptureRight = 0;
 
-		static uint32_t colorDetectionRight[FIELD_SIZE] = {0, };
-		static uint8_t headRight = 0;
+		/*static uint32_t colorDetectionRight[FIELD_SIZE] = {0, };
+		static uint8_t headRight = 0;*/
 
 		static bool risingRight = true;
 
@@ -152,8 +159,14 @@ void GPIO_COLOR_MAIN_IRQHandler()
 		else
 		{
 			secondCaptureRight = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
-			uint32_t pulseWidthRight = secondCaptureRight - firstCaptureRight;
-			if (pulseWidthRight > 10000)
+			RightSensorValue = secondCaptureRight - firstCaptureRight;
+			if (RightSensorValue > 1000)
+			{
+				uint32_t firstPartRight = 30000 - firstCaptureRight;
+				RightSensorValue = secondCaptureRight + firstPartRight;
+			}
+
+			/*if (pulseWidthRight > 10000)
 			{
 				uint32_t firstPartRight = 30000 - firstCaptureRight;
 				pulseWidthRight = secondCaptureRight + firstPartRight;
@@ -177,14 +190,14 @@ void GPIO_COLOR_MAIN_IRQHandler()
 				RightSensorValue = colorRight/FIELD_SIZE;
 				headRight = 0;
 				DisableIRQ(MAIN_SEN_TPM_IRQ);
-			}
+			}*/
 		}
 		risingRight = !risingRight;
 		MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
 		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl4Flag);
 	}
 	// Center sensor
-	else if (pinInterrupt & kTPM_Chnl3Flag)
+	/*else if (pinInterrupt & kTPM_Chnl3Flag)
 	{
 		static uint32_t firstCaptureCenter = 0;
 		static uint32_t secondCaptureCenter = 0;
@@ -231,5 +244,5 @@ void GPIO_COLOR_MAIN_IRQHandler()
 		risingCenter = !risingCenter;
 		MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
 		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl3Flag);
-	}
+	}*/
 }

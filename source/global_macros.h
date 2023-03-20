@@ -80,13 +80,13 @@ extern "C" {
 // Line detected counter
 /*************************************/
 // Maximum number which says how long can we be on the line
-#define MAX_CNT_ON_LINE	40
+#define MAX_CNT_ON_LINE	15
 // The number that tells us after how long we should increase the speed
 // if there is no line
 #define CNT_OUT_OF_LANE 80
 
 // If there is white color under sensor, no more than 2500 will occure
-#define COLOR_TRESHOLD	45
+#define COLOR_TRESHOLD	100
 
 /*************************************/
 // Engine
