@@ -14,6 +14,7 @@
 #include "stdlib.h"
 #include <stdbool.h>
 #include "utilities/fsl_debug_console.h"
+#include "block_connection.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -36,11 +37,6 @@ typedef enum _block_direction
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
-
-//! Field of directions, where we went
-static map_move_direction *path = NULL;
-static uint16_t pathFieldCapacity = 0;
-static uint16_t pathFieldOccupied = 0;
 
 static int maxBlockX = 0;
 static int minBlockX = 0;
@@ -65,91 +61,6 @@ curr_pos_map currPosInBlk = {
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-
-static int getUniqueID(int x, int y)
-{
-    int unique_id = (y * MAP_ROWS * MAP_COLUMNS) + x;
-    unique_id *= 31;
-    return unique_id;
-}
-
-static void addBlockToPath()
-{
-	currentBlockInMap->id = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);
-	if (++pathFieldOccupied >= pathFieldCapacity)
-	{
-		add_elements(&path, &pathFieldCapacity, 10);
-	}
-	path[pathFieldOccupied] = currentBlockInMap->id;
-}
-
-static bool checkID(int id)
-{
-	bool idFound = false;
-	for(int i = 0; i < pathFieldCapacity; i++)
-	{
-		if (path[i] == id)
-		{
-			idFound = true;
-			break;
-		}
-	}
-	return idFound;
-}
-
-static void connectToNeighbors()
-{
-	// Calculate id's for neighbors
-	int leftNeigborID = getUniqueID(--(currentBlockInMap->corX), currentBlockInMap->corY);
-	int upNeigborID = getUniqueID(currentBlockInMap->corX, ++(currentBlockInMap->corY));
-	int rightNeigborID = getUniqueID(++(currentBlockInMap->corX), currentBlockInMap->corY);
-	int downNeigborID = getUniqueID(currentBlockInMap->corX, --(currentBlockInMap->corY));
-
-	// Check id's if exist, if yes, connect them to existing block
-	if (checkID(leftNeigborID))
-	{
-		connectBlock(leftNeigborID);
-	}
-	if (checkID(upNeigborID))
-	{
-		connectBlock(leftNeigborID);
-	}
-	if (checkID(rightNeigborID))
-	{
-		connectBlock(leftNeigborID);
-	}
-	if (checkID(downNeigborID))
-	{
-		connectBlock(leftNeigborID);
-	}
-
-}
-
-//!*************************************************************************************************
-//! static void add_elements(map_move_direction** array, int* capacity, int num_elements)
-//!
-//! @description
-//! Function dynamically allocates given field.
-//!
-//! @param	map_move_direction** array	Pointer to array to be allocated
-//! @param	int* capacity				Number of allocated items in the array
-//! @param	int num_elements			Number for how much should we allocate
-//!
-//! @return   None
-//!*************************************************************************************************
-void add_elements(map_move_direction** array, int* capacity, int num_elements)
-{
-    int new_capacity = *capacity + num_elements;
-    map_move_direction* new_array = realloc(*array, new_capacity * sizeof(int));
-
-    if (new_array == NULL) {
-        PRINTF("Error: Unable to allocate enough memory\r\n");
-        exit(1);
-    }
-
-    *array = new_array;
-    *capacity = new_capacity;
-}
 
 //!*************************************************************************************************
 //! static void initNewBlock(map_block *newBlock)
@@ -188,6 +99,7 @@ static void initNewBlock(struct map_blk *newBlock)
 	newBlock->blockRight = NULL;
 	newBlock->blockUp = NULL;
 }
+
 
 //!*************************************************************************************************
 //! static bool checkExistingBlock(block_direction direction)
@@ -237,6 +149,7 @@ static bool doesBlockExists(block_direction direction)
 	return ret;
 }
 
+
 //!*************************************************************************************************
 //! static void createNewBlock(map_block *current, map_block *newBlock, block_direction direction)
 //!
@@ -283,8 +196,6 @@ static void createNewBlock(block_direction direction)
 	currentBlockInMap = newBlock;
 
 	// TODO: connect block to existing neighbors
-	// Get id of the new block
-	addBlockToPath();
 	connectToNeighbours();
 }
 
