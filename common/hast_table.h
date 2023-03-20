@@ -1,14 +1,14 @@
 /**
  ***************************************************************************************************
- * @file    dictionary.h
+ * @file    hast_table.h
  * @author  user
  * @date    Mar 20, 2023
  * @brief   
  ***************************************************************************************************
  */
 
-#ifndef DICTIONARY_H_
-#define DICTIONARY_H_
+#ifndef HAST_TABLE_H_
+#define HAST_TABLE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,4 +39,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DICTIONARY_H_ */
+#endif /* HAST_TABLE_H_ */
