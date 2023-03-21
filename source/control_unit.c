@@ -69,15 +69,15 @@ void setWheelToInitPosition()
 void controlUnit()
 {
 	//PRINTF("Control unit: \r\n");
-	static uint16_t stopCar = 0;
+	static uint16_t stopCarCnt = 0;
 
-	stopCar++;
+	stopCarCnt++;
 	// If car goes straight for too long
-	if (stopCar > MAX_DISTANCE_WITHOUT_LINE)
+	/*if (stopCarCnt > MAX_DISTANCE_WITHOUT_LINE)
 	{
 		PRINTF("\t-> Distance without interrupt -> STOP. \r\n");
 		stopCar();
-	}
+	}*/
 
 	switch(LineDetected)
 	{
@@ -114,7 +114,7 @@ void controlUnit()
 				slackUpSpeed();
 				lineCnt = 0;
 			}
-			stopCar = 0;
+			stopCarCnt = 0;
 			prevTurning = LineLeft;
 			break;
 		}
@@ -138,7 +138,7 @@ void controlUnit()
 				lineCnt = 0;
 			}
 
-			stopCar = 0;
+			stopCarCnt = 0;
 			prevTurning = LineRight;
 			break;
 		}
@@ -148,7 +148,7 @@ void controlUnit()
 			turnRightCustom(MAX_STEER_RIGHT);
 			slackUpSpeedCustom(2);
 			PRINTF("\t-> Turning HARD right! \r\n");
-			stopCar = 0;
+			stopCarCnt = 0;
 			break;
 		}
 
@@ -157,7 +157,7 @@ void controlUnit()
 			turnLeftCustom(MAX_STEER_LEFT);
 			slackUpSpeedCustom(2);
 			PRINTF("\t-> Turning HARD left! \r\n");
-			stopCar = 0;
+			stopCarCnt = 0;
 			break;
 		}
 
@@ -166,7 +166,7 @@ void controlUnit()
 			// todo: go backwards until some sensor detects line
 			goDirect();
 			goBackwards();
-			stopCar = 0;
+			stopCarCnt = 0;
 			break;
 		}
 	}

@@ -139,8 +139,14 @@ static void initMotors()
 static void initServo()
 {
 	PRINTF("\t\t- Servo initialization started.\r\n");
-	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.37);
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.5);
 	delay_ms(100);
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 3.735);
+	delay_ms(250);
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 11.205);
+	delay_ms(250);
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.5);
+	delay_ms(250);
 	PRINTF("\t\t- Servo initialization complete.\r\n");
 }
 
@@ -160,21 +166,21 @@ void startupPeripherals()
 	/*VL53L0X_Init();
 
 	VL53L0X_Dev_t device;
+	VL53L0X_DeviceParameters_t *deviceParams;
 	VL53L0X_RangingMeasurementData_t measurementData;
 	 //Initialize Comms
 	device.I2cDevAddr      =  0x29;
 	device.comms_type      =  0;
 	device.comms_speed_khz =  400;
-*/
 	// Inicializace senzoru
-	/*VL53L0X_DataInit(&device);
+	VL53L0X_DataInit(&device);
 	VL53L0X_GetDeviceParameters(&device, &deviceParams);
 
 	VL53L0X_SetDeviceParameters(&device, &deviceParams);
 	// Spuštění jednoho měření
-	VL53L0X_StartMeasurement(&device);*/
+	VL53L0X_StartMeasurement(&device);
 
-	/*while(1)
+	while(1)
 	{
 	uint8_t measurementDataReady;
 	while(measurementDataReady == 0)

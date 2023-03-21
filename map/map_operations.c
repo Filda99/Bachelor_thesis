@@ -190,7 +190,7 @@ static void createNewBlock(block_direction direction)
 	currentBlockInMap = newBlock;
 
 	// TODO: connect block to existing neighbors
-	connectToNeighbours();
+	connectToNeighbors();
 }
 
 //!*************************************************************************************************
