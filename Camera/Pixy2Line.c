@@ -57,22 +57,23 @@ int8_t getFeatures(uint8_t type,  uint8_t features, bool wait)
           ftype = packet.m_buf[offset];
           fsize = packet.m_buf[offset+1];
           fdata = &packet.m_buf[offset+2];
+          //TODO fix types
           if (ftype==LINE_VECTOR)
           {
-            vectors = (Vector *)fdata;
-            numVectors = fsize/sizeof(Vector);
+            //vectors = (Vector *)fdata;
+            numVectors = fsize/sizeof(struct Vector);
             res |= LINE_VECTOR;
 		  }
 		  else if (ftype==LINE_INTERSECTION)
           {
-            intersections = (Intersection *)fdata;
-            numIntersections = fsize/sizeof(Intersection);
+            //intersections = (Intersection *)fdata;
+            numIntersections = fsize/sizeof(struct Intersection);
             res |= LINE_INTERSECTION;
           }
 	      else if (ftype==LINE_BARCODE)
           {
-            barcodes = (Barcode *)fdata;
-            numBarcodes = fsize/sizeof(Barcode);;
+            //barcodes = (Barcode *)fdata;
+            numBarcodes = fsize/sizeof(struct Barcode);;
             res |= LINE_BARCODE;
           }
           else

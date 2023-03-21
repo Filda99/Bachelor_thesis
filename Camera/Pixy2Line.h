@@ -78,7 +78,7 @@ struct Intersection
   uint8_t numIntersections;
   uint8_t m_n;
   uint8_t m_reserved;
-  IntersectionLine m_intLines[LINE_MAX_INTERSECTION_LINES];
+  struct IntersectionLine m_intLines[LINE_MAX_INTERSECTION_LINES];
 };
 
 struct Barcode

@@ -87,7 +87,7 @@ struct Packet
   bool m_cs;
 };
 
-void memory_allocation();
+struct Packet CreatePacket();
 int8_t init(uint32_t arg);
 int16_t getSync(struct Packet packet);
 int16_t recvPacket(struct Packet packet);

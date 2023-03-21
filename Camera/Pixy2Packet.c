@@ -1,15 +1,17 @@
 #include "Pixy2Packet.h"
 #include <string.h>
 #include <stdio.h>
+#include "peripherals/i2c.h"
 
 
-void memory_allocation(){
+struct Packet CreatePacket(){
 	  // allocate buffer space for send/receive
-	  m_buf = (uint8_t *)malloc(PIXY_BUFFERSIZE);
+	struct Packet packet;
+	packet.m_buf = (uint8_t *)malloc(PIXY_BUFFERSIZE);
 	  // shifted buffer is used for sending, so we have space to write header information
-	  m_bufPayload = m_buf + PIXY_SEND_HEADER_SIZE;
-	  frameWidth = frameHeight = 0;
-	  version = NULL;
+	  packet.m_bufPayload = packet.m_buf + PIXY_SEND_HEADER_SIZE;
+	  return packet;
+
 }
 
 
@@ -23,12 +25,8 @@ void delay(int miliseconds)
 int8_t init(uint32_t arg)
 {
   uint32_t t0;
-  int8_t res;
 
-  res = m_link.open(arg);
-  if (res<0)
-    return res;
-
+  i2cInit(/*TODO baudrate*/);
   // wait for pixy to be ready -- that is, Pixy takes a second or 2 boot up
   // getVersion is an effective "ping".  We timeout after 5s.
   for(t0=millis(); millis()-t0<5000; )
@@ -53,8 +51,8 @@ int16_t getSync(struct Packet packet)
   // parse bytes until we find sync
   for(i=j=0, cprev=0; true; i++)
   {
-    res = m_link.recv(&c, 1);
-    if (res>=PIXY_RESULT_OK)
+    res = i2cRead(0x52,0,&c, 1);
+    if (res==PIXY_RESULT_OK)
     {
       // since we're using little endian, previous byte is least significant byte
       start = cprev;
@@ -91,7 +89,7 @@ int16_t getSync(struct Packet packet)
 int16_t recvPacket(struct Packet packet)
 {
   uint16_t csCalc, csSerial;
-  int16_t res;
+  int32_t res;
 
   res = getSync(packet);
   if (res<0)
@@ -99,16 +97,17 @@ int16_t recvPacket(struct Packet packet)
 
   if (packet.m_cs)
   {
-    res = m_link.recv(m_buf, 4);
+	  //TODO fill parameters
+    res = i2cRead(0x52,0,packet.m_buf, 4);
     if (res<0)
       return res;
 
-    packet.m_type = m_buf[0];
-    packet.m_length = m_buf[1];
+    packet.m_type = packet.m_buf[0];
+    packet.m_length = packet.m_buf[1];
 
-    csSerial = *(uint16_t *)&m_buf[2];
-
-    res = m_link.recv(m_buf, m_length, &csCalc);
+    csSerial = *(uint16_t *)&packet.m_buf[2];
+    //TODO fix check sum
+    res = i2cRead(0x52,0,packet.m_buf, packet.m_length/*, &csCalc*/);
     if (res<0)
       return res;
 
@@ -119,14 +118,14 @@ int16_t recvPacket(struct Packet packet)
   }
   else
   {
-    res = m_link.recv(m_buf, 2);
+    res = i2cRead(0x52,0,packet.m_buf, 2);
     if (res<0)
       return res;
 
-    packet.m_type = m_buf[0];
-    packet.m_length = m_buf[1];
+    packet.m_type = packet.m_buf[0];
+    packet.m_length = packet.m_buf[1];
 
-    res = m_link.recv(m_buf, m_length);
+    res = i2cRead(0x52,0,packet.m_buf, packet.m_length);
     if (res<0)
       return res;
   }
@@ -141,13 +140,14 @@ int16_t sendPacket(struct Packet packet)
   packet.m_buf[2] = packet.m_type;
   packet.m_buf[3] = packet.m_length;
   // send whole thing -- header and data in one call
-  return m_link.send(m_buf, m_length+PIXY_SEND_HEADER_SIZE);
+  return m_link.send(packet.m_buf, packet.m_length+PIXY_SEND_HEADER_SIZE);
 }
 
 int8_t changeProg(const char *prog)
 {
   int32_t res;
   struct Packet packet;
+  packet = CreatePacket();
   // poll for program to change
   while(1)
   {
@@ -173,7 +173,9 @@ int8_t changeProg(const char *prog)
 int8_t getVersion()
 {
 	struct Version version;
+	//version = NULL;
 	struct Packet packet;
+	packet=CreatePacket();
   packet.m_length = 0;
   packet.m_type = PIXY_TYPE_REQUEST_VERSION;
   sendPacket(packet);
@@ -183,7 +185,7 @@ int8_t getVersion()
     {
 
     	//TODO copy correct part
-      version = packet.m_buf;
+      //version = packet.m_buf;
       return packet.m_length;
     }
     else if (packet.m_type==PIXY_TYPE_RESPONSE_ERROR)
@@ -195,6 +197,9 @@ int8_t getVersion()
 int8_t getResolution()
 {
 	struct Packet packet;
+	packet=CreatePacket();
+	struct Frame frame;
+	frame.frameWidth = frame.frameHeight = 0;
   packet.m_length = 1;
   packet.m_bufPayload[0] = 0; // for future types of queries
   packet.m_type = PIXY_TYPE_REQUEST_RESOLUTION;
@@ -204,8 +209,8 @@ int8_t getResolution()
     if (packet.m_type==PIXY_TYPE_RESPONSE_RESOLUTION)
     {
     	//TODO frame
-      frameWidth = *(uint16_t *)m_buf;
-      frameHeight = *(uint16_t *)(m_buf+sizeof(uint16_t));
+      frame.frameWidth = *(uint16_t *)packet.m_buf;
+      frame.frameHeight = *(uint16_t *)(packet.m_buf+sizeof(uint16_t));
       return PIXY_RESULT_OK; // success
     }
     else
@@ -220,6 +225,7 @@ int8_t setCameraBrightness(uint8_t brightness)
 {
   uint32_t res;
   struct Packet packet;
+  packet=CreatePacket();
   packet.m_bufPayload[0] = brightness;
   packet.m_length = 1;
   packet.m_type = PIXY_TYPE_REQUEST_BRIGHTNESS;
@@ -238,6 +244,7 @@ int8_t setServos(uint16_t s0, uint16_t s1)
 {
   uint32_t res;
   struct Packet packet;
+  packet=CreatePacket();
   *(int16_t *)(packet.m_bufPayload + 0) = s0;
   *(int16_t *)(packet.m_bufPayload + 2) = s1;
   packet.m_length = 4;
@@ -257,6 +264,7 @@ int8_t setLED(uint8_t r, uint8_t g, uint8_t b)
 {
   uint32_t res;
   struct Packet packet;
+  packet=CreatePacket();
   packet.m_bufPayload[0] = r;
   packet.m_bufPayload[1] = g;
   packet.m_bufPayload[2] = b;
@@ -276,6 +284,7 @@ int8_t setLamp(uint8_t upper, uint8_t lower)
 {
   uint32_t res;
   struct Packet packet;
+  packet=CreatePacket();
   packet.m_bufPayload[0] = upper;
   packet.m_bufPayload[1] = lower;
   packet.m_length = 2;
@@ -294,6 +303,7 @@ int8_t getFPS()
 {
   uint32_t res;
   struct Packet packet;
+  packet=CreatePacket();
   packet.m_length = 0; // no args
   packet.m_type = PIXY_TYPE_REQUEST_FPS;
   sendPacket(packet);
