@@ -1,6 +1,7 @@
 #include "Pixy2Packet.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "peripherals/i2c.h"
 
 
@@ -140,7 +141,13 @@ int16_t sendPacket(struct Packet packet)
   packet.m_buf[2] = packet.m_type;
   packet.m_buf[3] = packet.m_length;
   // send whole thing -- header and data in one call
-  return m_link.send(packet.m_buf, packet.m_length+PIXY_SEND_HEADER_SIZE);
+  for(int i=0;i<packet.m_length+PIXY_SEND_HEADER_SIZE;i++){
+	  uint32_t res = i2cWrite(0x52,0,packet.m_buf[i]);
+	  if(res!=0){
+		  return 1;
+	  }
+  }
+  return 2;
 }
 
 int8_t changeProg(const char *prog)
