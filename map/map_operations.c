@@ -14,7 +14,7 @@
 #include "stdlib.h"
 #include <stdbool.h>
 #include "utilities/fsl_debug_console.h"
-#include "block_connection.h"
+#include "common/hast_table.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -24,6 +24,22 @@
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
 
+// LEFT
+#define	GO_LEFT_X	--(currentBlockInMap->corX)
+#define GO_LEFT_Y	   currentBlockInMap->corY
+
+// UP
+#define GO_UP_X		   currentBlockInMap->corX
+#define GO_UP_Y		++(currentBlockInMap->corY)
+
+// RIGHT
+#define GO_RIGHT_X	++(currentBlockInMap->corX)
+#define GO_RIGHT_Y	   currentBlockInMap->corY
+
+// DOWN
+#define GO_DOWN_X	   currentBlockInMap->corX
+#define GO_DOWN_Y	--(currentBlockInMap->corY)
+
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
@@ -31,10 +47,7 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
-static int maxBlockX = 0;
-static int minBlockX = 0;
-static int maxBlockY = 0;
-static int minBlockY = 0;
+static map_block *firstBlockToStartSaving = NULL;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -54,6 +67,36 @@ curr_pos_map currPosInBlk = {
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+static int getUniqueID(int x, int y)
+{
+    int unique_id = (y * MAP_ROWS * MAP_COLUMNS) + x;
+    unique_id *= 31;
+    return unique_id;
+}
+
+//!*************************************************************************************************
+//! static bool checkExistingBlock(block_direction direction)
+//!
+//! @description
+//! Function looks at the block next to current in the direction we want to move
+//! if block already exists or not.
+//!
+//! @param    block_direction direction	The direction we want to go
+//!
+//! @return   True if block already exists, False otherwise
+//!*************************************************************************************************
+static bool doesBlockExists(map_block *block, int ID, int X, int Y)
+{
+	bool ret = false;
+
+	block = searchItemInHT(ID, X, Y);
+	if (block)
+	{
+		ret = true;
+	}
+
+	return ret;
+}
 
 //!*************************************************************************************************
 //! static void initNewBlock(map_block *newBlock)
@@ -93,38 +136,48 @@ static void initNewBlock(struct map_blk *newBlock)
 //! static void createNewBlock(map_block *current, map_block *newBlock, block_direction direction)
 //!
 //! @description
-//! Function connects new map block to existing one.
+//! Function creates new block to move to.
 //!
 //! @param    block_direction direction The direction in which the new block will be created
 //!
 //! @return   None
 //!*************************************************************************************************
-static void createNewBlock(block_direction direction)
+static void createNewBlock(map_block *block, int ID, int X, int Y)
 {
-	map_block *newBlock = malloc(sizeof(*newBlock));
+	block = malloc(sizeof(*block));
 
-	initNewBlock(newBlock);
+	initNewBlock(block);
+	block->corX = X;
+	block->corY = Y;
+	block->id = ID;
+
+	insertToHashTable(ID, block);
+}
+
+void getCoordinates(block_direction direction, int *x, int *y)
+{
 	switch (direction)
 	{
 		case block_up:
-			newBlock->corY = ++currentBlockInMap->corY;
+			*x = GO_UP_X;
+			*y = GO_UP_Y;
 			break;
 		case block_down:
-			newBlock->corY = --currentBlockInMap->corY;
+			*x = GO_DOWN_X;
+			*y = GO_DOWN_Y;
 			break;
 		case block_left:
-			newBlock->corX = --currentBlockInMap->corX;
+			*x = GO_LEFT_X;
+			*y = GO_LEFT_Y;
 			break;
 		case block_right:
-			newBlock->corX = ++currentBlockInMap->corX;
+			*x = GO_RIGHT_X;
+			*y = GO_RIGHT_Y;
 			break;
 
 		default:
 			break;
 	}
-
-	// Move to new block
-	currentBlockInMap = newBlock;
 }
 
 //!*************************************************************************************************
@@ -139,30 +192,27 @@ static void createNewBlock(block_direction direction)
 //!*************************************************************************************************
 static void moveBetweenBlocks(block_direction direction)
 {
-	if (!doesBlockExists(direction))
-	{
-		createNewBlock(direction);
-	}
-	else
-	{
-		switch (direction)
-		{
-			case block_up:
-				currentBlockInMap = currentBlockInMap->blockUp;
-				break;
-			case block_down:
-				currentBlockInMap = currentBlockInMap->blockDown;
-				break;
-			case block_left:
-				currentBlockInMap = currentBlockInMap->blockLeft;
-				break;
-			case block_right:
-				currentBlockInMap = currentBlockInMap->blockRight;
-				break;
+	map_block *pBlockToMove = NULL;
+	int x = 0;
+	int y = 0;
 
-			default:
-				break;
-		}
+	// Based on direction we get x, y coordinates
+	getCoordinates(direction, &x, &y);
+
+	// Get ID from coordinates
+	int ID = getUniqueID(x, y);
+
+	if (!doesBlockExists(pBlockToMove, ID, x, y))
+	{
+		createNewBlock(pBlockToMove, ID, x, y);
+
+	}
+	currentBlockInMap = pBlockToMove;
+
+	// For saving purpose, store the most top-left block
+	if (currentBlockInMap->corX < firstBlockToStartSaving->corX && currentBlockInMap->corY > firstBlockToStartSaving->corY)
+	{
+		firstBlockToStartSaving = currentBlockInMap;
 	}
 }
 
