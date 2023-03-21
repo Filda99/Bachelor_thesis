@@ -49,67 +49,62 @@ static int getUniqueID(int x, int y)
     return unique_id;
 }
 
-static void connectBlock(map_block *neighbor, block_direction direction)
-{
-	if (direction == block_left)
-	{
-		currentBlockInMap->blockLeft = neighbor;
-		neighbor->blockRight = currentBlockInMap;
-	}
-	else if (direction == block_right)
-	{
-		currentBlockInMap->blockRight = neighbor;
-		neighbor->blockLeft = currentBlockInMap;
-	}
-	else if (direction == block_up)
-	{
-		currentBlockInMap->blockUp = neighbor;
-		neighbor->blockDown = currentBlockInMap;
-	}
-	else if (direction == block_down)
-	{
-		currentBlockInMap->blockDown = neighbor;
-		neighbor->blockUp = currentBlockInMap;
-	}
-}
-
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
-void connectToNeighbors()
+//!*************************************************************************************************
+//! static bool checkExistingBlock(block_direction direction)
+//!
+//! @description
+//! Function looks at the block next to current in the direction we want to move
+//! if block already exists or not.
+//!
+//! @param    block_direction direction	The direction we want to go
+//!
+//! @return   True if block already exists, False otherwise
+//!*************************************************************************************************
+bool_t doesBlockExists(block_direction direction)
 {
-	// Calculate id's for neighbors
-	int leftNeigborID = getUniqueID(--(currentBlockInMap->corX), currentBlockInMap->corY);
-	int upNeigborID = getUniqueID(currentBlockInMap->corX, ++(currentBlockInMap->corY));
-	int rightNeigborID = getUniqueID(++(currentBlockInMap->corX), currentBlockInMap->corY);
-	int downNeigborID = getUniqueID(currentBlockInMap->corX, --(currentBlockInMap->corY));
-
-	// Check id's if exist, if yes, connect them to existing block
+	bool_t ret = false;
 	map_block* neighbor;
-	neighbor = searchItemInHT(leftNeigborID, --(currentBlockInMap->corX), currentBlockInMap->corY);
-	if (neighbor)
-	{
-		connectBlock(neighbor, block_left);
-	}
 
-	neighbor = searchItemInHT(upNeigborID, currentBlockInMap->corX, ++(currentBlockInMap->corY));
-	if (neighbor)
+	// Calculate id's for neighbors
+	switch (direction)
 	{
-		connectBlock(neighbor, block_up);
-	}
+		case block_left:
+			int leftNeigborID = getUniqueID(--(currentBlockInMap->corX), currentBlockInMap->corY);
+			if (searchItemInHT(leftNeigborID, --(currentBlockInMap->corX), currentBlockInMap->corY))
+			{
+				ret = true;
+			}
+			break;
+		case block_up:
+			int upNeigborID = getUniqueID(currentBlockInMap->corX, ++(currentBlockInMap->corY));
+			if (searchItemInHT(upNeigborID, currentBlockInMap->corX, ++(currentBlockInMap->corY)))
+			{
+				ret = true;
+			}
+			break;
+		case block_right:
+			int rightNeigborID = getUniqueID(++(currentBlockInMap->corX), currentBlockInMap->corY);
+			if (searchItemInHT(rightNeigborID, ++(currentBlockInMap->corX), currentBlockInMap->corY))
+			{
+				ret = true;
+			}
+			break;
+		case block_down:
+			int downNeigborID = getUniqueID(currentBlockInMap->corX, --(currentBlockInMap->corY));
+			if (searchItemInHT(downNeigborID, currentBlockInMap->corX, --(currentBlockInMap->corY)))
+			{
+				ret = true;
+			}
+			break;
 
-	neighbor = searchItemInHT(rightNeigborID, ++(currentBlockInMap->corX), currentBlockInMap->corY);
-	if (neighbor)
-	{
-		connectBlock(neighbor, block_right);
+		default:
+			break;
 	}
-
-	neighbor = searchItemInHT(downNeigborID, currentBlockInMap->corX, --(currentBlockInMap->corY));
-	if (neighbor)
-	{
-		connectBlock(neighbor, block_down);
-	}
+	return ret;
 }
 

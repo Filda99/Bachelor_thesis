@@ -31,7 +31,6 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
-
 static int maxBlockX = 0;
 static int minBlockX = 0;
 static int maxBlockY = 0;
@@ -87,60 +86,6 @@ static void initNewBlock(struct map_blk *newBlock)
 			newBlock->currentBlock[i][j] = map_Empty;
 		}
 	}
-
-	newBlock->blockDown = NULL;
-	newBlock->blockLeft = NULL;
-	newBlock->blockRight = NULL;
-	newBlock->blockUp = NULL;
-}
-
-
-//!*************************************************************************************************
-//! static bool checkExistingBlock(block_direction direction)
-//!
-//! @description
-//! Function looks at the block next to current in the direction we want to move
-//! if block already exists or not.
-//!
-//! @param    block_direction direction	The direction we want to go
-//!
-//! @return   True if block already exists, False otherwise
-//!*************************************************************************************************
-static bool doesBlockExists(block_direction direction)
-{
-	bool ret = false;
-	switch (direction)
-	{
-		case block_up:
-			if (currentBlockInMap->blockUp != NULL)
-			{
-				ret = true;
-			}
-			break;
-		case block_down:
-			if (currentBlockInMap->blockDown != NULL)
-			{
-				ret = true;
-			}
-			break;
-		case block_left:
-			if (currentBlockInMap->blockLeft != NULL)
-			{
-				ret = true;
-			}
-			else
-			break;
-		case block_right:
-			if (currentBlockInMap->blockRight != NULL)
-			{
-				ret = true;
-			}
-			break;
-
-		default:
-			break;
-	}
-	return ret;
 }
 
 
@@ -162,23 +107,15 @@ static void createNewBlock(block_direction direction)
 	switch (direction)
 	{
 		case block_up:
-			currentBlockInMap->blockUp = newBlock;
-			newBlock->blockDown = currentBlockInMap;
 			newBlock->corY = ++currentBlockInMap->corY;
 			break;
 		case block_down:
-			currentBlockInMap->blockDown = newBlock;
-			newBlock->blockUp = currentBlockInMap;
 			newBlock->corY = --currentBlockInMap->corY;
 			break;
 		case block_left:
-			currentBlockInMap->blockLeft = newBlock;
-			newBlock->blockRight = currentBlockInMap;
 			newBlock->corX = --currentBlockInMap->corX;
 			break;
 		case block_right:
-			currentBlockInMap->blockRight = newBlock;
-			newBlock->blockLeft = currentBlockInMap;
 			newBlock->corX = ++currentBlockInMap->corX;
 			break;
 
@@ -188,9 +125,6 @@ static void createNewBlock(block_direction direction)
 
 	// Move to new block
 	currentBlockInMap = newBlock;
-
-	// TODO: connect block to existing neighbors
-	connectToNeighbors();
 }
 
 //!*************************************************************************************************
@@ -369,7 +303,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(block_left);
+				moveBetweenBlocks(block_left);
 				currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 			}
 			break;
@@ -402,8 +336,8 @@ void moveInMap(map_move_direction direction)
 				// Move to the block to the left below us
 				else
 				{
-					createNewBlock(block_down);
-					createNewBlock(block_left);
+					moveBetweenBlocks(block_down);
+					moveBetweenBlocks(block_left);
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 				}
@@ -417,7 +351,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(block_down);
+				moveBetweenBlocks(block_down);
 				currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 			}
 			break;
@@ -450,8 +384,8 @@ void moveInMap(map_move_direction direction)
 				// Move to the block to the right below us
 				else
 				{
-					createNewBlock(block_down);
-					createNewBlock(block_right);
+					moveBetweenBlocks(block_down);
+					moveBetweenBlocks(block_right);
 					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
 				}
@@ -465,7 +399,7 @@ void moveInMap(map_move_direction direction)
 			}
 			else
 			{
-				createNewBlock(block_right);
+				moveBetweenBlocks(block_right);
 				currPosInBlk.Col = MAP_BLOCK_MIN_COL;
 			}
 			break;

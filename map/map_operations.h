@@ -41,10 +41,6 @@ typedef enum _map_object {
 typedef struct map_blk
 {
 	map_object_t 	**currentBlock; // 2D field of map objects
-	struct map_blk 	*blockUp;
-	struct map_blk 	*blockDown;
-	struct map_blk 	*blockLeft;
-	struct map_blk 	*blockRight;
 	int	corX;
 	int corY;
 	int id;
