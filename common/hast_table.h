@@ -46,7 +46,7 @@ typedef struct HashTable {
 //**************************************************************************************************
 void createHashTable(int size);
 void deleteHashTable();
-void insertToHashTable(int key, map_block *value);
+void insertToHashTable(int key, map_block value);
 map_block *searchItemInHT(int key, int x, int y);
 void deleteItemInHT(int key);
 void resizeHashTable();

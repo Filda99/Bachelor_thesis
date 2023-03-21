@@ -73,14 +73,15 @@ void deleteHashTable()
     free(ht);
 }
 
-void insertToHashTable(int key, map_block *value)
+void insertToHashTable(int key, map_block value)
 {
     if (ht->count >= ht->size * 0.7) {
         resizeHashTable(ht);
     }
     Node *new_node = (Node *)malloc(sizeof(Node));
+    if (!new_node) return;
     new_node->key = key;
-    new_node->value = value;
+    new_node->value = &value;
     new_node->next = NULL;
 
     int index = hash(key, ht->size);
@@ -94,6 +95,8 @@ void insertToHashTable(int key, map_block *value)
         }
         node->next = new_node;
     }
+
+    free(new_node);
 
     ht->count++;
 }
@@ -147,7 +150,7 @@ void resizeHashTable()
     for (int i = 0; i < old_size; i++) {
         Node *node = old_table[i];
         while (node) {
-            insertToHashTable(node->key, node->value);
+            insertToHashTable(node->key, *(node->value));
             Node *temp = node;
             node = node->next;
             free(temp);

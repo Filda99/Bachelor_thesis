@@ -146,8 +146,8 @@ void routine(void)
 
 	static int i = 0;
 	PRINTF("Cycle: %i\r\n", i++);
- 	mapping();
  	printBlock();
+ 	mapping();
 	PRINTF("-------------------------------------\r\n");
 }
 

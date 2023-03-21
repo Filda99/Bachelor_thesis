@@ -69,7 +69,7 @@ curr_pos_map currPosInBlk = {
 
 static int getUniqueID(int x, int y)
 {
-    int unique_id = (y * MAP_ROWS * MAP_COLUMNS) + x;
+    int unique_id = (y * MAP_ROWS * MAP_COLUMNS) + x + 1;
     unique_id *= 31;
     return unique_id;
 }
@@ -94,6 +94,10 @@ static bool doesBlockExists(map_block *block, int ID, int X, int Y)
 	{
 		ret = true;
 	}
+	else
+	{
+		block = NULL;
+	}
 
 	return ret;
 }
@@ -109,9 +113,20 @@ static bool doesBlockExists(map_block *block, int ID, int X, int Y)
 //!
 //! @return   None
 //!*************************************************************************************************
-static int initNewBlock(struct map_blk *newBlock)
+static int initNewBlock(map_block *newBlock)
 {
-	newBlock->block = (map_object_t **) malloc(MAP_ROWS * sizeof(map_object_t*));
+	if (newBlock != NULL)
+	{
+		for (int i = 0; i < MAP_ROWS; i++) {
+			if (newBlock->block[i] != NULL)
+			{
+				free(newBlock->block[i]);
+			}
+		}
+		free(newBlock->block);
+		newBlock->block = NULL;
+	}
+	newBlock->block = (map_object_t**)calloc(MAP_ROWS, sizeof(map_object_t*));
 	if (!newBlock->block)
 	{
 		return -1;  // error: calloc() failed
@@ -119,7 +134,7 @@ static int initNewBlock(struct map_blk *newBlock)
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
-		newBlock->block[i] = (map_object_t *) malloc(MAP_COLUMNS * sizeof(map_object_t));
+		newBlock->block[i] = (map_object_t*)calloc(MAP_COLUMNS, sizeof(map_object_t));
 		if (!newBlock->block[i]) {
 			// error: calloc() failed, free memory allocated so far
 			for (int j = 0; j < i; j++) {
@@ -152,16 +167,18 @@ static int initNewBlock(struct map_blk *newBlock)
 //!
 //! @return   None
 //!*************************************************************************************************
-static void createNewBlock(map_block *block, int ID, int X, int Y)
+static void createNewBlock(map_block **block, int ID, int X, int Y)
 {
-	block = malloc(sizeof(map_block));
+	if (*block != NULL) {
+		free(*block);
+		*block = NULL;
+	}
+	*block = (map_block*)malloc(sizeof(map_block));
 
-	initNewBlock(block);
-	block->corX = X;
-	block->corY = Y;
-	block->id = ID;
-
-	insertToHashTable(ID, block);
+	initNewBlock(*block);
+	(*block)->corX = X;
+	(*block)->corY = Y;
+	(*block)->id = ID;
 }
 
 void getCoordinates(block_direction direction, int *x, int *y)
@@ -202,6 +219,10 @@ void getCoordinates(block_direction direction, int *x, int *y)
 //!*************************************************************************************************
 static void moveBetweenBlocks(block_direction direction)
 {
+	int oldID = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);
+	insertToHashTable(oldID, *currentBlockInMap);
+
+
 	map_block *pBlockToMove = NULL;
 	int x = 0;
 	int y = 0;
@@ -214,10 +235,17 @@ static void moveBetweenBlocks(block_direction direction)
 
 	if (!doesBlockExists(pBlockToMove, ID, x, y))
 	{
-		createNewBlock(pBlockToMove, ID, x, y);
-
+		createNewBlock(&pBlockToMove, ID, x, y);
 	}
+
 	currentBlockInMap = pBlockToMove;
+
+
+	/*for (int i = 0; i < MAP_ROWS; i++) {
+		free(pBlockToMove->block[i]);
+	}
+	free(pBlockToMove->block);
+	free(pBlockToMove);*/
 
 	// For saving purpose, store the most top-left block
 	if (currentBlockInMap->corX < firstBlockToStartSaving->corX && currentBlockInMap->corY > firstBlockToStartSaving->corY)
@@ -242,12 +270,21 @@ static void moveBetweenBlocks(block_direction direction)
 //!*************************************************************************************************
 void createMap()
 {
-	currentBlockInMap = malloc(sizeof(map_block));
-	initNewBlock(currentBlockInMap);
-	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
-	currentBlockInMap->corX = 0;
-	currentBlockInMap->corY = 0;
 	createHashTable(200);
+
+	map_block *pBlockToMove = NULL;
+	int ID = getUniqueID(0, 0);
+	createNewBlock(&pBlockToMove, ID, 0, 0);
+
+	currentBlockInMap = pBlockToMove;
+
+	/*for (int i = 0; i < MAP_ROWS; i++) {
+		free(pBlockToMove->block[i]);
+	}
+	free(pBlockToMove->block);
+	free(pBlockToMove);*/
+
+	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
 //!*************************************************************************************************

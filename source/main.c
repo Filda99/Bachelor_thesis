@@ -114,7 +114,7 @@ int main(void)
 			LED_RED_ON();
 			LED_GREEN_ON();
 
-			//startupBoard();
+			startupBoard();
 			//startupPeripherals();
 
 			// todo: Reach the starting line
