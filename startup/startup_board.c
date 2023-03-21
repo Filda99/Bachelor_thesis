@@ -18,7 +18,7 @@
 #include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
-#include "common.h"
+#include "common/delay.h"
 #include "fsl_debug_console.h"
 #include "peripherals/i2c.h"
 

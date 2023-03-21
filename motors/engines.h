@@ -61,6 +61,7 @@ void addSpeed();
 void addSpeedCustom(int speed);
 void slackUpSpeed();
 void slackUpSpeedCustom(int speed);
+void slackUpSpeedOnWheel(unsigned char slackAmount);
 void goBackwards();
 void stopCar();
 void hardStop();

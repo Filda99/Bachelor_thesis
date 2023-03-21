@@ -7,8 +7,8 @@
  ***************************************************************************************************
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef DELAY_H_
+#define DELAY_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,4 +39,4 @@ void delay_ms(unsigned int ms);
 }
 #endif
 
-#endif /* COMMON_H_ */
+#endif /* DELAY_H_ */
