@@ -44,16 +44,6 @@
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
 
-//!*************************************************************************************************
-//! void delay_ms(uint32_t ms)
-//!
-//! @description
-//! Function
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
 void delay_ms(uint32_t ms)
 {
     uint32_t i;
@@ -63,23 +53,4 @@ void delay_ms(uint32_t ms)
     }
 }
 
-//!*************************************************************************************************
-//! void delay(uint32_t delay)
-//!
-//! @description
-//! Function will probably not be used. Maybe in the application, when it is flashed to the
-//! controller == without debbuging (not working with debug).
-//!
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-void delay(uint32_t delay)
-{
-  uint32_t currentTime = 0;
-  currentTime = SysTick->VAL;
-  while ((SysTick->VAL - currentTime) > delay) {
-    // do nothing
-  }
-}
+

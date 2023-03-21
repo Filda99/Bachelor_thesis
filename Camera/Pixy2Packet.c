@@ -15,19 +15,11 @@ struct Packet CreatePacket(){
 
 }
 
-
-void delay(int miliseconds)
-{
-    clock_t start_time = clock();
-    while (clock() < start_time + miliseconds)
-        ;
-}
-
 int8_t init(uint32_t arg)
 {
   uint32_t t0;
 
-  i2cInit(/*TODO baudrate*/);
+  i2cInit(400000);
   // wait for pixy to be ready -- that is, Pixy takes a second or 2 boot up
   // getVersion is an effective "ping".  We timeout after 5s.
   for(t0=millis(); millis()-t0<5000; )
