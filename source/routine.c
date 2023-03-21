@@ -68,7 +68,7 @@ static void printBlock()
 	{
 		for (int j = 0; j < MAP_COLUMNS; j++)
 		{
-			PRINTF(" %d |", currentBlockInMap->currentBlock[i][j]);
+			PRINTF(" %d |", currentBlockInMap->block[i][j]);
 		}
 		PRINTF("\r\n");
 	}
@@ -136,18 +136,18 @@ static void checkLines()
 //!*************************************************************************************************
 void routine(void)
 {
-	//HalfWheelRotations++;
-	checkLines();
-	controlUnit();
+	HalfWheelRotations++;
+	//checkLines();
+	//controlUnit();
 
 	/*uint16_t data;
 	VL53L0X_MeasureSingle(&data);
 	PRINTF("Measured data: %i\r\n", data);*/
 
-	//static int i = 0;
-	//PRINTF("Cycle: %i\r\n", i++);
- 	//mapping();
- 	//printBlock();
-	//PRINTF("-------------------------------------\r\n");
+	static int i = 0;
+	PRINTF("Cycle: %i\r\n", i++);
+ 	mapping();
+ 	printBlock();
+	PRINTF("-------------------------------------\r\n");
 }
 

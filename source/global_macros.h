@@ -29,10 +29,10 @@ extern "C" {
 
 //* User defined, how many rows should one map block have
 //! Keep it odd!
-#define MAP_ROWS		15
+#define MAP_ROWS		5
 //* User defined, how many columns should one map block have
 	//! Keep it odd!
-#define MAP_COLUMNS		15
+#define MAP_COLUMNS		5
 
 //* First useable row
 #define MAP_BLOCK_MIN_ROW	0
@@ -44,8 +44,8 @@ extern "C" {
 //* Last useable column in map block
 #define MAP_BLOCK_MAX_COL  (MAP_COLUMNS - 1)
 
-//* Size of one field in map block in centimetres
-#define MAP_BLOCK_SIZE	5	// One decimetre
+//* Size of one field in map block in centimeters
+#define MAP_BLOCK_SIZE	5
 
 /*************************************/
 // Hall sensor

@@ -114,8 +114,8 @@ int main(void)
 			LED_RED_ON();
 			LED_GREEN_ON();
 
-			startupBoard();
-			startupPeripherals();
+			//startupBoard();
+			//startupPeripherals();
 
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
@@ -130,7 +130,6 @@ int main(void)
 			PRINTF("-----------------\r\n");
 			PRINTF("Starting routine.\r\n");
 			LED_RED_OFF();
-			addSpeed();
 
 			while (!IsCmdToStopCar)
 			{

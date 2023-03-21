@@ -109,26 +109,36 @@ static bool doesBlockExists(map_block *block, int ID, int X, int Y)
 //!
 //! @return   None
 //!*************************************************************************************************
-static void initNewBlock(struct map_blk *newBlock)
+static int initNewBlock(struct map_blk *newBlock)
 {
-	map_object_t **block;
-	block = (enum _map_object**) malloc(MAP_ROWS * sizeof(enum _map_object*));
+	newBlock->block = (map_object_t **) malloc(MAP_ROWS * sizeof(map_object_t*));
+	if (!newBlock->block)
+	{
+		return -1;  // error: calloc() failed
+	}
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
-		block[i] = (enum _map_object*) malloc(
-				MAP_COLUMNS * sizeof(enum _map_object));
+		newBlock->block[i] = (map_object_t *) malloc(MAP_COLUMNS * sizeof(map_object_t));
+		if (!newBlock->block[i]) {
+			// error: calloc() failed, free memory allocated so far
+			for (int j = 0; j < i; j++) {
+				free(newBlock->block[j]);
+			}
+			free(newBlock->block);
+			return -1;
+		}
 	}
-
-	newBlock->currentBlock = block;
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
 		for (int j = 0; j < MAP_COLUMNS; j++)
 		{
-			newBlock->currentBlock[i][j] = map_Empty;
+			newBlock->block[i][j] = map_Empty;
 		}
 	}
+
+	return 0;
 }
 
 
@@ -144,7 +154,7 @@ static void initNewBlock(struct map_blk *newBlock)
 //!*************************************************************************************************
 static void createNewBlock(map_block *block, int ID, int X, int Y)
 {
-	block = malloc(sizeof(*block));
+	block = malloc(sizeof(map_block));
 
 	initNewBlock(block);
 	block->corX = X;
@@ -232,9 +242,9 @@ static void moveBetweenBlocks(block_direction direction)
 //!*************************************************************************************************
 void createMap()
 {
-	currentBlockInMap = malloc(sizeof(*currentBlockInMap));
+	currentBlockInMap = malloc(sizeof(map_block));
 	initNewBlock(currentBlockInMap);
-	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
+	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 	currentBlockInMap->corX = 0;
 	currentBlockInMap->corY = 0;
 	createHashTable(200);
@@ -267,7 +277,7 @@ void saveMap()
 void deleteMap()
 {
 	// TODO: Go through all map blocks.
-	free(currentBlockInMap->currentBlock);
+	free(currentBlockInMap->block);
 	free(currentBlockInMap);
 }
 
@@ -291,7 +301,7 @@ void deleteMap()
 //!*************************************************************************************************
 void moveInMap(map_move_direction direction)
 {
-	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_Track;
+	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_Track;
 	switch (direction)
 	{
 		case move_up:
@@ -493,5 +503,5 @@ void moveInMap(map_move_direction direction)
 		default:
 			break;
 	}
-	currentBlockInMap->currentBlock[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
+	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }

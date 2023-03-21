@@ -310,7 +310,15 @@ void mapping()
 	static uint32_t totalDistanceTraveled = 0;
 
 	// Get info about circle
-	uint8_t turningSide = (currentSteer > GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
+	uint8_t turningSide;
+	if (currentSteer == GO_DIRECT)
+	{
+		turningSide = GO_DIRECT;
+	}
+	else
+	{
+		turningSide = (currentSteer > GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
+	}
 
 	// Calculate new traveled distance
 	float newDistance = calcNewDistance(turningSide);
