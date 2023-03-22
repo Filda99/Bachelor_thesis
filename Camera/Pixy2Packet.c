@@ -19,12 +19,11 @@ struct Packet CreatePacket(){
 
 int8_t init(uint32_t arg)
 {
-  uint32_t t0;
 
   i2cInit(400000);
   // wait for pixy to be ready -- that is, Pixy takes a second or 2 boot up
   // getVersion is an effective "ping".  We timeout after 5s.
-  for(t0=millis(); millis()-t0<5000; )
+  for(int i=0;i<1000;i++ )
   {
     if (getVersion()>=0) // successful version get -> pixy is ready
 	{

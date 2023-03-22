@@ -27,6 +27,7 @@ int8_t getFeatures(uint8_t type,  uint8_t features, bool wait)
   int8_t res;
   uint8_t offset, fsize, ftype, *fdata;
   struct Packet packet;
+  packet = CreatePacket();
   uint8_t numVectors = 0;
   uint8_t numIntersections = 0;
   uint8_t numBarcodes = 0;
@@ -108,6 +109,7 @@ int8_t setMode(uint8_t mode)
 {
   uint32_t res;
   struct Packet packet;
+  packet = CreatePacket();
   *(int8_t *)packet.m_bufPayload = mode;
   packet.m_length = 1;
   packet.m_type = LINE_REQUEST_SET_MODE;
@@ -126,6 +128,7 @@ int8_t setNextTurn(int16_t angle)
 {
   uint32_t res;
   struct Packet packet;
+  packet = CreatePacket();
   *(int16_t *)packet.m_bufPayload = angle;
   packet.m_length = 2;
   packet.m_type = LINE_REQUEST_SET_NEXT_TURN_ANGLE;
@@ -143,6 +146,7 @@ int8_t setDefaultTurn(int16_t angle)
 {
   uint32_t res;
   struct Packet packet;
+  packet = CreatePacket();
   *(int16_t *)packet.m_bufPayload = angle;
   packet.m_length = 2;
   packet.m_type = LINE_REQUEST_SET_DEFAULT_TURN_ANGLE;
@@ -160,6 +164,7 @@ int8_t setVector(uint8_t index)
 {
   uint32_t res;
   struct Packet packet;
+  packet = CreatePacket();
   *(int8_t *)packet.m_bufPayload = index;
   packet.m_length = 1;
   packet.m_type = LINE_REQUEST_SET_VECTOR;
@@ -178,6 +183,7 @@ int8_t reverseVector()
 {
   uint32_t res;
   struct Packet packet;
+  packet = CreatePacket();
   packet.m_length = 0;
   packet.m_type = LINE_REQUEST_REVERSE_VECTOR;
   sendPacket(packet);
