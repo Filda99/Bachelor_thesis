@@ -22,7 +22,6 @@
 #include "../common/delay.h"
 
 
-
 int8_t getFeatures(uint8_t type,  uint8_t features, bool wait)
 {
   int8_t res;

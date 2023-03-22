@@ -19,7 +19,8 @@
 #ifndef _PIXY2PACKET_H
 #define _PIXY2PACKET_H
 
-#include<stdbool.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // uncomment to turn on debug prints to console
 #define PIXY_DEBUG
@@ -57,7 +58,7 @@
 #define PIXY_RCS_MAX_POS                     1000L
 #define PIXY_RCS_CENTER_POS                  ((PIXY_RCS_MAX_POS-PIXY_RCS_MIN_POS)/2)
 
-#include "Pixy2Line.h"
+
 
 struct Version
 {
