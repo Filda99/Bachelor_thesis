@@ -19,14 +19,9 @@
 
 #include "Pixy2Line.h"
 #include "Pixy2Packet.h"
-#include <time.h>
+#include "../common/delay.h"
 
-void delay(int miliseconds)
-{
-    clock_t start_time = clock();
-    while (clock() < start_time + miliseconds)
-        ;
-}
+
 
 int8_t getFeatures(uint8_t type,  uint8_t features, bool wait)
 {
@@ -95,7 +90,7 @@ int8_t getFeatures(uint8_t type,  uint8_t features, bool wait)
 
     // If we're waiting for frame data, don't thrash Pixy with requests.
     // We can give up half a millisecond of latency (worst case)
-    delay(1);
+    delay_ms(1);
   }
 }
 

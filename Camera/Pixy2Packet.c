@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "peripherals/i2c.h"
+#include "../common/delay.h"
 
 
 struct Packet CreatePacket(){
@@ -29,7 +30,7 @@ int8_t init(uint32_t arg)
       getResolution(); // get resolution so we have it
       return PIXY_RESULT_OK;
     }
-    delay(5); // delay for sync
+    delay_ms(5); // delay for sync
   }
   // timeout
   return PIXY_RESULT_TIMEOUT;
@@ -72,7 +73,7 @@ int16_t getSync(struct Packet packet)
       {
         return PIXY_RESULT_ERROR;
       }
-      delayMicroseconds(25);
+      delay_ms(1);
       j++;
       i = 0;
     }
@@ -165,7 +166,7 @@ int8_t changeProg(const char *prog)
     }
     else
       return PIXY_RESULT_ERROR;  // some kind of bitstream error
-    delayMicroseconds(1000);
+    delay_ms(1);
   }
 }
 
