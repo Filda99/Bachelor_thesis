@@ -100,6 +100,7 @@ static void initServo()
  ************************************/
 void startupPeripherals()
 {
+	initCam();
 	initMotors();
 	initServo();
 }

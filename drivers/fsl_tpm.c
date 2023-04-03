@@ -364,7 +364,7 @@ status_t TPM_SetupPwm(TPM_Type *base,
 void TPM_UpdatePwmDutycycle(TPM_Type *base,
                             tpm_chnl_t chnlNumber,
                             tpm_pwm_mode_t currentPwmMode,
-                            float dutyCyclePercent)
+                            uint8_t dutyCyclePercent)
 {
     assert(chnlNumber < FSL_FEATURE_TPM_CHANNEL_COUNTn(base));
 #if defined(FSL_FEATURE_TPM_HAS_COMBINE) && FSL_FEATURE_TPM_HAS_COMBINE

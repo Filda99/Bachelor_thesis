@@ -44,7 +44,7 @@
 #ifndef _FSL_DEBUGCONSOLE_H_
 #define _FSL_DEBUGCONSOLE_H_
 
-#include "../drivers/fsl_common.h"
+#include "fsl_common.h"
 
 /*
  * @addtogroup debugconsole

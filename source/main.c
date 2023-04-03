@@ -19,8 +19,8 @@
 #include "fsl_port.h"
 #include "MKL25Z4.h"
 #include "control_unit.h"
-#include "motors/engines.h"
-#include "common/delay.h"
+#include "../motors/engines.h"
+#include "../common/delay.h"
 #include "startup_peripherals.h"
 
 //**************************************************************************************************

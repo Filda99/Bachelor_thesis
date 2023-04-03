@@ -18,7 +18,7 @@
 #include "fsl_gpio.h"
 #include "fsl_debug_console.h"
 
-#include "motors/engines.h"
+#include "../motors/engines.h"
 #include "control_unit.h"
 #include "vector.h"
 

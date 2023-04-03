@@ -89,7 +89,7 @@ struct Packet
 };
 
 struct Packet CreatePacket();
-int8_t init(uint32_t arg);
+int8_t initCam();
 int16_t getSync(struct Packet packet);
 int16_t recvPacket(struct Packet packet);
 int16_t sendPacket(struct Packet packet);

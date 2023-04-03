@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "peripherals/i2c.h"
+#include "../peripherals/i2c.h"
 #include "../common/delay.h"
+#include "fsl_debug_console.h"
 
 
 struct Packet CreatePacket(){
@@ -17,10 +18,11 @@ struct Packet CreatePacket(){
 
 }
 
-int8_t init(uint32_t arg)
+int8_t initCam()
 {
-
-  i2cInit(400000);
+	PRINTF("CAM Init start------\r\n");
+	//already inicialized previously
+  //i2cInit(400000);
   // wait for pixy to be ready -- that is, Pixy takes a second or 2 boot up
   // getVersion is an effective "ping".  We timeout after 5s.
   for(int i=0;i<1000;i++ )
@@ -45,7 +47,7 @@ int16_t getSync(struct Packet packet)
   // parse bytes until we find sync
   for(i=j=0, cprev=0; true; i++)
   {
-    res = i2cRead(0x52,0,&c, 1);
+    res = i2cRead(0x54,0,&c, 1);
     if (res==PIXY_RESULT_OK)
     {
       // since we're using little endian, previous byte is least significant byte
@@ -92,7 +94,7 @@ int16_t recvPacket(struct Packet packet)
   if (packet.m_cs)
   {
 	  //TODO fill parameters
-    res = i2cRead(0x52,0,packet.m_buf, 4);
+    res = i2cRead(0x54,0,packet.m_buf, 4);
     if (res<0)
       return res;
 
@@ -101,7 +103,7 @@ int16_t recvPacket(struct Packet packet)
 
     csSerial = *(uint16_t *)&packet.m_buf[2];
     //TODO fix check sum
-    res = i2cRead(0x52,0,packet.m_buf, packet.m_length/*, &csCalc*/);
+    res = i2cRead(0x54,0,packet.m_buf, packet.m_length/*, &csCalc*/);
     if (res<0)
       return res;
 
@@ -112,14 +114,14 @@ int16_t recvPacket(struct Packet packet)
   }
   else
   {
-    res = i2cRead(0x52,0,packet.m_buf, 2);
+    res = i2cRead(0x54,0,packet.m_buf, 2);
     if (res<0)
       return res;
 
     packet.m_type = packet.m_buf[0];
     packet.m_length = packet.m_buf[1];
 
-    res = i2cRead(0x52,0,packet.m_buf, packet.m_length);
+    res = i2cRead(0x54,0,packet.m_buf, packet.m_length);
     if (res<0)
       return res;
   }
@@ -135,7 +137,8 @@ int16_t sendPacket(struct Packet packet)
   packet.m_buf[3] = packet.m_length;
   // send whole thing -- header and data in one call
   for(int i=0;i<packet.m_length+PIXY_SEND_HEADER_SIZE;i++){
-	  uint32_t res = i2cWrite(0x52,0,packet.m_buf[i]);
+	  PRINTF("sending byte number %d\r\n",i);
+	  uint32_t res = i2cWrite(0x54,0,packet.m_buf[i]);
 	  if(res!=0){
 		  return 1;
 	  }
@@ -172,13 +175,16 @@ int8_t changeProg(const char *prog)
 
 int8_t getVersion()
 {
+	PRINTF("GetVersion start-----\r\n");
 	struct Version version;
 	//version = NULL;
 	struct Packet packet;
 	packet=CreatePacket();
   packet.m_length = 0;
   packet.m_type = PIXY_TYPE_REQUEST_VERSION;
+  PRINTF("GetVersion sending packet-----\r\n");
   sendPacket(packet);
+  PRINTF("GetVersion packet sent\r\n");
   if (recvPacket(packet)==0)
   {
     if (packet.m_type==PIXY_TYPE_RESPONSE_VERSION)

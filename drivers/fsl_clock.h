@@ -33,6 +33,7 @@
 #define _FSL_CLOCK_H_
 
 #include "fsl_common.h"
+
 /*! @addtogroup clock */
 /*! @{ */
 

@@ -30,8 +30,8 @@
 
 #include <stdint.h>
 #include "board.h"
-#include "../utilities/fsl_debug_console.h"
-#include "../drivers/fsl_common.h"
+#include "fsl_debug_console.h"
+#include "fsl_common.h"
 
 /*******************************************************************************
  * Variables

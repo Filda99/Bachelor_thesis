@@ -11,7 +11,7 @@
 //* INCLUDES
 //**************************************************************************************************
 #include "global_macros.h"
-#include "motors/engines.h"
+#include "../motors/engines.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 #include "routine.h"
