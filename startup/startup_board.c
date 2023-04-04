@@ -18,7 +18,6 @@
 #include "fsl_i2c.h"
 #include "board.h"
 #include "fsl_debug_console.h"
-#include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
 
@@ -58,6 +57,21 @@
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+
+/*static void cleanUpBoard()
+{
+	uint32_t* sram_start_address = (uint32_t*)0x1FFFF000; // Start address of SRAM
+	uint32_t sram_size = 0x4000; // Size of SRAM
+	uint32_t i;
+
+
+	// Erase SRAM memory
+	for (i = 0; i < sram_size/4; i++)
+	{
+		*(sram_start_address + i) = 0;
+	}
+
+}*/
 
 //!*************************************************************************************************
 //! static void init_tsi(void)
@@ -199,6 +213,8 @@ void i2cInit(void)
     I2C_MasterGetDefaultConfig(&masterConfig);
     masterConfig.baudRate_Bps = 200000;
     I2C_MasterInit(USING_I2C, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
+    //I2C0->F = 0b01000001;
+    //I2C0->F = 0x23;
 }
 
 
@@ -226,6 +242,7 @@ void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
 
+	//cleanUpBoard();
 	startupPWM();
 	startupInterrupts();
 	i2cInit();

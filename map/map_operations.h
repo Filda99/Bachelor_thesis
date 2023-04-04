@@ -43,7 +43,6 @@ typedef struct map_blk
 	map_object_t **block; // 2D field of map objects
 	int	corX;
 	int corY;
-	int id;
 }map_block;
 
 //* Directions for moving in the map

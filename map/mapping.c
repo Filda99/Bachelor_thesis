@@ -350,7 +350,7 @@ void mapping()
 		}
 		else
 		{
-			PRINTF("ERROR! I should have moved but still on the same position!\r\n");
+			PRINTF("[ERROR]: I should have moved but still on the same position!\r\n");
 		}
 	}
 

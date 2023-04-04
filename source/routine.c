@@ -23,8 +23,6 @@
 #include "map/mapping.h"
 #include "map/map_operations.h"
 
-#include "peripherals/vl53l0x/vl53l0x.h"
-
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
@@ -90,7 +88,6 @@ static void printBlock()
 //!*************************************************************************************************
 static void checkLines()
 {
-	static int enableIrq = 0;
 	bool isLineDetected = false;
 	LineDetected = 0;
 
@@ -140,14 +137,11 @@ void routine(void)
 	//checkLines();
 	//controlUnit();
 
-	/*uint16_t data;
-	VL53L0X_MeasureSingle(&data);
-	PRINTF("Measured data: %i\r\n", data);*/
-
 	static int i = 0;
+	turnLeft();
 	PRINTF("Cycle: %i\r\n", i++);
  	printBlock();
- 	mapping();
+	mapping();
 	PRINTF("-------------------------------------\r\n");
 }
 

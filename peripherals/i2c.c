@@ -32,6 +32,7 @@
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
+bool g_MasterCompletionFlag;
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -40,6 +41,12 @@
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
+
+static void callback()
+{
+	I2C_MasterStop(USING_I2C);
+	g_MasterCompletionFlag = true;
+}
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
@@ -67,6 +74,7 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
 {
     i2c_master_transfer_t transfer;
     uint8_t buff[2];
+	g_MasterCompletionFlag = false;
 
     buff[0] = regAddr;
     buff[1] = data;
@@ -79,10 +87,10 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
     transfer.data = buff;
     transfer.dataSize = 2;
 
-    if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
-	{
-		return kStatus_Fail;
-	}
+    i2c_master_handle_t handle;
+	I2C_MasterTransferCreateHandle(USING_I2C, &handle, callback, NULL);
+	I2C_MasterTransferNonBlocking(USING_I2C, &handle, &transfer);
+	while (!g_MasterCompletionFlag);
 
 	return kStatus_Success;
 }
@@ -114,31 +122,56 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
 	{
 		return kStatus_Fail;
 	}
+	g_MasterCompletionFlag = false;
 
     i2c_master_transfer_t transfer;
+    i2c_master_handle_t handle;
+
     /* Send register address to read from */
     transfer.flags = kI2C_TransferDefaultFlag;
     transfer.slaveAddress = deviceAddr;
     transfer.direction = kI2C_Write;
-    transfer.subaddress = regAddr;
+    transfer.subaddress = 15;
     transfer.subaddressSize = 1;
     transfer.data = NULL;
     transfer.dataSize = 0;
     if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
-    {
-        return kStatus_Fail;
-    }
+   	{
+   		return kStatus_Fail;
+   	}
 
     /* Read data from device */
+    transfer.slaveAddress = deviceAddr;
+    transfer.flags = kI2C_TransferDefaultFlag;
     transfer.direction = kI2C_Read;
     transfer.subaddress = 0;
     transfer.subaddressSize = 0;
     transfer.data = data;
     transfer.dataSize = dataLen;
     if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
-    {
-        return kStatus_Fail;
-    }
+	{
+		return kStatus_Fail;
+	}
+	/*I2C_MasterTransferCreateHandle(USING_I2C, &handle, callback, NULL);
+	I2C_MasterTransferNonBlocking(USING_I2C, &handle, &transfer);
+	while (!g_MasterCompletionFlag);
+
+	  if (transfer.data != NULL)
+	    {
+	        // Send an ACK to the slave device to indicate that the data was received successfully
+	       I2C_MasterStart(USING_I2C, 0x8, kI2C_Write);
+	       I2C_MasterTransferNonBlocking(USING_I2C, 0, kI2C_TransferDefaultFlag);
+		   I2C_MasterStop(USING_I2C);
+		   while (!g_MasterCompletionFlag);
+	    }
+	    else
+	    {
+	        // Send a NAK to the slave device to indicate that the data was not received successfully
+	        I2C_MasterStart(USING_I2C, 0x8, kI2C_Write);
+	        I2C_MasterTransferNonBlocking(USING_I2C, 0, kI2C_TransferDefaultFlag | kI2C_TransferNoStopFlag);
+	        while (!g_MasterCompletionFlag);
+	    }*/
+
 
     return kStatus_Success;
 }

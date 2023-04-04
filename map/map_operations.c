@@ -113,35 +113,24 @@ static bool doesBlockExists(map_block *block, int ID, int X, int Y)
 //!
 //! @return   None
 //!*************************************************************************************************
-static int initNewBlock(map_block *newBlock)
+static bool initNewBlock(map_block *newBlock)
 {
-	if (newBlock != NULL)
-	{
-		for (int i = 0; i < MAP_ROWS; i++) {
-			if (newBlock->block[i] != NULL)
-			{
-				free(newBlock->block[i]);
-			}
-		}
-		free(newBlock->block);
-		newBlock->block = NULL;
-	}
-	newBlock->block = (map_object_t**)calloc(MAP_ROWS, sizeof(map_object_t*));
+	newBlock->block = (map_object_t **)malloc(MAP_ROWS * sizeof(map_object_t*));
 	if (!newBlock->block)
 	{
-		return -1;  // error: calloc() failed
+		return false;  // error: calloc() failed
 	}
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
-		newBlock->block[i] = (map_object_t*)calloc(MAP_COLUMNS, sizeof(map_object_t));
+		newBlock->block[i] = (map_object_t*)malloc(MAP_COLUMNS * sizeof(map_object_t));
 		if (!newBlock->block[i]) {
 			// error: calloc() failed, free memory allocated so far
 			for (int j = 0; j < i; j++) {
 				free(newBlock->block[j]);
 			}
 			free(newBlock->block);
-			return -1;
+			return false;
 		}
 	}
 
@@ -153,7 +142,7 @@ static int initNewBlock(map_block *newBlock)
 		}
 	}
 
-	return 0;
+	return true;
 }
 
 
@@ -167,18 +156,22 @@ static int initNewBlock(map_block *newBlock)
 //!
 //! @return   None
 //!*************************************************************************************************
-static void createNewBlock(map_block **block, int ID, int X, int Y)
+static bool createNewBlock(map_block **block, int ID, int X, int Y)
 {
-	if (*block != NULL) {
-		free(*block);
-		*block = NULL;
-	}
-	*block = (map_block*)malloc(sizeof(map_block));
+	bool ret = false;
 
-	initNewBlock(*block);
-	(*block)->corX = X;
-	(*block)->corY = Y;
-	(*block)->id = ID;
+	*block = (map_block*)malloc(sizeof(map_block));
+	if (block != NULL)
+	{
+		ret = initNewBlock(*block);
+		if (ret == true)
+		{
+			(*block)->corX = X;
+			(*block)->corY = Y;
+		}
+	}
+
+	return true;
 }
 
 void getCoordinates(block_direction direction, int *x, int *y)
@@ -220,8 +213,10 @@ void getCoordinates(block_direction direction, int *x, int *y)
 static void moveBetweenBlocks(block_direction direction)
 {
 	int oldID = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);
-	insertToHashTable(oldID, *currentBlockInMap);
-
+	if(searchItemInHT(oldID, currentBlockInMap->corX, currentBlockInMap->corY) == NULL)
+	{
+		insertToHashTable(oldID, *currentBlockInMap);
+	}
 
 	map_block *pBlockToMove = NULL;
 	int x = 0;
@@ -239,13 +234,6 @@ static void moveBetweenBlocks(block_direction direction)
 	}
 
 	currentBlockInMap = pBlockToMove;
-
-
-	/*for (int i = 0; i < MAP_ROWS; i++) {
-		free(pBlockToMove->block[i]);
-	}
-	free(pBlockToMove->block);
-	free(pBlockToMove);*/
 
 	// For saving purpose, store the most top-left block
 	if (currentBlockInMap->corX < firstBlockToStartSaving->corX && currentBlockInMap->corY > firstBlockToStartSaving->corY)
@@ -270,19 +258,13 @@ static void moveBetweenBlocks(block_direction direction)
 //!*************************************************************************************************
 void createMap()
 {
-	createHashTable(200);
+	createHashTable(50);
 
 	map_block *pBlockToMove = NULL;
 	int ID = getUniqueID(0, 0);
 	createNewBlock(&pBlockToMove, ID, 0, 0);
 
 	currentBlockInMap = pBlockToMove;
-
-	/*for (int i = 0; i < MAP_ROWS; i++) {
-		free(pBlockToMove->block[i]);
-	}
-	free(pBlockToMove->block);
-	free(pBlockToMove);*/
 
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }

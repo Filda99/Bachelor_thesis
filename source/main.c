@@ -25,9 +25,6 @@
 #include "peripherals/i2c.h"
 #include "startup_peripherals.h"
 
-#include "peripherals/vl53l0x/vl53l0x.h"
-#include "peripherals/vl53l0x/vl53l0x_api.h"
-
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
@@ -64,7 +61,7 @@ extern bool IsCmdToStopCar;
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
-
+#include "stdlib.h"
 //!*************************************************************************************************
 //! int main(void)
 //!
@@ -115,7 +112,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
-			//startupPeripherals();
+			startupPeripherals();
 
 			// todo: Reach the starting line
 			//setWheelToInitPosition();

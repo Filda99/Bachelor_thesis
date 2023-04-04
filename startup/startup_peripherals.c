@@ -14,9 +14,6 @@
 #include "fsl_tpm.h"
 #include "fsl_debug_console.h"
 #include "global_macros.h"
-#include "peripherals/vl53l0x/vl53l0x.h"
-#include "peripherals/vl53l0x/vl53l0x_api.h"
-#include "peripherals/vl53l0x/vl53l0x_platform.h"
 
 /************************************
  * EXTERN VARIABLES
@@ -160,34 +157,4 @@ void startupPeripherals()
 
 	//initMotors();
 	initServo();
-
-	// Laser sensor
-
-	/*VL53L0X_Init();
-
-	VL53L0X_Dev_t device;
-	VL53L0X_DeviceParameters_t *deviceParams;
-	VL53L0X_RangingMeasurementData_t measurementData;
-	 //Initialize Comms
-	device.I2cDevAddr      =  0x29;
-	device.comms_type      =  0;
-	device.comms_speed_khz =  400;
-	// Inicializace senzoru
-	VL53L0X_DataInit(&device);
-	VL53L0X_GetDeviceParameters(&device, &deviceParams);
-
-	VL53L0X_SetDeviceParameters(&device, &deviceParams);
-	// Spuštění jednoho měření
-	VL53L0X_StartMeasurement(&device);
-
-	while(1)
-	{
-	uint8_t measurementDataReady;
-	while(measurementDataReady == 0)
-	{
-		VL53L0X_GetMeasurementDataReady(&device, &measurementDataReady);
-	}
-	VL53L0X_GetRangingMeasurementData(&device, &measurementData);
-	PRINTF("MM: %i\r\n", measurementData.RangeMilliMeter);
-	}*/
 }

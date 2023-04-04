@@ -34,6 +34,7 @@ extern "C" {
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
 void delay_ms(unsigned int ms);
+void delay_us(int us);
 
 #ifdef __cplusplus
 }

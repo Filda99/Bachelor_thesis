@@ -143,7 +143,7 @@ void resizeHashTable()
     int old_size = ht->size;
     Node **old_table = ht->table;
 
-    ht->size *= 2;
+    ht->size += 25;
     ht->count = 0;
     ht->table = (Node **)calloc(ht->size, sizeof(Node *));
 
