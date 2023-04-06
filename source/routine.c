@@ -138,7 +138,7 @@ void routine(void)
 	//controlUnit();
 
 	static int i = 0;
-	turnLeft();
+	turnLeftCustom(3);
 	PRINTF("Cycle: %i\r\n", i++);
  	printBlock();
 	mapping();

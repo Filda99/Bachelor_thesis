@@ -112,7 +112,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
-			startupPeripherals();
+			//startupPeripherals();
 
 			// todo: Reach the starting line
 			//setWheelToInitPosition();

@@ -24,21 +24,9 @@
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
 
-// LEFT
-#define	GO_LEFT_X	--(currentBlockInMap->corX)
-#define GO_LEFT_Y	   currentBlockInMap->corY
+#define	GET_COORDINATES_X	currentBlockInMap->corX
+#define GET_COORDINATES_Y	currentBlockInMap->corY
 
-// UP
-#define GO_UP_X		   currentBlockInMap->corX
-#define GO_UP_Y		++(currentBlockInMap->corY)
-
-// RIGHT
-#define GO_RIGHT_X	++(currentBlockInMap->corX)
-#define GO_RIGHT_Y	   currentBlockInMap->corY
-
-// DOWN
-#define GO_DOWN_X	   currentBlockInMap->corX
-#define GO_DOWN_Y	--(currentBlockInMap->corY)
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -75,34 +63,6 @@ static int getUniqueID(int x, int y)
 }
 
 //!*************************************************************************************************
-//! static bool checkExistingBlock(block_direction direction)
-//!
-//! @description
-//! Function looks at the block next to current in the direction we want to move
-//! if block already exists or not.
-//!
-//! @param    block_direction direction	The direction we want to go
-//!
-//! @return   True if block already exists, False otherwise
-//!*************************************************************************************************
-static bool doesBlockExists(map_block *block, int ID, int X, int Y)
-{
-	bool ret = false;
-
-	block = searchItemInHT(ID, X, Y);
-	if (block)
-	{
-		ret = true;
-	}
-	else
-	{
-		block = NULL;
-	}
-
-	return ret;
-}
-
-//!*************************************************************************************************
 //! static void initNewBlock(map_block *newBlock)
 //!
 //! @description
@@ -113,36 +73,39 @@ static bool doesBlockExists(map_block *block, int ID, int X, int Y)
 //!
 //! @return   None
 //!*************************************************************************************************
-static bool initNewBlock(map_block *newBlock)
+static map_object_t** initNewBlock()
 {
-	newBlock->block = (map_object_t **)malloc(MAP_ROWS * sizeof(map_object_t*));
-	if (!newBlock->block)
+	map_object_t** newBlock;
+	//map_object_t** field;
+	newBlock = (map_object_t **)malloc(MAP_ROWS * sizeof(map_object_t*));
+	if (!newBlock)
 	{
-		return false;  // error: calloc() failed
+		//return NULL;  // error: calloc() failed
 	}
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
-		newBlock->block[i] = (map_object_t*)malloc(MAP_COLUMNS * sizeof(map_object_t));
-		if (!newBlock->block[i]) {
+		newBlock[i] = (map_object_t*)malloc(MAP_COLUMNS * sizeof(map_object_t));
+		if (!newBlock[i]) {
 			// error: calloc() failed, free memory allocated so far
 			for (int j = 0; j < i; j++) {
-				free(newBlock->block[j]);
+				free(newBlock[j]);
 			}
-			free(newBlock->block);
-			return false;
+			free(newBlock);
+			//return NULL;
 		}
 	}
+
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
 		for (int j = 0; j < MAP_COLUMNS; j++)
 		{
-			newBlock->block[i][j] = map_Empty;
+			newBlock[i][j] = map_Empty;
 		}
 	}
 
-	return true;
+	return newBlock;
 }
 
 
@@ -156,43 +119,36 @@ static bool initNewBlock(map_block *newBlock)
 //!
 //! @return   None
 //!*************************************************************************************************
-static bool createNewBlock(map_block **block, int ID, int X, int Y)
+static map_block *createNewBlock(int ID, int X, int Y)
 {
-	bool ret = false;
-
-	*block = (map_block*)malloc(sizeof(map_block));
+	map_block *block = (map_block*)malloc(sizeof(map_block));
 	if (block != NULL)
 	{
-		ret = initNewBlock(*block);
-		if (ret == true)
-		{
-			(*block)->corX = X;
-			(*block)->corY = Y;
-		}
+		block->block = initNewBlock();
+		block->corX = X;
+		block->corY = Y;
 	}
 
-	return true;
+	return block;
 }
 
 void getCoordinates(block_direction direction, int *x, int *y)
 {
+	*x = GET_COORDINATES_X;
+	*y = GET_COORDINATES_Y;
 	switch (direction)
 	{
 		case block_up:
-			*x = GO_UP_X;
-			*y = GO_UP_Y;
+			(*y)++;
 			break;
 		case block_down:
-			*x = GO_DOWN_X;
-			*y = GO_DOWN_Y;
+			(*y)--;
 			break;
 		case block_left:
-			*x = GO_LEFT_X;
-			*y = GO_LEFT_Y;
+			(*x)--;
 			break;
 		case block_right:
-			*x = GO_RIGHT_X;
-			*y = GO_RIGHT_Y;
+			(*x)++;
 			break;
 
 		default:
@@ -215,22 +171,23 @@ static void moveBetweenBlocks(block_direction direction)
 	int oldID = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);
 	if(searchItemInHT(oldID, currentBlockInMap->corX, currentBlockInMap->corY) == NULL)
 	{
-		insertToHashTable(oldID, *currentBlockInMap);
+		insertToHashTable(oldID, currentBlockInMap);
 	}
 
-	map_block *pBlockToMove = NULL;
-	int x = 0;
-	int y = 0;
+ 	int X = 0;
+	int Y = 0;
 
 	// Based on direction we get x, y coordinates
-	getCoordinates(direction, &x, &y);
+	getCoordinates(direction, &X, &Y);
 
 	// Get ID from coordinates
-	int ID = getUniqueID(x, y);
+	int ID = getUniqueID(X, Y);
 
-	if (!doesBlockExists(pBlockToMove, ID, x, y))
+	map_block *pBlockToMove = searchItemInHT(ID, X, Y);
+
+	if (!pBlockToMove)
 	{
-		createNewBlock(&pBlockToMove, ID, x, y);
+		pBlockToMove = createNewBlock(ID, X, Y);
 	}
 
 	currentBlockInMap = pBlockToMove;
@@ -260,9 +217,9 @@ void createMap()
 {
 	createHashTable(50);
 
-	map_block *pBlockToMove = NULL;
+	map_block *pBlockToMove;
 	int ID = getUniqueID(0, 0);
-	createNewBlock(&pBlockToMove, ID, 0, 0);
+	pBlockToMove = createNewBlock(ID, 0, 0);
 
 	currentBlockInMap = pBlockToMove;
 
