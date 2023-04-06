@@ -116,11 +116,12 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
     //memset(&g_m_handle, 0, sizeof(g_m_handle));
     I2C_MasterTransferCreateHandle(CAM_I2C, &g_m_handle, callback, NULL);
 
-    if (I2C_MasterTransferNonBlocking(CAM_I2C,&g_m_handle, &transfer) != kStatus_Success)
+    I2C_MasterTransferBlocking(CAM_I2C, &transfer);
+   /* if (I2C_MasterTransferNonBlocking(CAM_I2C,&g_m_handle, &transfer) != kStatus_Success)
 	{
 		return kStatus_Fail;
 	}
-    I2C_MasterTransferHandleIRQ(CAM_I2C, &g_m_handle);
+    I2C_MasterTransferHandleIRQ(CAM_I2C, &g_m_handle);*/
 
     while(g_m_handle.state != 0x0U){ //idle state
     	I2C_MasterTransferHandleIRQ(CAM_I2C, &g_m_handle);
