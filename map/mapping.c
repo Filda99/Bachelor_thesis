@@ -142,6 +142,7 @@ static float calcNewDistance(uint8_t turningSide)
 	}
 
 	prevNoWheelRot = HalfWheelRotations;
+	angleHeading = fmodf(angleHeading*180/M_PI, 360.0)*M_PI/180;
 	return newDistance;
 }
 

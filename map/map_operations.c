@@ -215,7 +215,8 @@ static void moveBetweenBlocks(block_direction direction)
 //!*************************************************************************************************
 void createMap()
 {
-	createHashTable(50);
+	/*createHashTable(50);*/
+	createHashTable(2);
 
 	map_block *pBlockToMove;
 	int ID = getUniqueID(0, 0);
