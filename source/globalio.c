@@ -47,3 +47,9 @@ uint8_t currentSpeed = ENGINE_STOP;
 //! 3 = direct
 //! 6 = max right
 uint8_t currentSteer = GO_DIRECT;
+
+//! I2C data transfer buffer
+uint8_t g_slave_buff;
+
+//! Buffer for saving data from i2c
+uint8_t glob_data[I2C_DATA_LENGTH];

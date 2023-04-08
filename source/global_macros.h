@@ -103,7 +103,10 @@ extern "C" {
 /*************************************/
 // I2C
 /*************************************/
-#define USING_I2C	I2C0
+#define SAVING_I2C	I2C0
+#define DATA_I2C	I2C1
+
+#define I2C_DATA_LENGTH	6
 
 /************************************
  * TYPEDEFS

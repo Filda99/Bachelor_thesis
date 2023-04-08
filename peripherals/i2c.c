@@ -32,7 +32,6 @@
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
-bool g_MasterCompletionFlag;
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -41,12 +40,6 @@ bool g_MasterCompletionFlag;
 //**************************************************************************************************
 //* STATIC FUNCTIONS
 //**************************************************************************************************
-
-static void callback()
-{
-	I2C_MasterStop(USING_I2C);
-	g_MasterCompletionFlag = true;
-}
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
@@ -74,7 +67,6 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
 {
     i2c_master_transfer_t transfer;
     uint8_t buff[2];
-	g_MasterCompletionFlag = false;
 
     buff[0] = regAddr;
     buff[1] = data;
@@ -87,10 +79,11 @@ status_t i2cWrite(uint8_t deviceAddr, uint8_t regAddr, uint8_t data)
     transfer.data = buff;
     transfer.dataSize = 2;
 
-    i2c_master_handle_t handle;
-	I2C_MasterTransferCreateHandle(USING_I2C, &handle, callback, NULL);
-	I2C_MasterTransferNonBlocking(USING_I2C, &handle, &transfer);
-	while (!g_MasterCompletionFlag);
+    if (I2C_MasterTransferBlocking(SAVING_I2C, &transfer) != kStatus_Success)
+	{
+		return kStatus_Fail;
+	}
+
 
 	return kStatus_Success;
 }
@@ -122,7 +115,6 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
 	{
 		return kStatus_Fail;
 	}
-	g_MasterCompletionFlag = false;
 
     i2c_master_transfer_t transfer;
     i2c_master_handle_t handle;
@@ -135,7 +127,7 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
     transfer.subaddressSize = 1;
     transfer.data = NULL;
     transfer.dataSize = 0;
-    if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(SAVING_I2C, &transfer) != kStatus_Success)
    	{
    		return kStatus_Fail;
    	}
@@ -148,7 +140,7 @@ status_t i2cRead(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint32_t da
     transfer.subaddressSize = 0;
     transfer.data = data;
     transfer.dataSize = dataLen;
-    if (I2C_MasterTransferBlocking(USING_I2C, &transfer) != kStatus_Success)
+    if (I2C_MasterTransferBlocking(SAVING_I2C, &transfer) != kStatus_Success)
 	{
 		return kStatus_Fail;
 	}

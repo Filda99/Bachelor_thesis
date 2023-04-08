@@ -21,9 +21,12 @@
 #include "fsl_port.h"
 #include "global_macros.h"
 
+#include "routine.h"
+
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
+extern dma_handle_t dmaHandle;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -37,6 +40,23 @@
 #define GPIO_HALL_IRQn			PORTD_IRQn
 
 
+
+#define EXAMPLE_I2C_MASTER_BASEADDR I2C0
+#define EXAMPLE_I2C_SLAVE_BASEADDR I2C1
+#define I2C_MASTER_CLK_SRC I2C0_CLK_SRC
+#define I2C_MASTER_CLK_FREQ CLOCK_GetFreq(I2C0_CLK_SRC)
+#define I2C_SLAVE_CLK_SRC I2C1_CLK_SRC
+#define I2C_SLAVE_CLK_FREQ CLOCK_GetFreq(I2C1_CLK_SRC)
+#define EXAMPLE_I2C_DMAMUX_BASEADDR DMAMUX0
+#define EXAMPLE_I2C_DMA_BASEADDR DMA0
+#define I2C_DMA_CHANNEL 0U
+
+#define DMA_REQUEST_SRC kDmaRequestMux0I2C0
+#define I2C_MASTER_SLAVE_ADDR_7BIT 0x7EU
+#define I2C_BAUDRATE 100000U
+
+
+
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
@@ -44,6 +64,7 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+i2c_slave_handle_t g_s_handle;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -212,10 +233,36 @@ void i2cInit(void)
 	i2c_master_config_t masterConfig;
     I2C_MasterGetDefaultConfig(&masterConfig);
     masterConfig.baudRate_Bps = 200000;
-    I2C_MasterInit(USING_I2C, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
-    //I2C0->F = 0b01000001;
-    //I2C0->F = 0x23;
+    I2C_MasterInit(SAVING_I2C, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
 }
+
+void i2cInitSlave()
+{
+	i2c_slave_config_t slaveConfig;
+
+	DMAMUX_Init(EXAMPLE_I2C_DMAMUX_BASEADDR);
+	DMA_Init(EXAMPLE_I2C_DMA_BASEADDR);
+
+	PRINTF("\r\nI2C example -- MasterDMA_SlaveInterrupt.\r\n");
+
+	I2C_SlaveGetDefaultConfig(&slaveConfig);
+
+	slaveConfig.addressingMode = kI2C_Address7bit;
+	slaveConfig.slaveAddress = I2C_MASTER_SLAVE_ADDR_7BIT;
+	slaveConfig.upperAddress = 0;
+
+	I2C_SlaveInit(DATA_I2C, &slaveConfig, I2C_SLAVE_CLK_FREQ);
+
+	memset(&g_s_handle, 0, sizeof(g_s_handle));
+
+	I2C_SlaveTransferCreateHandle(DATA_I2C, &g_s_handle, i2c_slave_callback, NULL);
+	I2C_SlaveTransferNonBlocking(DATA_I2C, &g_s_handle, kI2C_SlaveCompletionEvent);
+
+	DMAMUX_SetSource(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL, DMA_REQUEST_SRC);
+	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
+	DMA_CreateHandle(&dmaHandle, EXAMPLE_I2C_DMA_BASEADDR, I2C_DMA_CHANNEL);
+}
+
 
 
 //**************************************************************************************************
@@ -246,6 +293,7 @@ void startupBoard(void)
 	startupPWM();
 	startupInterrupts();
 	i2cInit();
+	i2cInitSlave();
 
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

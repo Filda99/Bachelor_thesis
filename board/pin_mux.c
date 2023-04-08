@@ -72,6 +72,8 @@ BOARD_InitPins:
   - {pin_num: '78', peripheral: TPM0, signal: 'CH, 5', pin_signal: ADC0_SE6b/PTD5/SPI1_SCK/UART2_TX/TPM0_CH5, direction: OUTPUT}
   - {pin_num: '65', peripheral: I2C0, signal: SCL, pin_signal: CMP0_IN2/PTC8/I2C0_SCL/TPM0_CH4, pull_enable: enable}
   - {pin_num: '66', peripheral: I2C0, signal: SDA, pin_signal: CMP0_IN3/PTC9/I2C0_SDA/TPM0_CH5, pull_enable: enable}
+  - {pin_num: '56', peripheral: I2C1, signal: SCL, pin_signal: ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0}
+  - {pin_num: '57', peripheral: I2C1, signal: SDA, pin_signal: ADC0_SE11/TSI0_CH15/PTC2/I2C1_SDA/TPM0_CH1}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -172,6 +174,12 @@ void BOARD_InitPins(void)
 
                      /* Pull Enable: Internal pullup or pulldown resistor is not enabled on the corresponding pin. */
                      | PORT_PCR_PE(kPORT_PullDisable));
+
+    /* PORTC1 (pin 56) is configured as I2C1_SCL */
+    PORT_SetPinMux(PORTC, 1U, kPORT_MuxAlt2);
+
+    /* PORTC2 (pin 57) is configured as I2C1_SDA */
+    PORT_SetPinMux(PORTC, 2U, kPORT_MuxAlt2);
 
     /* PORTC4 (pin 61) is configured as PTC4 */
     PORT_SetPinMux(BOARD_INITPINS_S0S2COLORSEN_PORT, BOARD_INITPINS_S0S2COLORSEN_PIN, kPORT_MuxAsGpio);

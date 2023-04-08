@@ -35,6 +35,9 @@ extern unsigned int RightSensorValue;
 extern unsigned int HalfWheelRotations;
 extern map_block *currentBlockInMap;
 
+extern uint8_t g_slave_buff;
+extern uint8_t glob_data[I2C_DATA_LENGTH];
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -46,6 +49,8 @@ extern map_block *currentBlockInMap;
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+dma_handle_t dmaHandle;
+volatile bool completionFlag = false;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -133,13 +138,53 @@ static void checkLines()
 //!*************************************************************************************************
 void routine(void)
 {
-	checkLines();
-	controlUnit();
+	 PRINTF("Slave received data: ");
+	 for (uint32_t i = 0U; i < I2C_DATA_LENGTH; i++)
+		 {
+			 PRINTF("%i  ", glob_data[i]);
+		 }
+		 PRINTF("\r\n\r\n");
+
+	 delay_ms(10);
+	//checkLines();
+	//controlUnit();
 
 	//static int i = 0;
 	//PRINTF("Cycle: %i\r\n", i++);
  	//printBlock();
-	mapping();
+	//mapping();
 	//PRINTF("-------------------------------------\r\n");
 }
 
+void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
+{
+	static uint8_t counter = 0;
+	if (counter >= I2C_DATA_LENGTH)
+		counter = 0;
+    switch (xfer->event)
+    {
+        /*  Transmit request */
+        case kI2C_SlaveTransmitEvent:
+            /*  Update information for transmit process */
+            xfer->data = &g_slave_buff;
+            xfer->dataSize = 1;
+            break;
+
+        /*  Receive request */
+        case kI2C_SlaveReceiveEvent:
+            /*  Update information for received process */
+            xfer->data = &g_slave_buff;
+            xfer->dataSize = 1;
+            glob_data[counter++] = g_slave_buff;
+            break;
+
+        /*  Transfer done */
+        case kI2C_SlaveCompletionEvent:
+            completionFlag = true;
+            break;
+
+        default:
+            completionFlag = false;
+            break;
+    }
+}
