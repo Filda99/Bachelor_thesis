@@ -20,6 +20,7 @@
 //**************************************************************************************************
 extern unsigned char LineDetected;
 extern unsigned int HalfWheelRotations;
+extern uint8_t currentSteer;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -109,9 +110,29 @@ void controlUnit()
 
 			if (lineCnt > MAX_CNT_ON_LINE)
 			{
+				if (currentSteer >= GO_DIRECT)
+				{
+					goDirect();
+				}
+
 				PRINTF("\t-> Turning right! \r\n");
-				turnRight();
-				slackUpSpeed();
+				if (currentSteer == 2)
+				{
+					turnRight();
+					slackUpSpeed();
+				}
+				else if (currentSteer == 1)
+				{
+					turnRightCustom(2);
+					slackUpSpeed();
+					slackUpSpeedOnWheel(1);
+				}
+				else if (currentSteer == 0)
+				{
+					turnRightCustom(MAX_STEER_LEFT);
+					slackUpSpeedOnWheel(2);
+				}
+
 				lineCnt = 0;
 			}
 			stopCarCnt = 0;
@@ -132,9 +153,28 @@ void controlUnit()
 
 			if (lineCnt > MAX_CNT_ON_LINE)
 			{
+				if (currentSteer <= GO_DIRECT)
+				{
+					goDirect();
+				}
+
 				PRINTF("\t-> Turning left! \r\n");
-				turnLeft();
-				slackUpSpeed();
+				if (currentSteer == 4)
+				{
+					turnLeft();
+					slackUpSpeed();
+				}
+				else if (currentSteer == 5)
+				{
+					turnLeftCustom(2);
+					slackUpSpeed();
+					slackUpSpeedOnWheel(1);
+				}
+				else if (currentSteer == 6)
+				{
+					turnLeftCustom(MAX_STEER_LEFT);
+					slackUpSpeedOnWheel(2);
+				}
 				lineCnt = 0;
 			}
 

@@ -43,9 +43,9 @@ unsigned int RightSensorValue = 0;
 uint8_t currentSpeed = ENGINE_STOP;
 
 //! Current position in steer array.
-//! 0 = max left
+//! 0 = max right
 //! 3 = direct
-//! 6 = max right
+//! 6 = max left
 uint8_t currentSteer = GO_DIRECT;
 
 //! I2C data transfer buffer

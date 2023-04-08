@@ -57,9 +57,6 @@ static const float SteerMap[7] = {
 /************************************
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
-void setMotorSpeed(int speed);
-void setMotorSteer(int steer);
-
 void addSpeed();
 void addSpeedCustom(int speed);
 void slackUpSpeed();
