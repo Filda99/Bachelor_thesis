@@ -107,6 +107,7 @@ void setMotorSteer(int steer)
 	float setSteer = SteerMap[steer];
 	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5,
 				kTPM_EdgeAlignedPwm, setSteer);
+	delay_ms(50);
 }
 
 //-------------------
@@ -188,7 +189,7 @@ void turnRight()
 {
 	if(currentSteer == MAX_STEER_RIGHT) return;
 
-	currentSteer++;
+	currentSteer--;
 	setMotorSteer(currentSteer);
 }
 
@@ -200,7 +201,7 @@ void turnRightCustom(int steer)
 	}
 	else
 	{
-		currentSteer += steer;
+		currentSteer -= steer;
 	}
 
 	setMotorSteer(currentSteer);
@@ -210,7 +211,7 @@ void turnLeft()
 {
 	if(currentSteer == MAX_STEER_LEFT) return;
 
-	currentSteer--;
+	currentSteer++;
 	setMotorSteer(currentSteer);
 }
 

@@ -133,15 +133,13 @@ static void checkLines()
 //!*************************************************************************************************
 void routine(void)
 {
-	HalfWheelRotations++;
-	//checkLines();
-	//controlUnit();
+	checkLines();
+	controlUnit();
 
-	static int i = 0;
-	turnLeftCustom(3);
-	PRINTF("Cycle: %i\r\n", i++);
- 	printBlock();
+	//static int i = 0;
+	//PRINTF("Cycle: %i\r\n", i++);
+ 	//printBlock();
 	mapping();
-	PRINTF("-------------------------------------\r\n");
+	//PRINTF("-------------------------------------\r\n");
 }
 

@@ -137,13 +137,17 @@ static void initServo()
 {
 	PRINTF("\t\t- Servo initialization started.\r\n");
 	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.5);
-	delay_ms(100);
-	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 3.735);
-	delay_ms(250);
+	delay_ms(150);
+	/*TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 3.735);
+	delay_ms(150);
 	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 11.205);
-	delay_ms(250);
+	delay_ms(150);*/
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7);
+	delay_ms(150);
+	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 8);
+	delay_ms(150);
 	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.5);
-	delay_ms(250);
+	delay_ms(150);
 	PRINTF("\t\t- Servo initialization complete.\r\n");
 }
 

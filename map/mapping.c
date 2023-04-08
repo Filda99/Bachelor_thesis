@@ -289,7 +289,7 @@ static map_move_direction getDirection(uint8_t moveToNewBlock_x, uint8_t moveToN
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
-
+#include "../motors/engines.h"
 //!*************************************************************************************************
 //! void mapping(void)
 //!
@@ -361,6 +361,10 @@ void mapping()
 	PRINTF("Distance traveled: %d\r\n", totalDistanceTraveled);
 	PRINTF("Coordinates: %d, %d\r\n", (int)newPos.x, (int)newPos.y);
     PRINTF("Center of circle coordinates: %d, %d\r\n", (int)centerOfCircle[X], (int)centerOfCircle[Y]);
+    if ((int)(angleHeading*180/M_PI) >= 360)
+	{
+		hardStop();
+	}
 }
 
 

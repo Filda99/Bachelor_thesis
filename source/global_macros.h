@@ -80,10 +80,10 @@ extern "C" {
 // Line detected counter
 /*************************************/
 // Maximum number which says how long can we be on the line
-#define MAX_CNT_ON_LINE	15
+#define MAX_CNT_ON_LINE	3
 // The number that tells us after how long we should increase the speed
 // if there is no line
-#define CNT_OUT_OF_LANE 80
+#define CNT_OUT_OF_LANE 10
 
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	100
@@ -94,11 +94,11 @@ extern "C" {
 #define MAX_FORWARD_ENGINE_LIMIT	6
 #define MAX_REVERSE_ENGINE_LIMIT	0
 
-#define MAX_STEER_RIGHT		6
-#define MAX_STEER_LEFT		0
+#define MAX_STEER_RIGHT		0
+#define MAX_STEER_LEFT		6
 
 #define ENGINE_STOP			1	// Pulse width for STOP is the second value in the speed field
-#define GO_DIRECT			(MAX_STEER_RIGHT / 2)
+#define GO_DIRECT			(MAX_STEER_LEFT / 2)
 
 /*************************************/
 // I2C

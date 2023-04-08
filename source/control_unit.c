@@ -86,8 +86,8 @@ void controlUnit()
 			// If there is no line for some time, add speed
 			if (HalfWheelRotations > CNT_OUT_OF_LANE)
 			{
-				addSpeed();
 				PRINTF("\t-> Add speed. \r\n");
+				addSpeed();
 				goDirect();
 			}
 
