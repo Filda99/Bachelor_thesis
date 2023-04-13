@@ -1,4 +1,4 @@
-/**
+ /**
  ********************************************************************************
  * @file    global_macros.h
  * @author  user
@@ -83,7 +83,7 @@ extern "C" {
 #define MAX_CNT_ON_LINE	3
 // The number that tells us after how long we should increase the speed
 // if there is no line
-#define CNT_OUT_OF_LANE 10
+#define CNT_OUT_OF_LANE 100
 
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	100

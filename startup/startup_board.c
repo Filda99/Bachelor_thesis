@@ -176,7 +176,7 @@ static void startupPWM(void)
 	// Configure tpm params with frequency 24kHZ
 	tpmParamSer.chnlNumber = kTPM_Chnl_5;
 	tpmParamSer.level = kTPM_HighTrue;
-	tpmParamSer.dutyCyclePercent = 7.37;
+	tpmParamSer.dutyCyclePercent = 7.375;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);

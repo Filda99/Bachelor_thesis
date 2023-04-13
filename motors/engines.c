@@ -128,7 +128,7 @@ static void setMotorSpeed(int speed, uint8_t wheelSide, uint8_t slackWheel)
 				kTPM_EdgeAlignedPwm, rightMotorSpeed);
 	}
 
-	delay_ms(50);
+	//delay_ms(50);
 }
 
 void setMotorSteer(int steer)
@@ -136,7 +136,7 @@ void setMotorSteer(int steer)
 	float setSteer = SteerMap[steer];
 	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5,
 				kTPM_EdgeAlignedPwm, setSteer);
-	delay_ms(50);
+	//delay_ms(50);
 }
 
 //-------------------

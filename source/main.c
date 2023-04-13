@@ -127,6 +127,7 @@ int main(void)
 			PRINTF("-----------------\r\n");
 			PRINTF("Starting routine.\r\n");
 			LED_RED_OFF();
+			addSpeed();
 
 			while (!IsCmdToStopCar)
 			{

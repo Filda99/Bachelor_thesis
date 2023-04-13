@@ -21,6 +21,7 @@
 extern unsigned char LineDetected;
 extern unsigned int HalfWheelRotations;
 extern uint8_t currentSteer;
+extern uint8_t currentSpeed;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -84,12 +85,12 @@ void controlUnit()
 	{
 		case LineNone:
 		{
+			goDirect();
 			// If there is no line for some time, add speed
 			if (HalfWheelRotations > CNT_OUT_OF_LANE)
 			{
 				PRINTF("\t-> Add speed. \r\n");
 				addSpeed();
-				goDirect();
 			}
 
 			prevTurning = LineNone;
@@ -116,15 +117,13 @@ void controlUnit()
 				}
 
 				PRINTF("\t-> Turning right! \r\n");
-				if (currentSteer == 2)
+				if (currentSteer >= 2)
 				{
 					turnRight();
-					slackUpSpeed();
 				}
 				else if (currentSteer == 1)
 				{
 					turnRightCustom(2);
-					slackUpSpeed();
 					slackUpSpeedOnWheel(1);
 				}
 				else if (currentSteer == 0)
@@ -132,6 +131,12 @@ void controlUnit()
 					turnRightCustom(MAX_STEER_LEFT);
 					slackUpSpeedOnWheel(2);
 				}
+
+				if (currentSpeed > 2)
+				{
+					slackUpSpeed();
+				}
+
 
 				lineCnt = 0;
 			}
@@ -159,15 +164,13 @@ void controlUnit()
 				}
 
 				PRINTF("\t-> Turning left! \r\n");
-				if (currentSteer == 4)
+				if (currentSteer <= 4)
 				{
 					turnLeft();
-					slackUpSpeed();
 				}
 				else if (currentSteer == 5)
 				{
 					turnLeftCustom(2);
-					slackUpSpeed();
 					slackUpSpeedOnWheel(1);
 				}
 				else if (currentSteer == 6)
@@ -175,6 +178,13 @@ void controlUnit()
 					turnLeftCustom(MAX_STEER_LEFT);
 					slackUpSpeedOnWheel(2);
 				}
+
+				if (currentSpeed > 2)
+				{
+					slackUpSpeed();
+				}
+
+
 				lineCnt = 0;
 			}
 
@@ -185,8 +195,9 @@ void controlUnit()
 
 		case LineCenter_Left:
 		{
-			turnRightCustom(MAX_STEER_RIGHT);
 			slackUpSpeedCustom(2);
+			turnRightCustom(MAX_STEER_LEFT);
+			slackUpSpeedOnWheel(2);
 			PRINTF("\t-> Turning HARD right! \r\n");
 			stopCarCnt = 0;
 			break;
@@ -194,8 +205,9 @@ void controlUnit()
 
 		case LineCenter_Right:
 		{
-			turnLeftCustom(MAX_STEER_LEFT);
 			slackUpSpeedCustom(2);
+			turnLeftCustom(MAX_STEER_LEFT);
+			slackUpSpeedOnWheel(2);
 			PRINTF("\t-> Turning HARD left! \r\n");
 			stopCarCnt = 0;
 			break;

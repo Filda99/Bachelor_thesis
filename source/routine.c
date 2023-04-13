@@ -138,21 +138,13 @@ static void checkLines()
 //!*************************************************************************************************
 void routine(void)
 {
-	 PRINTF("Slave received data: ");
-	 for (uint32_t i = 0U; i < I2C_DATA_LENGTH; i++)
-		 {
-			 PRINTF("%i  ", glob_data[i]);
-		 }
-		 PRINTF("\r\n\r\n");
-
-	 delay_ms(10);
-	//checkLines();
-	//controlUnit();
+	checkLines();
+	controlUnit();
 
 	//static int i = 0;
 	//PRINTF("Cycle: %i\r\n", i++);
  	//printBlock();
-	//mapping();
+	mapping();
 	//PRINTF("-------------------------------------\r\n");
 }
 

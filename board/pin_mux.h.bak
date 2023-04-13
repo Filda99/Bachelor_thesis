@@ -65,6 +65,15 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_RightMotor_PIN_MASK (1U << 13U)      /*!<@brief PORT pin mask */
                                                             /* @} */
 
+/*! @name PORTE25 (number 25), U7[6]/I2C0_SDA
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_ACCEL_SDA_PORT PORTE                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_ACCEL_SDA_PIN 25U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_ACCEL_SDA_PIN_MASK (1U << 25U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
+
 /*! @name PORTD0 (number 73), J2[6]/D10
   @{ */
 
