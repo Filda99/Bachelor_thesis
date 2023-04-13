@@ -163,11 +163,7 @@ void getCoordinates(block_direction direction, int *x, int *y)
 //!*************************************************************************************************
 static void moveBetweenBlocks(block_direction direction)
 {
-	int oldID = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);
-	if(searchItemInHT(oldID, currentBlockInMap->corX, currentBlockInMap->corY) == NULL)
-	{
-		insertToHashTable(oldID, currentBlockInMap);
-	}
+	saveCurrentBlock();
 
  	int X = 0;
 	int Y = 0;
@@ -215,6 +211,16 @@ void createMap()
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
+//!*************************************************************************************************
+//! void saveCurrentBlock(void)
+//!
+//! @description
+//! Function saves current block to the hash table.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void saveCurrentBlock()
 {
 	int ID = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);

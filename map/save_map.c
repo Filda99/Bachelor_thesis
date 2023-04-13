@@ -110,6 +110,50 @@ static void writeToFile()
 	}
 }
 
+static void sort_coordinates(Coordinate* coordinates, int num_coords) {
+    int i, j;
+    Coordinate temp;
+
+    // Bubble sort by Y coordinate
+    for (i = 0; i < num_coords - 1; i++) {
+        for (j = 0; j < num_coords - i - 1; j++) {
+            if (coordinates[j].y < coordinates[j+1].y) {
+                temp = coordinates[j];
+                coordinates[j] = coordinates[j+1];
+                coordinates[j+1] = temp;
+            }
+        }
+    }
+
+    // Bubble sort by X coordinate within each Y group
+    int start_idx = 0;
+    for (i = 0; i < num_coords - 1; i++) {
+        if (coordinates[i].y != coordinates[i+1].y) {
+            for (j = start_idx; j < i; j++) {
+                for (int k = start_idx; k < i - (j - start_idx); k++) {
+                    if (coordinates[k].x > coordinates[k+1].x) {
+                        temp = coordinates[k];
+                        coordinates[k] = coordinates[k+1];
+                        coordinates[k+1] = temp;
+                    }
+                }
+            }
+            start_idx = i+1;
+        }
+    }
+
+    // Sort last Y group by X coordinate
+    for (j = start_idx; j < num_coords - 1; j++) {
+        for (int k = start_idx; k < num_coords - 1 - (j - start_idx); k++) {
+            if (coordinates[k].x > coordinates[k+1].x) {
+                temp = coordinates[k];
+                coordinates[k] = coordinates[k+1];
+                coordinates[k+1] = temp;
+            }
+        }
+    }
+}
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
