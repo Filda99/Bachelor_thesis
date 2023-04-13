@@ -24,10 +24,6 @@
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
 
-#define	GET_COORDINATES_X	currentBlockInMap->corX
-#define GET_COORDINATES_Y	currentBlockInMap->corY
-
-
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
@@ -35,7 +31,6 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
-static map_block *firstBlockToStartSaving = NULL;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -134,8 +129,8 @@ static map_block *createNewBlock(int ID, int X, int Y)
 
 void getCoordinates(block_direction direction, int *x, int *y)
 {
-	*x = GET_COORDINATES_X;
-	*y = GET_COORDINATES_Y;
+	*x = currentBlockInMap->corX;
+	*y = currentBlockInMap->corY;
 	switch (direction)
 	{
 		case block_up:
@@ -191,12 +186,6 @@ static void moveBetweenBlocks(block_direction direction)
 	}
 
 	currentBlockInMap = pBlockToMove;
-
-	// For saving purpose, store the most top-left block
-	if (currentBlockInMap->corX < firstBlockToStartSaving->corX && currentBlockInMap->corY > firstBlockToStartSaving->corY)
-	{
-		firstBlockToStartSaving = currentBlockInMap;
-	}
 }
 
 //**************************************************************************************************
@@ -215,8 +204,7 @@ static void moveBetweenBlocks(block_direction direction)
 //!*************************************************************************************************
 void createMap()
 {
-	/*createHashTable(50);*/
-	createHashTable(2);
+	createHashTable(50);
 
 	map_block *pBlockToMove;
 	int ID = getUniqueID(0, 0);
@@ -227,37 +215,14 @@ void createMap()
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
-//!*************************************************************************************************
-//! void saveMap(void)
-//!
-//! @description
-//! Function goes through all map blocks and saves them to a file.
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-void saveMap()
+void saveCurrentBlock()
 {
+	int ID = getUniqueID(currentBlockInMap->corX, currentBlockInMap->corY);
+	if(searchItemInHT(ID, currentBlockInMap->corX, currentBlockInMap->corY) == NULL)
+	{
+		insertToHashTable(ID, currentBlockInMap);
+	}
 }
-
-//!*************************************************************************************************
-//! void deleteMap(void)
-//!
-//! @description
-//! Function goes through all map blocks and dealocates them.
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-void deleteMap()
-{
-	// TODO: Go through all map blocks.
-	free(currentBlockInMap->block);
-	free(currentBlockInMap);
-}
-
 
 //!*************************************************************************************************
 //! void moveInMap(void)

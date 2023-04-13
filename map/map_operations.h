@@ -80,8 +80,7 @@ typedef struct
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
 void createMap(void);
-void saveMap(void);
-void deleteMap(void);
+void saveCurrentBlock();
 void moveInMap(map_move_direction direction);
 
 #ifdef __cplusplus

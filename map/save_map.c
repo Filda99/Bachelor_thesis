@@ -1,51 +1,48 @@
 /**
  ***************************************************************************************************
- * @file    main.c
+ * @file    save_map.c
  * @author  user
- * @date    Jul 18, 2022
- * @brief
+ * @date    Apr 13, 2023
+ * @brief   
  ***************************************************************************************************
  */
 
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "common/delay.h"
-#include <motors/engines.h>
-#include "map/map_operations.h"
-#include "fsl_debug_console.h"
-#include "fsl_device_registers.h"
-#include "board.h"
-#include "startup_board.h"
-#include "pin_mux.h"
-#include "routine.h"
-#include "fsl_port.h"
-#include "MKL25Z4.h"
-#include "control_unit.h"
-#include "peripherals/i2c.h"
-#include "startup_peripherals.h"
-#include "map/save_map.h"
+#include "save_map.h"
+#include "map_operations.h"
+#include "fsl_spi.h"
+#include <stdlib.h>
+#include "SD.h"
+#include "diskio.h"
+#include "ff.h"
+#include "utilities/fsl_debug_console.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
-extern unsigned LeftSensorValue;
-extern unsigned char LineDetected;
-extern bool IsCmdToStopCar;
+extern HashTable *ht;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
-#define LED_BLUE_TURN_ON() GPIOD->PCOR |= (1<<1)
-#define LED_BLUE_TURN_OFF() GPIOD->PSOR |= (1<<1)
+#define EXAMPLE_SPI_MASTER SPI0
+#define EXAMPLE_SPI_MASTER_SOURCE_CLOCK kCLOCK_BusClk
+#define EXAMPLE_SPI_MASTER_CLK_FREQ CLOCK_GetFreq(kCLOCK_BusClk)
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
+typedef struct {
+    int x;
+    int y;
+} Coordinate;
 
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+static const char file_name[] = "Map.csv";
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -59,98 +56,96 @@ extern bool IsCmdToStopCar;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+static void initSPI()
+{
+	spi_master_config_t masterConfig = {0};
+	uint32_t sourceClock = 0U;
+	/*
+	 * masterConfig.enableStopInWaitMode = false;
+	 * masterConfig.polarity = kSPI_ClockPolarityActiveHigh;
+	 * masterConfig.phase = kSPI_ClockPhaseFirstEdge;
+	 * masterConfig.direction = kSPI_MsbFirst;
+	 * masterConfig.dataMode = kSPI_8BitMode;
+	 * masterConfig.txWatermark = kSPI_TxFifoOneHalfEmpty;
+	 * masterConfig.rxWatermark = kSPI_RxFifoOneHalfFull;
+	 * masterConfig.pinMode = kSPI_PinModeNormal;
+	 * masterConfig.outputMode = kSPI_SlaveSelectAutomaticOutput;
+	 * masterConfig.baudRate_Bps = 500000U;
+	 */
+	SPI_MasterGetDefaultConfig(&masterConfig);
+	sourceClock = EXAMPLE_SPI_MASTER_CLK_FREQ;
+	SPI_MasterInit(EXAMPLE_SPI_MASTER, &masterConfig, sourceClock);
+}
+
+static void writeToFile()
+{
+	FATFS 	fs;
+	FRESULT fr;
+	FIL		fil;
+	UINT 	bw;
+
+	fr = f_mount(&fs, file_name, 0);
+	if(fr)
+	{
+		PRINTF("\nError mounting file system\r\n");
+		for(;;){}
+	}
+	fr = f_open(&fil, file_name, FA_CREATE_NEW | FA_WRITE);
+	if(fr)
+	{
+		PRINTF("\nError opening text file\r\n");
+		for(;;){}
+	}
+	fr = f_write(&fil, "Test1 ,Test2 ,Test3 ,Test4 \r\n", 29, &bw);
+	if(fr)
+	{
+		PRINTF("\nError write text file\r\n");
+		for(;;){}
+	}
+	fr = f_close(&fil);
+	if(fr)
+	{
+		PRINTF("\nError close text file\r\n");
+		for(;;){}
+	}
+}
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
-#include "stdlib.h"
+
 //!*************************************************************************************************
-//! int main(void)
+//! void function(void)
 //!
 //! @description
-//! Main function.
+//! Function
 //!
 //! @param    None
 //!
 //! @return   None
 //!*************************************************************************************************
-int main(void)
+void saveMap()
 {
-	BOARD_InitPins();
-	BOARD_BootClockRUN();
-	BOARD_InitDebugConsole();
-	PRINTF("Starting board...\r\n");
-
-	startupInit();
-	uint16_t touch_value;
-	uint8_t nextAction = 0;
-
-	PRINTF("Waiting for initialization -> Press capacitive sensor.\r\n");
-
-	while (1)
+	// dynamically allocate field to store coordinates
+	Coordinate **coordinates = (Coordinate **)malloc(ht->count * sizeof(Coordinate *));
+	if (coordinates == NULL) {
+		// handle allocation error
+		return;
+	}
+	// iterate over all allocated blocks and save their coordinates
+	int index = 0;
+	for (int i = 0; i < ht->size; i++)
 	{
-		// Get data from touch sensor
-		TSI0->DATA |= TSI_DATA_SWTS_MASK;
-		while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
+		Node *node = ht->table[i];
+		while (node != NULL)
 		{
-		}
-		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
-		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
-
-		// Wait for initialization
-		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
-		{
-			LED_RED_ON();
-			LED_GREEN_OFF();
-			LED_BLUE_TURN_OFF();
-
-			nextAction++;
-		}
-		// Initial initialization
-		else if (touch_value > 2 && touch_value < 10 && (nextAction == 1))
-		{
-			PRINTF("-----------------\r\n");
-			LED_RED_ON();
-			LED_GREEN_ON();
-
-			startupBoard();
-			//startupPeripherals();
-
-			// todo: Reach the starting line
-			//setWheelToInitPosition();
-			createMap();
-
-			nextAction++;
-			PRINTF("Waiting for routine -> Press capacitive sensor.\r\n");
-		}
-		// Routine
-		else if (touch_value > 2 && touch_value < 10 && (nextAction == 2))
-		{
-			PRINTF("-----------------\r\n");
-			PRINTF("Starting routine.\r\n");
-			LED_RED_OFF();
-			addSpeed();
-
-			while (!IsCmdToStopCar)
-			{
-				routine();
-
-				TSI0->DATA |= TSI_DATA_SWTS_MASK;
-				touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
-				TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
-				if (touch_value > 2 && touch_value < 10)
-				{
-					saveCurrentBlock();
-					break;
-				}
-			}
-
-			// If car stopped, wait for command to continue.
-			nextAction = 3;
-		}
-		// Save created map to SD card
-		else if (touch_value > 2 && touch_value < 10 && (nextAction == 3))
-		{
-			saveMap();
+			coordinates[index] = (Coordinate *)malloc(sizeof(Coordinate));
+			coordinates[index]->x = node->value->corX;
+			coordinates[index]->y = node->value->corY;
+			index++;
+			node = node->next;
 		}
 	}
+
+
 }

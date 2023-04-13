@@ -141,11 +141,12 @@ void routine(void)
 	checkLines();
 	controlUnit();
 
-	//static int i = 0;
-	//PRINTF("Cycle: %i\r\n", i++);
- 	//printBlock();
+	static int i = 0;
+	HalfWheelRotations++;
+	PRINTF("Cycle: %i\r\n", i++);
+ 	printBlock();
 	mapping();
-	//PRINTF("-------------------------------------\r\n");
+	PRINTF("-------------------------------------\r\n");
 }
 
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)

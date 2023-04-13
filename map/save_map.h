@@ -1,14 +1,14 @@
 /**
  ***************************************************************************************************
- * @file    hast_table.h
+ * @file    save_map.h
  * @author  user
- * @date    Mar 20, 2023
+ * @date    Apr 13, 2023
  * @brief   
  ***************************************************************************************************
  */
 
-#ifndef HAST_TABLE_H_
-#define HAST_TABLE_H_
+#ifndef SAVE_MAP_H_
+#define SAVE_MAP_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +17,7 @@ extern "C" {
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
-#include "map/map_operations.h"
+#include "common/hast_table.h"
 
 //**************************************************************************************************
 //* MACROS AND DEFINES
@@ -26,17 +26,6 @@ extern "C" {
 //**************************************************************************************************
 //* TYPEDEFS
 //**************************************************************************************************
-typedef struct Node {
-	int key;
-	map_block *value;
-	struct Node *next;
-} Node;
-
-typedef struct HashTable {
-	int size;
-	int count;
-	Node **table;
-} HashTable;
 
 //**************************************************************************************************
 //* EXPORTED VARIABLES
@@ -45,16 +34,10 @@ typedef struct HashTable {
 //**************************************************************************************************
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
-void createHashTable(int size);
-void deleteHashTable();
-void insertToHashTable(int key, map_block *value);
-map_block *searchItemInHT(int key, int x, int y);
-void deleteItemInHT(int key);
-void resizeHashTable();
-int hash(int key, int size);
+void saveMap();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* HAST_TABLE_H_ */
+#endif /* SAVE_MAP_H_ */
