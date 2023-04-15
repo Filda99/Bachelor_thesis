@@ -52,4 +52,4 @@ uint8_t currentSteer = GO_DIRECT;
 uint8_t g_slave_buff;
 
 //! Buffer for saving data from i2c
-uint8_t glob_data[I2C_DATA_LENGTH];
+uint8_t sensorsDataFromArduino[I2C_DATA_LENGTH];

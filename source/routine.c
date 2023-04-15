@@ -36,11 +36,13 @@ extern unsigned int HalfWheelRotations;
 extern map_block *currentBlockInMap;
 
 extern uint8_t g_slave_buff;
-extern uint8_t glob_data[I2C_DATA_LENGTH];
+extern uint8_t sensorsDataFromArduino[I2C_DATA_LENGTH];
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
+#define EXAMPLE_I2C_DMAMUX_BASEADDR DMAMUX0
+#define EXAMPLE_I2C_DMA_BASEADDR DMA0
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -55,6 +57,10 @@ volatile bool completionFlag = false;
 //**************************************************************************************************
 //* GLOBAL VARIABLES
 //**************************************************************************************************
+uint8_t leftLaserValue = 0;
+uint8_t rightLaserValue = 0;
+uint8_t centerSharpValue = 0;
+
 
 //**************************************************************************************************
 //* STATIC FUNCTION PROTOTYPES
@@ -122,6 +128,54 @@ static void checkLines()
 	}
 }
 
+static void processSensorData()
+{
+	DMAMUX_DisableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
+	for (int i = 0; i < I2C_DATA_LENGTH; i++)
+	{
+		// Left sensor ID
+		if (sensorsDataFromArduino[i] == 0x1)
+		{
+			leftLaserValue = sensorsDataFromArduino[i + 1];
+			i++;
+		}
+		// Right sensor ID
+		else if (sensorsDataFromArduino[i] == 0x2)
+		{
+			rightLaserValue = sensorsDataFromArduino[i + 1];
+			i++;
+		}
+		// Sharp sensor ID
+		else if (sensorsDataFromArduino[i] == 0x3)
+		{
+			centerSharpValue = sensorsDataFromArduino[i + 1];
+			i++;
+		}
+		else
+		{
+			// Left sensor ID
+			if (sensorsDataFromArduino[I2C_DATA_LENGTH-1] == 0x1)
+			{
+				leftLaserValue = sensorsDataFromArduino[i];
+				i++;
+			}
+			// Right sensor ID
+			else if (sensorsDataFromArduino[I2C_DATA_LENGTH-1] == 0x2)
+			{
+				rightLaserValue = sensorsDataFromArduino[i];
+				i++;
+			}
+			// Sharp sensor ID
+			else if (sensorsDataFromArduino[I2C_DATA_LENGTH-1] == 0x3)
+			{
+				centerSharpValue = sensorsDataFromArduino[i];
+				i++;
+			}
+		}
+	}
+	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
+}
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
@@ -147,6 +201,9 @@ void routine(void)
  	printBlock();
 	mapping();
 	PRINTF("-------------------------------------\r\n");
+
+	processSensorData();
+	saveSensorData();
 }
 
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
@@ -168,7 +225,7 @@ void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userDa
             /*  Update information for received process */
             xfer->data = &g_slave_buff;
             xfer->dataSize = 1;
-            glob_data[counter++] = g_slave_buff;
+            sensorsDataFromArduino[counter++] = g_slave_buff;
             break;
 
         /*  Transfer done */
