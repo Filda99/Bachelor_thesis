@@ -31,6 +31,11 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+static int maxTopBlock = 0;
+static int maxBottomBlock = 0;
+int maxLeftBlock = 0;
+// Maybe will not be used
+int maxRightBlock = 0;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -182,6 +187,23 @@ static void moveBetweenBlocks(block_direction direction)
 	}
 
 	currentBlockInMap = pBlockToMove;
+
+	if (currentBlockInMap->corX > maxRightBlock)
+	{
+		maxRightBlock = currentBlockInMap->corX;
+	}
+	else if (currentBlockInMap->corX < maxLeftBlock)
+	{
+		maxLeftBlock = currentBlockInMap->corX;
+	}
+	else if (currentBlockInMap->corY > maxTopBlock)
+	{
+		maxTopBlock = currentBlockInMap->corY;
+	}
+	else if (currentBlockInMap->corY > maxBottomBlock)
+	{
+		maxBottomBlock = currentBlockInMap->corY;
+	}
 }
 
 //**************************************************************************************************

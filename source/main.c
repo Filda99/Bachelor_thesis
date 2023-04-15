@@ -134,14 +134,22 @@ int main(void)
 			{
 				routine();
 
-				TSI0->DATA |= TSI_DATA_SWTS_MASK;
+				static int i = 0;
+				i++;
+				if (i > 15)
+				{
+					saveCurrentBlock();
+					break;
+				}
+
+				/*TSI0->DATA |= TSI_DATA_SWTS_MASK;
 				touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
 				TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
 				if (touch_value > 2 && touch_value < 10)
 				{
 					saveCurrentBlock();
 					break;
-				}
+				}*/
 			}
 
 			// If car stopped, wait for command to continue.
