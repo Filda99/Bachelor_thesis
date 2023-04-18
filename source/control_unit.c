@@ -116,7 +116,7 @@ void controlUnit()
 					goDirect();
 				}
 
-				PRINTF("\t-> Turning right! \r\n");
+				//PRINTF("\t-> Turning right! \r\n");
 				if (currentSteer >= 2)
 				{
 					turnRight();
@@ -163,7 +163,7 @@ void controlUnit()
 					goDirect();
 				}
 
-				PRINTF("\t-> Turning left! \r\n");
+				//PRINTF("\t-> Turning left! \r\n");
 				if (currentSteer <= 4)
 				{
 					turnLeft();

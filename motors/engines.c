@@ -26,7 +26,7 @@ extern uint8_t currentSteer;
 /************************************
  * PRIVATE MACROS AND DEFINES
  ************************************/
-#define STOP			7.365
+#define STOP			7.36500000
 
 #define TURNING_LEFT	0
 #define TURNING_RIGHT	180
@@ -62,6 +62,7 @@ static void getDutyCycle(float setSpeed)
 	if (rightMotorSpeed > STOP)
 	{
 		leftMotorSpeed = STOP - (rightMotorSpeed - STOP);
+		rightMotorSpeed += 0.035;
 	}
 	// Backwards
 	else if (rightMotorSpeed < STOP)
@@ -97,7 +98,7 @@ static void setMotorSpeed(int speed, uint8_t wheelSide, uint8_t slackWheel)
 
 	float slackValue = slackWheel / SLACK_DIV_AMOUNT;
 
-	if (wheelSide == TURNING_LEFT)
+	/*if (wheelSide == TURNING_LEFT)
 	{
 		// Set left motor duty cycle.
 		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
@@ -117,7 +118,7 @@ static void setMotorSpeed(int speed, uint8_t wheelSide, uint8_t slackWheel)
 		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1,
 				kTPM_EdgeAlignedPwm, rightMotorSpeed - slackValue);
 	}
-	else
+	else*/
 	{
 		// Set left motor duty cycle.
 		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0,
@@ -147,7 +148,7 @@ void addSpeed()
 	if (currentSpeed == MAX_FORWARD_ENGINE_LIMIT) return;
 
 	currentSpeed++;
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 void addSpeedCustom(int speed)
@@ -161,7 +162,7 @@ void addSpeedCustom(int speed)
 		currentSpeed += speed;
 	}
 
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 void slackUpSpeed()
@@ -173,7 +174,7 @@ void slackUpSpeed()
 	{
 		currentSpeed = ENGINE_STOP + 1;
 	}
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 void slackUpSpeedCustom(int speed)
@@ -187,7 +188,7 @@ void slackUpSpeedCustom(int speed)
 		currentSpeed -= speed;
 	}
 
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 void slackUpSpeedOnWheel(uint8_t slackAmount)
@@ -199,13 +200,13 @@ void slackUpSpeedOnWheel(uint8_t slackAmount)
 void goBackwards()
 {
 	currentSpeed = MAX_REVERSE_ENGINE_LIMIT;
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 void stopCar()
 {
 	currentSpeed = ENGINE_STOP;
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 void hardStop()
@@ -213,7 +214,7 @@ void hardStop()
 	IsCmdToStopCar = true;
 
 	currentSpeed = ENGINE_STOP;
-	setMotorSpeed(currentSpeed, 0, 0);
+	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
 }
 
 

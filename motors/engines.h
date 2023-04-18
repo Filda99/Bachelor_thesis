@@ -41,9 +41,9 @@ extern "C" {
 static const float SpeedMap[6] = {
 		6.7,		// Backwards
 		7.365, 		// STOP motors
-		7.5,	// Forwards
-		7.72375,		// ...
-		8.0,
+		7.5,		// Forwards
+		7.55,		// ...
+		7.6,
 		8.2
 };
 

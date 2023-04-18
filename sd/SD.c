@@ -29,7 +29,7 @@
 
 uint8 SD_Type =0;
 uint32 Logic_sector;
-uint8 MMCBuf[MMC_BUFF_SIZE];											  // »º´æ
+uint8 MMCBuf[MMC_BUFF_SIZE];											  // ï¿½ï¿½ï¿½ï¿½
 /**************************************************************************************
 * FunctionName   : MMCDelayUs()
 * Description    :software delay
@@ -105,8 +105,8 @@ __inline static uint8 sd_Enable_Select( void )
 
 /**************************************************************************************
 * FunctionName   : MMCWriteCmd()
-* Description    : MMCÃüÁî·¢ËÍ
-* EntryParameter : cmd0 - ÃüÁî0,cmd5 - ÃüÁî5,addr - ¶ÁÐ´µØÖ·
+* Description    : MMCï¿½ï¿½ï¿½î·¢ï¿½ï¿½
+* EntryParameter : cmd0 - ï¿½ï¿½ï¿½ï¿½0,cmd5 - ï¿½ï¿½ï¿½ï¿½5,addr - ï¿½ï¿½Ð´ï¿½ï¿½Ö·
 * ReturnValue    : None
 **************************************************************************************/
 
@@ -115,7 +115,7 @@ uint8 MMCWriteCmd( uint8 cmd, uint32 arg, uint8 crc )
  uint16 cnt=512;
  uint8  sta;
  	MMCCS(1);
-	Send_Byte( 0xff ); //¸ßËÙÐ´ÃüÁîÑÓÊ±
+	Send_Byte( 0xff ); //ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±
 	
 	MMCCS(0);
  if ( sd_Enable_Select() ) // ?????
@@ -145,7 +145,7 @@ uint8 MMCWriteCmd_NoDessert( uint8 cmd, uint32 arg, uint8 crc )
  uint16 cnt=512;
  uint8  sta;
  
-	Send_Byte( 0xff ); //¸ßËÙÐ´ÃüÁîÑÓÊ±
+	Send_Byte( 0xff ); //ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±
 	Send_Byte( 0xff ); 
 	
 	MMCCS(0);
@@ -166,7 +166,7 @@ uint8 MMCWriteCmd_NoDessert( uint8 cmd, uint32 arg, uint8 crc )
 }
 /**************************************************************************************
 * FunctionName   : SSP0LowSpeed()
-* Description    : SSP0µÍËÙ400K
+* Description    : SSP0ï¿½ï¿½ï¿½ï¿½400K
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
@@ -177,7 +177,7 @@ void SSP0LowSpeed(void)
 
 /**************************************************************************************
 * FunctionName   : SSP0HighSpeed()
-* Description    : SSP0¸ßËÙ24M
+* Description    : SSP0ï¿½ï¿½ï¿½ï¿½24M
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
@@ -188,9 +188,9 @@ void SSP0HighSpeed(void)
 
 /**************************************************************************************
 * FunctionName   : MMCInit()
-* Description    : ³õÊ¼»¯SD¿¨£¬²¢·µ»Ø×´Ì¬
+* Description    : ï¿½ï¿½Ê¼ï¿½ï¿½SDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
 * EntryParameter : None
-* ReturnValue    : ·µ»Ø²Ù×÷×´Ì¬£ºÊ§°Ü-1£»³É¹¦-0
+* ReturnValue    : ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½Ê§ï¿½ï¿½-1ï¿½ï¿½ï¿½É¹ï¿½-0
 **************************************************************************************/
 uint8 MMCInit(void)
 {
@@ -198,83 +198,83 @@ uint8 MMCInit(void)
 	uint16 cnt=0;
 	uint8  buff[512];
 	
-	SSP0LowSpeed();			  // µÍËÙ
+	SSP0LowSpeed();			  // ï¿½ï¿½ï¿½ï¿½
 	MMCDelayUs(5000);
 	                                                  
-  for (i=0; i<0x0F; i++) 	// ·¢ËÍÒ»¶¨ÊýÁ¿µÄÊ±ÖÓÂö³å
+  for (i=0; i<0x0F; i++) 	// ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   {
-      Send_Byte(0xFF);                                // ·¢ËÍÖÁÉÙ74¸öÊ±ÖÓ
+      Send_Byte(0xFF);                                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½74ï¿½ï¿½Ê±ï¿½ï¿½
   }
-	// SD¿¨¸´Î»µ½idle¿ªÊ¼ Ñ­»··¢ËÍCMD0,ÖªµÀSD¿¨·µ»Ø0X01£¬½øÈëIDLE×´Ì¬£¬³¬Ê±ÍË³ö
+	// SDï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½idleï¿½ï¿½Ê¼ Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CMD0,Öªï¿½ï¿½SDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0X01ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDLE×´Ì¬ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ë³ï¿½
 	// Send Command CMD0 to SD/SD Card
 	do
 	{
-	    tmp = MMCWriteCmd(CMD0,0x00,0x95);   // CMD0   ÏìÓ¦Îª01
+	    tmp = MMCWriteCmd(CMD0,0x00,0x95);   // CMD0   ï¿½ï¿½Ó¦Îª01
 		  k++;
 	}while ((tmp != 1) && (k < 200));
 	 
 	if(k == 0)
   {
-	  MMCCS(1);	//cs À­¸ß£¬ËµÃ÷Ã»Á¬ÉÏ
+	  MMCCS(1);	//cs ï¿½ï¿½ï¿½ß£ï¿½Ëµï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½
 		Send_Byte(0xFF);
-		printf("\n SD reset fail");
+		////printf("\n SD reset fail");
 	  return 1;// 
 	}		
-    //-----------------SD¿¨¸´Î»µ½idle½áÊø-----
-    //»ñÈ¡¿¨Æ¬SD°æ±¾ÐÅÏ¢
+    //-----------------SDï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½idleï¿½ï¿½ï¿½ï¿½-----
+    //ï¿½ï¿½È¡ï¿½ï¿½Æ¬SDï¿½æ±¾ï¿½ï¿½Ï¢
 	 tmp = MMCWriteCmd( CMD8,0x1AA,0x87 ); 
-	 printf( "SD_CMD8  return  %d........\n\n", tmp );  
-	if(tmp == 1)// ËµÃ÷ÊÇ2.0¿¨
+	 //printf( "SD_CMD8  return  %d........\n\n", tmp );
+	if(tmp == 1)// Ëµï¿½ï¿½ï¿½ï¿½2.0ï¿½ï¿½
 	{
     cnt=0xffff;
-		//·¢¿¨³õÊ¼»¯Ö¸ÁîCMD55+ACMD41
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ö¸ï¿½ï¿½CMD55+ACMD41
    do 
    {
     MMCWriteCmd( CMD55, 0, 0xff );
     tmp = MMCWriteCmd( 41,0x40000000, 0xff);//CMD41   MMCWriteCmd( 41,0x40000000, 0xff);
     cnt--;
    } while ((tmp) && (cnt));
-	 //³õÊ¼»¯Ö¸Áî·¢ËÍÍê³É£¬½ÓÏÂÀ´»ñÈ¡OCRÐÅÏ¢
+	 //ï¿½ï¿½Ê¼ï¿½ï¿½Ö¸ï¿½î·¢ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡OCRï¿½ï¿½Ï¢
 	 tmp = MMCWriteCmd(CMD58, 0, 0 );
    if ( tmp != 0x00 ) 
    {
-	  MMCCS(1);	//cs À­¸ß£¬ËµÃ÷Ã»Á¬ÉÏ
-		printf( "\nSD_CMD58 return  %d....\n", tmp );
+	  MMCCS(1);	//cs ï¿½ï¿½ï¿½ß£ï¿½Ëµï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½
+		//printf( "\nSD_CMD58 return  %d....\n", tmp );
 	  return 1;//
    }
-//¶ÁOCRÖ¸Áî·¢³öºó£¬½ô½Ó×ÅÊÇ4×Ö½ÚµÄOCRÐÅÏ¢
+//ï¿½ï¿½OCRÖ¸ï¿½î·¢ï¿½ï¿½ï¿½ó£¬½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½Ö½Úµï¿½OCRï¿½ï¿½Ï¢
    for ( i = 0; i < 4; i++ ) 
    {
     buff[ i ] = Get_Byte();
    }
-	//OCR½ÓÊÕÍê³É£¬Æ¬Ñ¡ÖÃ¸ß
+	//OCRï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½Æ¬Ñ¡ï¿½Ã¸ï¿½
    MMCCS(1);
 	// Send_Byte( 0xff );
-   printf( "OCR return: %x %x %x %x....\n\n", buff[0],buff[1],buff[2],buff[3] );
+   //printf( "OCR return: %x %x %x %x....\n\n", buff[0],buff[1],buff[2],buff[3] );
 
    if ( buff[0] & 0x40 )
    {
 		 SD_Type = SD_TYPE_V2HC;
-     printf( "card is V2.0 SDHC.....\n\n" );
+     //printf( "card is V2.0 SDHC.....\n\n" );
    }
    else {
 		 SD_Type = SD_TYPE_V2;
-     printf( "card is V2.0.....\n\n" );
+     //printf( "card is V2.0.....\n\n" );
 
    }	 
    while(MMCWriteCmd(CMD16,512,0xff)!=0);
 	 MMCWriteCmd(CMD9,0,0xff);
   }
-	SSP0HighSpeed();								   // ¸ßËÙ	
+	SSP0HighSpeed();								   // ï¿½ï¿½ï¿½ï¿½	
 	MMCCS(1);	
 	return 0;                        
 }
 
 /**************************************************************************************
 * FunctionName   : MMCCSD_CID()
-* Description    : CSD-Ö¸ÁîÐÅºÅ±àÒëÂë£»CID-Í¨µÀ±àÒëÂë¡£¼Ä´æÆ÷³¤¶ÈÎª128
-* EntryParameter : cmd - Ö¸Áî£ºCMD9 - CSD ; CMD10 - CID¡£buf - »º³å
-* ReturnValue    : ·µ»Ø²Ù×÷×´Ì¬£ºÊ§°Ü-1£»³É¹¦-0
+* Description    : CSD-Ö¸ï¿½ï¿½ï¿½ÅºÅ±ï¿½ï¿½ï¿½ï¿½ë£»CID-Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë¡£ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª128
+* EntryParameter : cmd - Ö¸ï¿½î£ºCMD9 - CSD ; CMD10 - CIDï¿½ï¿½buf - ï¿½ï¿½ï¿½ï¿½
+* ReturnValue    : ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½Ê§ï¿½ï¿½-1ï¿½ï¿½ï¿½É¹ï¿½-0
 **************************************************************************************/
 uint8 MMCCSD_CID(uint8 cmd, uint8 *buf)
 {
@@ -282,7 +282,7 @@ uint8 MMCCSD_CID(uint8 cmd, uint8 *buf)
 	
 	if (MMCWriteCmd(cmd,0x00,0xFF) != 0x00)
 	{
-	    return 1;                                    // ¶ÁÈ¡Ê§°Ü
+	    return 1;                                    // ï¿½ï¿½È¡Ê§ï¿½ï¿½
 	}
 	
 	for (i=0; i<16; i++)
@@ -290,14 +290,14 @@ uint8 MMCCSD_CID(uint8 cmd, uint8 *buf)
 	    *buf++ = Send_Byte(0xFF);
 	}
 	
-	return 0;                                        // ³É¹¦·µ
+	return 0;                                        // ï¿½É¹ï¿½ï¿½ï¿½
 }
 
 /**************************************************************************************
 * FunctionName   : MMCReadSingleBolck()
-* Description    : ¶ÁÈ¡Ò»ÉÈÇøÊý¾Ýµ½buffer»º³åÖÐ
+* Description    : ï¿½ï¿½È¡Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 * EntryParameter : None
-* ReturnValue    : ·µ»Ø²Ù×÷×´Ì¬£ºÊ§°Ü-1£»³É¹¦-0
+* ReturnValue    : ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½Ê§ï¿½ï¿½-1ï¿½ï¿½ï¿½É¹ï¿½-0
 **************************************************************************************/
 uint8 MMCReadSingleBolck(uint32 addr,uint8 *buf)
 {
@@ -316,19 +316,19 @@ uint8 MMCReadSingleBolck(uint32 addr,uint8 *buf)
 
 	while (Get_Byte() != 0xFE)
 	{
-	    ;			                                 // µÈ´ýÊý¾Ý½ÓÊÜ¿ªÊ¼£¬ÊÜµ½0xFE±íÊ¾¿ªÊ¼
+	    ;			                                 // ï¿½È´ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½Ü¿ï¿½Ê¼ï¿½ï¿½ï¿½Üµï¿½0xFEï¿½ï¿½Ê¾ï¿½ï¿½Ê¼
 	}
 	
   if(sta == 0)
 	{
-	  for (i=0; i<512; i++)                            // ¶ÁÈ¡Êý¾Ý
+	  for (i=0; i<512; i++)                            // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 	  {
 	    buf[i] = Send_Byte(0xFF);
 	  }	
 	}
 
 	
-	Send_Byte(0xFF);			                         // È¡×ßCRC×Ö½Ú
+	Send_Byte(0xFF);			                         // È¡ï¿½ï¿½CRCï¿½Ö½ï¿½
 	Send_Byte(0xFF);
 	
 	MMCCS(1);
@@ -337,9 +337,9 @@ uint8 MMCReadSingleBolck(uint32 addr,uint8 *buf)
 
 /**************************************************************************************
 * FunctionName   : MMCReadMultipleBolck()
-* Description    : ¶ÁÈ¡Ò»ÉÈÇøÊý¾Ýµ½buffer»º³åÖÐ
+* Description    : ï¿½ï¿½È¡Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 * EntryParameter : None
-* ReturnValue    : ·µ»Ø²Ù×÷×´Ì¬£ºÊ§°Ü-1£»³É¹¦-0
+* ReturnValue    : ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½Ê§ï¿½ï¿½-1ï¿½ï¿½ï¿½É¹ï¿½-0
 **************************************************************************************/
 uint8 MMCReadMultipleBolck(uint32 addr,uint8 *buf,uint8 count)
 {
@@ -349,9 +349,9 @@ uint8 MMCReadMultipleBolck(uint32 addr,uint8 *buf,uint8 count)
 		  addr= addr<<9;
 		}
 		
-	if (MMCWriteCmd(CMD18,addr,0xFF) != 0x00)        // ·¢ËÍCMD18
+	if (MMCWriteCmd(CMD18,addr,0xFF) != 0x00)        // ï¿½ï¿½ï¿½ï¿½CMD18
 	{
-	    return 1;                                    // ¶ÁÈ¡Ê§°Ü
+	    return 1;                                    // ï¿½ï¿½È¡Ê§ï¿½ï¿½
 	}
 	
 	MMCCS(0);
@@ -359,28 +359,28 @@ uint8 MMCReadMultipleBolck(uint32 addr,uint8 *buf,uint8 count)
 	{
 	    while (Send_Byte(0xFF) != 0xFE)
 	    {
-	        ;			                             // µÈ´ýÊý¾Ý½ÓÊÜ¿ªÊ¼£¬ÊÜµ½0xFE±íÊ¾¿ªÊ¼
+	        ;			                             // ï¿½È´ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½Ü¿ï¿½Ê¼ï¿½ï¿½ï¿½Üµï¿½0xFEï¿½ï¿½Ê¾ï¿½ï¿½Ê¼
 	    }
 	
-	    for (i=0; i<512; i++)                        // ¶ÁÈ¡Êý¾Ý
+	    for (i=0; i<512; i++)                        // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 	    {
 	        *buf++ = Send_Byte(0xFF);
 	    }
 	
-	    Send_Byte(0xFF);			                     // È¡×ßCRC×Ö½Ú
+	    Send_Byte(0xFF);			                     // È¡ï¿½ï¿½CRCï¿½Ö½ï¿½
 	    Send_Byte(0xFF);
 	
 	}while (--count);
 	
 	MMCCS(1);
-	MMCWriteCmd(CMD12,0x00,0xFF);                    // CMD12·¢ËÍÍ£Ö¹ÃüÁî
+	MMCWriteCmd(CMD12,0x00,0xFF);                    // CMD12ï¿½ï¿½ï¿½ï¿½Í£Ö¹ï¿½ï¿½ï¿½ï¿½
 	Send_Byte(0xFF);//delay
 	return 0;
 }
 
 /**************************************************************************************
 * FunctionName   : MMCWriteSingleBlock()
-* Description    : °ÑbufferÖÐµÄÊý¾ÝÐ´ÈëÒ»¸öÉÈÇøÖÐ
+* Description    : ï¿½ï¿½bufferï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
@@ -395,49 +395,49 @@ uint8 MMCWriteSingleBlock(uint32 addr,const uint8 *buf)
     }
 		
 		
-	if (MMCWriteCmd(CMD24,addr,0x01) != 0x00)         // ·¢ËÍCMD24µ½SD¿¨ÖÐÈ¥
+	if (MMCWriteCmd(CMD24,addr,0x01) != 0x00)         // ï¿½ï¿½ï¿½ï¿½CMD24ï¿½ï¿½SDï¿½ï¿½ï¿½ï¿½È¥
 	{
-	    return 1;                                     // Ð´ÈëÊ§°Ü
+	    return 1;                                     // Ð´ï¿½ï¿½Ê§ï¿½ï¿½
 	}
 	
 	MMCCS(0);
-	//ÏÈ·ÅÈý¸ö¿ÕÊý¾Ý£¬µÈSD¿¨×¼±¸ºÃ
-	Send_Byte(0xFF);                                    // ·¢ËÍÌî³å×Ö½Ú
+	//ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½SDï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½
+	Send_Byte(0xFF);                                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½
 	Send_Byte(0xFF);
 	Send_Byte(0xFF); 
-//·ÅÆðÊ¼ÁîÅÆ0XFE	
-	Send_Byte(0xFE);  	                // ·¢ËÍÊý¾Ý¿ªÊ¼±êÖ¾0XFE
-	//·ÅÒ»¸ösectoreµÄÊý¾Ý
-	for (i=0; i<512; i++)                             // Ð´ÈëÊý¾Ý
+//ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½0XFE	
+	Send_Byte(0xFE);  	                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½Ê¼ï¿½ï¿½Ö¾0XFE
+	//ï¿½ï¿½Ò»ï¿½ï¿½sectoreï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	for (i=0; i<512; i++)                             // Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 	    Send_Byte(buf[i]);
 	}
-	//·¢Á½¸öByteµÄDummy CRC
-	Send_Byte(0xFF);			                          // Ð´ÈëCRC×Ö½Ú
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Byteï¿½ï¿½Dummy CRC
+	Send_Byte(0xFF);			                          // Ð´ï¿½ï¿½CRCï¿½Ö½ï¿½
 	Send_Byte(0xFF);
-	//µÈ´ýSD¿¨Ó¦´ð
-	temp = Send_Byte(0xFF);		                      // ¶ÁÈ¡XXX0 0101×Ö½Ú
+	//ï¿½È´ï¿½SDï¿½ï¿½Ó¦ï¿½ï¿½
+	temp = Send_Byte(0xFF);		                      // ï¿½ï¿½È¡XXX0 0101ï¿½Ö½ï¿½
 	temp &= 0x1F;
 	
 	if (temp != 0x05)
 	{
 		  MMCCS(1);
-	    return 1; 				                      // Ð´ÈëÊ§°Ü
+	    return 1; 				                      // Ð´ï¿½ï¿½Ê§ï¿½ï¿½
 	}
 	
-	//µÈ´ý²Ù×÷Íê³É
+	//ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	while (Send_Byte(0xFF) == 0x00)
 	{
 	            retry++;
         
-        if(retry>0xfffe)//³¤Ê±¼äÃ»ÓÐÐ´ÈëÍê³É£¬±¨´íÍË³ö
+        if(retry>0xfffe)//ï¿½ï¿½Ê±ï¿½ï¿½Ã»ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½
         {
             MMCCS(1);
             return 1 ;
-            //Ð´Èë³¬Ê±·µ»Ø1
+            //Ð´ï¿½ë³¬Ê±ï¿½ï¿½ï¿½ï¿½1
         }
 	}
-	//Ð´ÈëÍê³É£¬Æ¬Ñ¡ÖÃ1
+	//Ð´ï¿½ï¿½ï¿½ï¿½É£ï¿½Æ¬Ñ¡ï¿½ï¿½1
 	MMCCS(1);
 	Send_Byte(0xFF);
 	return 0;
@@ -459,7 +459,7 @@ uint8 SD_WaitReady(void)
 
 /**************************************************************************************
 * FunctionName   : MMCWriteMultipleBlock()
-* Description    : °ÑbufferÖÐµÄÊý¾ÝÐ´ÈëÒ»¸öÉÈÇøÖÐ
+* Description    : ï¿½ï¿½bufferï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
@@ -471,61 +471,61 @@ uint8 MMCWriteMultipleBlock(uint32 addr,const uint8 *buf,uint8 count)
 		{
 		  addr= addr<<9;
 		}
-	//Èç¹ûÄ¿±ê¿¨²»ÊÇMMC¿¨£¬ÆôÓÃACMD23Ö¸ÁîÊ¹ÄÜÔ¤²Á³ý
+	//ï¿½ï¿½ï¿½Ä¿ï¿½ê¿¨ï¿½ï¿½ï¿½ï¿½MMCï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ACMD23Ö¸ï¿½ï¿½Ê¹ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½
 	   if(SD_Type!=SD_TYPE_MMC)
     {
         tmp=MMCWriteCmd(CMD23,count,0x00);
     }
-//·¢¶à¿éÐ´ÈëÖ¸Áî
-	if (MMCWriteCmd(CMD25,addr,0xFF) != 0x00)        // ·¢ËÍCMD25µ½SD¿¨ÖÐÈ¥
+//ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Ö¸ï¿½ï¿½
+	if (MMCWriteCmd(CMD25,addr,0xFF) != 0x00)        // ï¿½ï¿½ï¿½ï¿½CMD25ï¿½ï¿½SDï¿½ï¿½ï¿½ï¿½È¥
 	{
-	    return 1;                                    // Ð´ÈëÊ§°Ü
+	    return 1;                                    // Ð´ï¿½ï¿½Ê§ï¿½ï¿½
 	}
 
-//×¼±¸¿ªÊ¼Êý¾Ý´«Êä
+//×¼ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ï¿½
 		MMCCS(0);
-	//·Å¿ÕÊý¾Ý£¬µÈ´ýSD¿¨×¼±¸ºÃ
+	//ï¿½Å¿ï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½È´ï¿½SDï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½
 	Send_Byte(0xFF);
 	Send_Byte(0xFF);
 	
-	//ÏÂÃæÊÇN¸ösectorÐ´ÈëµÄÑ­»·²¿·Ö
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½sectorÐ´ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	do
 	{
-		//·ÅÆðÊ¼ÁîÅÆ0XFC£¬ ±íÃæÊÇ¶à¿éÐ´Èë
+		//ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½0XFCï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½ï¿½Ð´ï¿½ï¿½
 		Send_Byte(0xFC);                               // Send start block token 0xfc (0x11111100)
-		//·ÅÒ»¸ösectorµÄÊý¾Ý
-		for (i=0; i<512; i++)                        // Ð´ÈëÊý¾Ý
+		//ï¿½ï¿½Ò»ï¿½ï¿½sectorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		for (i=0; i<512; i++)                        // Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		{
 		    Send_Byte(*buf++);
 		}
-		//·¢Á½¸öByteµÄdummy CRC
-		Send_Byte(0xFF);			                     // Ð´ÈëCRC×Ö½Ú
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Byteï¿½ï¿½dummy CRC
+		Send_Byte(0xFF);			                     // Ð´ï¿½ï¿½CRCï¿½Ö½ï¿½
 		Send_Byte(0xFF);
-		//µÈ´ýSD¿¨Ó¦´ð
-		tmp = Send_Byte(0xFF);		                 // ¶ÁÈ¡XXX0 0101×Ö½Ú
+		//ï¿½È´ï¿½SDï¿½ï¿½Ó¦ï¿½ï¿½
+		tmp = Send_Byte(0xFF);		                 // ï¿½ï¿½È¡XXX0 0101ï¿½Ö½ï¿½
 		tmp &= 0x1F;
 		if (tmp != 0x05)
 		{
 			 MMCCS(1);
-		    return 1; 				                 // Ð´ÈëÊ§°Ü
+		    return 1; 				                 // Ð´ï¿½ï¿½Ê§ï¿½ï¿½
 		}
 		
-		//µÈ´ýSD¿¨Ð´ÈëÍê³É
+		//ï¿½È´ï¿½SDï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½
 		while (SD_WaitReady() == 0x01)
 		{
 			MMCCS(1);
-			//µÈ´ýSD¿¨Ð´ÈëÍê³É³¬Ê±£¬Ö±½ÓÍË³ö±¨´í
+			//ï¿½È´ï¿½SDï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½É³ï¿½Ê±ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½
 	  	 return 1;
 		}
 	}while (--count);
 	
-	//·¢ËÍ½áÊø´«ÊäÁîÅÆ0XFD
+	//ï¿½ï¿½ï¿½Í½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0XFD
 	Send_Byte(0xFD);                                   // send 'stop transmission token'
     if(SD_WaitReady())
     {
         while(1){}
     }
-//Ð´ÈëÍê³É£¬Æ¬Ñ¡ÖÃ1
+//Ð´ï¿½ï¿½ï¿½ï¿½É£ï¿½Æ¬Ñ¡ï¿½ï¿½1
 		MMCCS(1);
 	Send_Byte(0xFF);
 		

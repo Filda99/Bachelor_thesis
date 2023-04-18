@@ -75,7 +75,7 @@ extern bool IsCmdToStopCar;
 //!*************************************************************************************************
 int main(void)
 {
-	BOARD_InitPins();
+  	BOARD_InitPins();
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
 	PRINTF("Starting board...\r\n");
@@ -95,6 +95,7 @@ int main(void)
 		}
 		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
 		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
+		//touch_value = 3;
 
 		// Wait for initialization
 		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
@@ -113,7 +114,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
-			//startupPeripherals();
+			startupPeripherals();
 
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
@@ -134,23 +135,15 @@ int main(void)
 			{
 				routine();
 
-				static int i = 0;
+			/*	static int i = 0;
 				i++;
-				if (i > 15)
-				{
-					saveCurrentBlock();
-					break;
-				}
-
-				/*TSI0->DATA |= TSI_DATA_SWTS_MASK;
-				touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
-				TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
-				if (touch_value > 2 && touch_value < 10)
+				if (i > 3)
 				{
 					saveCurrentBlock();
 					break;
 				}*/
 			}
+			saveCurrentBlock();
 
 			// If car stopped, wait for command to continue.
 			nextAction = 3;
@@ -158,6 +151,7 @@ int main(void)
 		// Save created map to SD card
 		else if (touch_value > 2 && touch_value < 10 && (nextAction == 3))
 		{
+			DisableIRQ(MAIN_SEN_TPM_IRQ);
 			saveMap();
 		}
 	}

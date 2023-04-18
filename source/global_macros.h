@@ -29,10 +29,10 @@ extern "C" {
 
 //* User defined, how many rows should one map block have
 //! Keep it odd!
-#define MAP_ROWS		5
+#define MAP_ROWS		2
 //* User defined, how many columns should one map block have
 	//! Keep it odd!
-#define MAP_COLUMNS		5
+#define MAP_COLUMNS		2
 
 //* First useable row
 #define MAP_BLOCK_MIN_ROW	0
@@ -83,7 +83,7 @@ extern "C" {
 #define MAX_CNT_ON_LINE	3
 // The number that tells us after how long we should increase the speed
 // if there is no line
-#define CNT_OUT_OF_LANE 100
+#define CNT_OUT_OF_LANE 20
 
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	100
@@ -91,7 +91,7 @@ extern "C" {
 /*************************************/
 // Engine
 /*************************************/
-#define MAX_FORWARD_ENGINE_LIMIT	6
+#define MAX_FORWARD_ENGINE_LIMIT	2//6
 #define MAX_REVERSE_ENGINE_LIMIT	0
 
 #define MAX_STEER_RIGHT		0

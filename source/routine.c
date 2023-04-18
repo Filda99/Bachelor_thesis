@@ -18,6 +18,7 @@
 #include "fsl_tpm.h"
 #include "fsl_gpio.h"
 #include "fsl_debug_console.h"
+#include "fsl_dmamux.h"
 
 #include "control_unit.h"
 #include "map/mapping.h"
@@ -43,6 +44,7 @@ extern uint8_t sensorsDataFromArduino[I2C_DATA_LENGTH];
 //**************************************************************************************************
 #define EXAMPLE_I2C_DMAMUX_BASEADDR DMAMUX0
 #define EXAMPLE_I2C_DMA_BASEADDR DMA0
+#define I2C_DMA_CHANNEL 0U
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -114,11 +116,16 @@ static void checkLines()
 	if (RightSensorValue > COLOR_TRESHOLD && RightSensorValue < 400)
 	{
 		LineDetected |= LineRight;
-		if (CenterSensorValue > COLOR_TRESHOLD && CenterSensorValue < 400)
+		if (CenterSensorValue > COLOR_TRESHOLD && CenterSensorValue < 130)
 		{
 			LineDetected = LineCenter_Right;
 		}
 		isLineDetected = true;
+	}
+
+	if (CenterSensorValue > 140 && RightSensorValue > 140 && LeftSensorValue > 140 && HalfWheelRotations > 150)
+	{
+		hardStop();
 	}
 
 
@@ -176,6 +183,25 @@ static void processSensorData()
 	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
 }
 
+static void checkStop()
+{
+	static uint8_t count = 0;
+
+	if (centerSharpValue <= 20)
+	{
+		count++;
+	}
+
+	if (count > 5)
+	{
+		hardStop();
+	}
+	if (centerSharpValue <= 15)
+	{
+		hardStop();
+	}
+}
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
@@ -195,15 +221,18 @@ void routine(void)
 	checkLines();
 	controlUnit();
 
-	static int i = 0;
-	HalfWheelRotations++;
-	PRINTF("Cycle: %i\r\n", i++);
- 	printBlock();
-	mapping();
-	PRINTF("-------------------------------------\r\n");
+	//mapping();
 
-	processSensorData();
-	saveSensorData();
+	//static int i = 0;
+	//HalfWheelRotations++;
+	//PRINTF("Cycle: %i\r\n", i++);
+ 	//printBlock();
+	//mapping();
+	//PRINTF("-------------------------------------\r\n");
+
+	//processSensorData();
+	//checkStop();
+	//saveSensorData();
 }
 
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
