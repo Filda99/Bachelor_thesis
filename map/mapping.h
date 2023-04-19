@@ -40,6 +40,7 @@ typedef struct
 //* GLOBAL FUNCTION PROTOTYPES
 //**************************************************************************************************
 void mapping(void);
+void saveSensorData(void);
 
 
 #ifdef __cplusplus

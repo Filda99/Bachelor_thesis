@@ -95,7 +95,7 @@ int main(void)
 		}
 		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
 		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
-		//touch_value = 3;
+		touch_value = 3;
 
 		// Wait for initialization
 		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
@@ -114,7 +114,7 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
-			startupPeripherals();
+			//startupPeripherals();
 
 			// todo: Reach the starting line
 			//setWheelToInitPosition();
@@ -135,13 +135,12 @@ int main(void)
 			{
 				routine();
 
-			/*	static int i = 0;
+				static int i = 0;
 				i++;
 				if (i > 3)
 				{
-					saveCurrentBlock();
 					break;
-				}*/
+				}
 			}
 			saveCurrentBlock();
 

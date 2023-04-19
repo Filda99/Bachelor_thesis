@@ -27,6 +27,11 @@ extern "C" {
  * TYPEDEFS
  ************************************/
 
+typedef enum {
+	sensor_Left = 1,
+	sensor_Right = 2
+}sensor_side;
+
 //* Map possible objects
 typedef enum _map_object {
   map_Empty = 0U,	///< We don't know, what is here yet
@@ -82,6 +87,7 @@ typedef struct
 void createMap(void);
 void saveCurrentBlock();
 void moveInMap(map_move_direction direction);
+void getBlock(sensor_side laserSide, uint8_t value, float angle);
 
 #ifdef __cplusplus
 }

@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include "utilities/fsl_debug_console.h"
 #include "common/hast_table.h"
+#include "math.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -474,4 +475,19 @@ void moveInMap(map_move_direction direction)
 			break;
 	}
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
+}
+
+void getBlock(sensor_side laserSide, uint8_t value, float angle)
+{
+	if (value != 0)
+	{
+		uint8_t bc = tanf(angle * M_PI / 180.0) * value;
+		uint8_t ab = 1.0 / tanf(angle * M_PI / 180.0) * value;
+	}
+	else
+	{
+		value;
+	}
+
+
 }

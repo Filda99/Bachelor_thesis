@@ -123,9 +123,14 @@ static void checkLines()
 		isLineDetected = true;
 	}
 
-	if (CenterSensorValue > 140 && RightSensorValue > 140 && LeftSensorValue > 140 && HalfWheelRotations > 150)
+
+	PRINTF("C: %i ", CenterSensorValue);
+	PRINTF("L: %i ", LeftSensorValue);
+	PRINTF("R: %i \r\n", RightSensorValue);
+
+	if (CenterSensorValue > 60 && RightSensorValue > 60 && LeftSensorValue > 60)
 	{
-		hardStop();
+		//hardStop();
 	}
 
 
@@ -221,7 +226,7 @@ void routine(void)
 	checkLines();
 	controlUnit();
 
-	//mapping();
+	mapping();
 
 	//static int i = 0;
 	//HalfWheelRotations++;
@@ -230,9 +235,9 @@ void routine(void)
 	//mapping();
 	//PRINTF("-------------------------------------\r\n");
 
-	//processSensorData();
+	processSensorData();
 	//checkStop();
-	//saveSensorData();
+	saveSensorData();
 }
 
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)

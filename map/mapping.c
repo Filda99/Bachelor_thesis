@@ -31,6 +31,9 @@ extern uint8_t currentPosCols;
 
 extern curr_pos_map currPosInBlk;
 
+extern uint8_t leftLaserValue;
+extern uint8_t rightLaserValue;
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -40,7 +43,6 @@ extern curr_pos_map currPosInBlk;
 #define TURNING_LEFT	0
 #define TURNING_RIGHT	180
 
-# define M_PI           3.14159265358979323846
 #define STARTING_HEADING_ANGLE	 0
 
 //**************************************************************************************************
@@ -143,7 +145,13 @@ static float calcNewDistance(uint8_t turningSide)
 	}
 
 	prevNoWheelRot = HalfWheelRotations;
+
+	if ((int)(angleHeading*180/M_PI) >= 360)
+	{
+		hardStop();
+	}
 	angleHeading = fmodf(angleHeading*180/M_PI, 360.0)*M_PI/180;
+
 	return newDistance;
 }
 
@@ -362,9 +370,18 @@ void mapping()
 	PRINTF("Distance traveled: %d\r\n", totalDistanceTraveled);
 	PRINTF("Coordinates: %d, %d\r\n", (int)newPos.x, (int)newPos.y);
     PRINTF("Center of circle coordinates: %d, %d\r\n", (int)centerOfCircle[X], (int)centerOfCircle[Y]);
-    if ((int)(angleHeading*180/M_PI) >= 360)
+}
+
+void saveSensorData(void)
+{
+
+	if (leftLaserValue < 250)
 	{
-		hardStop();
+		getBlock(0x1, leftLaserValue, angleHeading);
+	}
+	if (rightLaserValue < 250)
+	{
+		getBlock(0x2, rightLaserValue, angleHeading);
 	}
 }
 

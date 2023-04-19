@@ -13,11 +13,14 @@
 #include "save_map.h"
 #include "map_operations.h"
 #include "fsl_spi.h"
-#include <stdlib.h>
 #include "SD.h"
 #include "diskio.h"
 #include "ff.h"
 #include "utilities/fsl_debug_console.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -35,6 +38,8 @@ extern int maxRightBlock;
 #define EXAMPLE_SPI_MASTER_SOURCE_CLOCK kCLOCK_BusClk
 #define EXAMPLE_SPI_MASTER_CLK_FREQ CLOCK_GetFreq(kCLOCK_BusClk)
 
+#define BUFFER_SIZE 15
+
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
 //**************************************************************************************************
@@ -46,8 +51,6 @@ typedef struct {
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
-static const char file_name[]="Map.csv";
-static FIL	file;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -61,11 +64,36 @@ static FIL	file;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-static void initSPI()
+static void insertValue(uint8_t newValue, char **stringPtr, size_t *currentSizePtr) {
+    // Convert uint8_t value to string and add ", "
+    char valueStr[4] = " , ";
+    //snprintf(valueStr, sizeof(valueStr), "%d, ", newValue);
+    if (newValue == 0)
+    	valueStr[0] = '0';
+    else if (newValue == 1)
+    	valueStr[0] = '1';
+    else if (newValue == 2)
+    	valueStr[0] = '2';
+
+    // Calculate new string size and reallocate memory
+    size_t valueSize = strlen(valueStr);
+    size_t newSize = *currentSizePtr + valueSize;
+    *stringPtr = (char*)realloc(*stringPtr, newSize + 1);
+    if (*stringPtr == NULL) {
+        // Handle allocation error
+        //exit(EXIT_FAILURE);
+    }
+
+    // Append new value to string and update size
+    strcat(*stringPtr, valueStr);
+    *currentSizePtr += valueSize;
+}
+
+/*static void initSPI()
 {
 	spi_master_config_t masterConfig = {0};
 	uint32_t sourceClock = 0U;
-	/*
+
 	 * masterConfig.enableStopInWaitMode = false;
 	 * masterConfig.polarity = kSPI_ClockPolarityActiveHigh;
 	 * masterConfig.phase = kSPI_ClockPhaseFirstEdge;
@@ -76,13 +104,13 @@ static void initSPI()
 	 * masterConfig.pinMode = kSPI_PinModeNormal;
 	 * masterConfig.outputMode = kSPI_SlaveSelectAutomaticOutput;
 	 * masterConfig.baudRate_Bps = 500000U;
-	 */
+
 	SPI_MasterGetDefaultConfig(&masterConfig);
 	sourceClock = EXAMPLE_SPI_MASTER_CLK_FREQ;
 	SPI_MasterInit(EXAMPLE_SPI_MASTER, &masterConfig, sourceClock);
-}
+}*/
 
-static bool openFile()
+/*static bool openFile()
 {
 	FATFS 	fs;
 	FRESULT fr;
@@ -118,35 +146,11 @@ static bool closeFile()
 	}
 
 	return true;
-}
-
-static bool writeToFile(uint8_t data)
-{
-	FRESULT fr;
-	UINT 	bw;
-
-	if (data == 0)
-		fr = f_write(&file, "0, \r", 4, &bw);
-	else if (data == 1)
-		fr = f_write(&file, "1, \r", 4, &bw);
-	else if (data == 2)
-		fr = f_write(&file, "2, \r", 4, &bw);
-	else
-		fr = f_write(&file, "-, \r", 4, &bw);
+}*/
 
 
-/*	fr = f_write(&file, charToBeSend, sizeof(charToBeSend), &bw);*/
-	PRINTF("Saving: %i\r\n", data);
-	if(fr)
-	{
-		PRINTF("-> Error write text file\r\n");
-		return false;
-	}
-	return true;
-}
 
-
-static void saveBlocks(map_block* blockBuffer, int bufferCount)
+static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr, size_t *currentSizePtr)
 {
 	int rowIndexBuffer = 0;			// Starting index of block row in block field of a row we are processing
 	int processingRowInBlock = 0;	// Stores number of row which we are currently processing
@@ -162,7 +166,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount)
 			// Print the gap
 			for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 			{
-				writeToFile(0);
+				insertValue(0, stringPtr, currentSizePtr);
 			}
 		}
 		// If we are processing the subset of the blocks which are on the same row
@@ -174,7 +178,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount)
 				// Print the gap
 				for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 				{
-					writeToFile(0);
+					insertValue(0, stringPtr, currentSizePtr);
 				}
 			}
 			prevProcessedBlockColumn = blockBuffer[indexBuffer].corX;
@@ -182,7 +186,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount)
 			// Print the current processing row
 			for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 			{
-				writeToFile(blockBuffer[indexBuffer].block[processingRowInBlock][columnBlock]);
+				insertValue(blockBuffer[indexBuffer].block[processingRowInBlock][columnBlock], stringPtr, currentSizePtr);
 			}
 		}
 
@@ -255,6 +259,63 @@ static void sort_coordinates(map_block* block, int num_coords) {
     }
 }
 
+static void writeStringToSD(char **stringPtr, size_t *currentSizePtr)
+{
+    spi_master_config_t masterConfig = {0};
+    uint32_t sourceClock = 0U;
+    FATFS 	fs;
+	FRESULT fr;
+	FIL		fil;
+	UINT 	bw;
+
+	char file_name[]="Map.csv";
+
+     /*Init SPI master
+     * masterConfig.enableStopInWaitMode = false;
+     * masterConfig.polarity = kSPI_ClockPolarityActiveHigh;
+     * masterConfig.phase = kSPI_ClockPhaseFirstEdge;
+     * masterConfig.direction = kSPI_MsbFirst;
+     * masterConfig.dataMode = kSPI_8BitMode;
+     * masterConfig.txWatermark = kSPI_TxFifoOneHalfEmpty;
+     * masterConfig.rxWatermark = kSPI_RxFifoOneHalfFull;
+     * masterConfig.pinMode = kSPI_PinModeNormal;
+     * masterConfig.outputMode = kSPI_SlaveSelectAutomaticOutput;
+     * masterConfig.baudRate_Bps = 500000U;*/
+    SPI_MasterGetDefaultConfig(&masterConfig);
+    sourceClock = EXAMPLE_SPI_MASTER_CLK_FREQ;
+    SPI_MasterInit(EXAMPLE_SPI_MASTER, &masterConfig, sourceClock);
+
+	fr = f_mount(&fs, file_name, 0);
+	if(fr)
+	{
+		PRINTF("\nError mounting file system\r\n");
+		for(;;){}
+	}
+	PRINTF("Opening file.\r\n");
+	fr = f_open(&fil, file_name, FA_CREATE_NEW | FA_WRITE);
+	if(fr)
+	{
+		fr = f_open(&fil, file_name, FA_OPEN_EXISTING | FA_WRITE);
+		if(fr)
+		{
+			PRINTF("\nError opening text file\r\n");
+			for(;;){}
+		}
+	}
+	fr = f_write(&fil, stringPtr, *currentSizePtr, &bw);
+	if(fr)
+	{
+		PRINTF("\nError write text file\r\n");
+		for(;;){}
+	}
+	fr = f_close(&fil);
+	if(fr)
+	{
+		PRINTF("\nError close text file\r\n");
+		for(;;){}
+	}
+}
+
 
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
@@ -272,7 +333,10 @@ static void sort_coordinates(map_block* block, int num_coords) {
 //!*************************************************************************************************
 void saveMap()
 {
-	initSPI();
+	static char *fieldsBuffer = NULL;
+	static size_t currentSize = 0;
+
+	//initSPI();
 	// dynamically allocate field to store map blocks in the buffer
 	map_block *blockBuffer = (map_block *)malloc(ht->count * sizeof(map_block));
 	if (blockBuffer == NULL) {
@@ -294,72 +358,12 @@ void saveMap()
 
 	sort_coordinates(blockBuffer, ht->count);
 
-	PRINTF("Opening file.\r\n");
-	openFile();
-
 	PRINTF("Saving map...\r\n");
-	saveBlocks(blockBuffer, ht->count);
+	saveBlocks(blockBuffer, ht->count, &fieldsBuffer, &currentSize);
 
-	PRINTF("Closing file.\r\n");
-	closeFile();
+	writeStringToSD(&fieldsBuffer, &currentSize);
 }
 
 
 
-void saveMap1()
-{
-    spi_master_config_t masterConfig = {0};
-    uint32_t sourceClock = 0U;
-    FATFS 	fs;
-	FRESULT fr;
-	FIL		fil;
-	UINT 	bw;
 
-	char file_name[]="Map.csv";
-
-     /*Init SPI maste
-     * masterConfig.enableStopInWaitMode = false;
-     * masterConfig.polarity = kSPI_ClockPolarityActiveHigh;
-     * masterConfig.phase = kSPI_ClockPhaseFirstEdge;
-     * masterConfig.direction = kSPI_MsbFirst;
-     * masterConfig.dataMode = kSPI_8BitMode;
-     * masterConfig.txWatermark = kSPI_TxFifoOneHalfEmpty;
-     * masterConfig.rxWatermark = kSPI_RxFifoOneHalfFull;
-     * masterConfig.pinMode = kSPI_PinModeNormal;
-     * masterConfig.outputMode = kSPI_SlaveSelectAutomaticOutput;
-     * masterConfig.baudRate_Bps = 500000U;*/
-    SPI_MasterGetDefaultConfig(&masterConfig);
-    sourceClock = EXAMPLE_SPI_MASTER_CLK_FREQ;
-    SPI_MasterInit(EXAMPLE_SPI_MASTER, &masterConfig, sourceClock);
-
-    //fr = f_mount(0, &fs);
-	fr = f_mount(&fs, file_name, 0);
-	if(fr)
-	{
-		PRINTF("\nError mounting file system\r\n");
-		for(;;){}
-	}
-	fr = f_open(&fil, file_name, FA_CREATE_NEW | FA_WRITE);
-	if(fr)
-	{
-		fr = f_open(&fil, file_name, FA_OPEN_EXISTING | FA_WRITE);
-		if(fr)
-		{
-			PRINTF("\nError opening text file\r\n");
-			for(;;){}
-		}
-	}
-	fr = f_write(&fil, "Test1, ", 7, &bw);
-	fr = f_write(&fil, "Test1 ,Test2 ,Test3 ,Test4 \r\n", 29, &bw);
-	if(fr)
-	{
-		PRINTF("\nError write text file\r\n");
-		for(;;){}
-	}
-	fr = f_close(&fil);
-	if(fr)
-	{
-		PRINTF("\nError close text file\r\n");
-		for(;;){}
-	}
-}
