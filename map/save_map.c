@@ -64,9 +64,9 @@ typedef struct {
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
-static void insertValue(uint8_t newValue, char **stringPtr, size_t *currentSizePtr) {
+static void insertValue(int newValue, char **stringPtr, size_t *currentSizePtr) {
     // Convert uint8_t value to string and add ", "
-    char valueStr[4] = " , ";
+    char valueStr[3] = " , ";
     //snprintf(valueStr, sizeof(valueStr), "%d, ", newValue);
     if (newValue == 0)
     	valueStr[0] = '0';
@@ -74,6 +74,9 @@ static void insertValue(uint8_t newValue, char **stringPtr, size_t *currentSizeP
     	valueStr[0] = '1';
     else if (newValue == 2)
     	valueStr[0] = '2';
+    else if (newValue == -1)
+    	valueStr[1] = '\n';
+
 
     // Calculate new string size and reallocate memory
     size_t valueSize = strlen(valueStr);
@@ -89,69 +92,10 @@ static void insertValue(uint8_t newValue, char **stringPtr, size_t *currentSizeP
     *currentSizePtr += valueSize;
 }
 
-/*static void initSPI()
+
+static char *saveBlocks(map_block* blockBuffer, int bufferCount, size_t *currentSizePtr)
 {
-	spi_master_config_t masterConfig = {0};
-	uint32_t sourceClock = 0U;
-
-	 * masterConfig.enableStopInWaitMode = false;
-	 * masterConfig.polarity = kSPI_ClockPolarityActiveHigh;
-	 * masterConfig.phase = kSPI_ClockPhaseFirstEdge;
-	 * masterConfig.direction = kSPI_MsbFirst;
-	 * masterConfig.dataMode = kSPI_8BitMode;
-	 * masterConfig.txWatermark = kSPI_TxFifoOneHalfEmpty;
-	 * masterConfig.rxWatermark = kSPI_RxFifoOneHalfFull;
-	 * masterConfig.pinMode = kSPI_PinModeNormal;
-	 * masterConfig.outputMode = kSPI_SlaveSelectAutomaticOutput;
-	 * masterConfig.baudRate_Bps = 500000U;
-
-	SPI_MasterGetDefaultConfig(&masterConfig);
-	sourceClock = EXAMPLE_SPI_MASTER_CLK_FREQ;
-	SPI_MasterInit(EXAMPLE_SPI_MASTER, &masterConfig, sourceClock);
-}*/
-
-/*static bool openFile()
-{
-	FATFS 	fs;
-	FRESULT fr;
-
-	fr = f_mount(&fs, file_name, 0);
-	if(fr)
-	{
-		PRINTF("\nError mounting file system\r\n");
-		return false;
-	}
-	fr = f_open(&file, file_name, FA_CREATE_NEW | FA_WRITE);
-	if(fr)
-	{
-		fr = f_open(&file, file_name, FA_OPEN_EXISTING | FA_WRITE);
-		if(fr)
-		{
-			PRINTF("\nError opening text file\r\n");
-			return false;
-		}
-	}
-
-	return true;
-}
-
-static bool closeFile()
-{
-	FRESULT fr;
-	fr = f_close(&file);
-	if(fr)
-	{
-		PRINTF("\nError close text file\r\n");
-		return false;
-	}
-
-	return true;
-}*/
-
-
-
-static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr, size_t *currentSizePtr)
-{
+	static char *stringPtr = NULL;
 	int rowIndexBuffer = 0;			// Starting index of block row in block field of a row we are processing
 	int processingRowInBlock = 0;	// Stores number of row which we are currently processing
 	int prevProcessedBlockColumn = blockBuffer->corX;	// Stores previously processed column which is helpful for filling gaps
@@ -166,7 +110,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr
 			// Print the gap
 			for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 			{
-				insertValue(0, stringPtr, currentSizePtr);
+				insertValue(0, &stringPtr, currentSizePtr);
 			}
 		}
 		// If we are processing the subset of the blocks which are on the same row
@@ -178,7 +122,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr
 				// Print the gap
 				for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 				{
-					insertValue(0, stringPtr, currentSizePtr);
+					insertValue(0, &stringPtr, currentSizePtr);
 				}
 			}
 			prevProcessedBlockColumn = blockBuffer[indexBuffer].corX;
@@ -186,7 +130,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr
 			// Print the current processing row
 			for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 			{
-				insertValue(blockBuffer[indexBuffer].block[processingRowInBlock][columnBlock], stringPtr, currentSizePtr);
+				insertValue(blockBuffer[indexBuffer].block[processingRowInBlock][columnBlock], &stringPtr, currentSizePtr);
 			}
 		}
 
@@ -194,6 +138,7 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr
 		{
 			indexBuffer = rowIndexBuffer;
 			processingRowInBlock++;
+			insertValue(-1, &stringPtr, currentSizePtr);
 		}
 		else
 		{
@@ -212,6 +157,8 @@ static void saveBlocks(map_block* blockBuffer, int bufferCount, char **stringPtr
 			rowIndexBuffer = ++indexBuffer;
 		}
 	}
+
+	return stringPtr;
 }
 
 
@@ -302,18 +249,21 @@ static void writeStringToSD(char **stringPtr, size_t *currentSizePtr)
 			for(;;){}
 		}
 	}
+	PRINTF("Writing to file...\r\n");
 	fr = f_write(&fil, *stringPtr, *currentSizePtr, &bw);
 	if(fr)
 	{
 		PRINTF("\nError write text file\r\n");
 		for(;;){}
 	}
+	PRINTF("Closing file.\r\n");
 	fr = f_close(&fil);
 	if(fr)
 	{
 		PRINTF("\nError close text file\r\n");
 		for(;;){}
 	}
+	PRINTF("File closed.\r\n");
 }
 
 
@@ -359,7 +309,7 @@ void saveMap()
 	sort_coordinates(blockBuffer, ht->count);
 
 	PRINTF("Saving map...\r\n");
-	saveBlocks(blockBuffer, ht->count, &fieldsBuffer, &currentSize);
+	fieldsBuffer = saveBlocks(blockBuffer, ht->count, &currentSize);
 
 	writeStringToSD(&fieldsBuffer, &currentSize);
 }

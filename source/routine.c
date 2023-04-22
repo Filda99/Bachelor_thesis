@@ -182,10 +182,10 @@ static void checkStop()
 {
 	static uint8_t count = 0;
 
-	while (0U == (kADC16_ChannelConversionDoneFlag &
+	/*while (0U == (kADC16_ChannelConversionDoneFlag &
 	                      ADC16_GetChannelStatusFlags(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP)))
 	{
-	}
+	}*/
 	float distance = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);
 	distance = distance * 5 / 1023.0;
 	distance = 60.374 * pow(distance , -1.16);
@@ -224,18 +224,18 @@ void routine(void)
 	checkLines();
 	controlUnit();
 
+
+	static int i = 0;
+	HalfWheelRotations++;
+	PRINTF("Cycle: %i\r\n", i++);
+ 	printBlock();
 	mapping();
+	PRINTF("-------------------------------------\r\n");
 
-	//static int i = 0;
-	//HalfWheelRotations++;
-	//PRINTF("Cycle: %i\r\n", i++);
- 	//printBlock();
-	//mapping();
-	//PRINTF("-------------------------------------\r\n");
-
+	/*mapping();
 	processSensorData();
 	checkStop();
-	saveSensorData();
+	saveSensorData();*/
 }
 
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)

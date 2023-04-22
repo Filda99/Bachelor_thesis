@@ -26,9 +26,6 @@ extern unsigned int HalfWheelRotations;
 extern uint8_t currentSpeed;
 extern uint8_t currentSteer;
 
-extern uint8_t currentPosRows;
-extern uint8_t currentPosCols;
-
 extern curr_pos_map currPosInBlk;
 
 extern uint8_t leftLaserValue;
