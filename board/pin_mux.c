@@ -71,6 +71,7 @@ BOARD_InitPins:
   - {pin_num: '62', peripheral: SPI0, signal: SCK, pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT, identifier: SCK}
   - {pin_num: '63', peripheral: SPI0, signal: SIN, pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/SPI0_MISO, identifier: MISO}
   - {pin_num: '64', peripheral: SPI0, signal: SOUT, pin_signal: CMP0_IN1/PTC7/SPI0_MISO/SPI0_MOSI}
+  - {pin_num: '13', peripheral: ADC0, signal: 'DP, 0', pin_signal: ADC0_DP0/ADC0_SE0/PTE20/TPM1_CH0/UART0_TX}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -89,6 +90,8 @@ void BOARD_InitPins(void)
     CLOCK_EnableClock(kCLOCK_PortC);
     /* Port D Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortD);
+    /* Port E Clock Gate Control: Clock enabled */
+    CLOCK_EnableClock(kCLOCK_PortE);
 
     gpio_pin_config_t RIGHTHALL_config = {
         .pinDirection = kGPIO_DigitalInput,
@@ -144,6 +147,9 @@ void BOARD_InitPins(void)
 
     /* PORTD5 (pin 78) is configured as TPM0_CH5 */
     PORT_SetPinMux(BOARD_INITPINS_ServoMotor_PORT, BOARD_INITPINS_ServoMotor_PIN, kPORT_MuxAlt4);
+
+    /* PORTE20 (pin 13) is configured as ADC0_DP0 */
+    PORT_SetPinMux(PORTE, 20U, kPORT_PinDisabledOrAnalog);
 
     SIM->SOPT4 = ((SIM->SOPT4 &
                    /* Mask bits to zero which are setting */

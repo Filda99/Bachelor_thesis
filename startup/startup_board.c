@@ -22,6 +22,7 @@
 #include "fsl_debug_console.h"
 #include "fsl_port.h"
 #include "global_macros.h"
+#include "fsl_adc16.h"
 
 #include "routine.h"
 
@@ -57,6 +58,7 @@ extern dma_handle_t dmaHandle;
 #define I2C_MASTER_SLAVE_ADDR_7BIT 0x7EU
 #define I2C_BAUDRATE 100000U
 
+#define DEMO_ADC16_USER_CHANNEL 0U /*PTE20, ADC0_SE0 */
 
 
 //**************************************************************************************************
@@ -81,20 +83,33 @@ i2c_slave_handle_t g_s_handle;
 //**************************************************************************************************
 
 
-/*static void cleanUpBoard()
+static void init_adc(void)
 {
-	uint32_t* sram_start_address = (uint32_t*)0x1FFFF000; // Start address of SRAM
-	uint32_t sram_size = 0x4000; // Size of SRAM
-	uint32_t i;
+	adc16_config_t adc16ConfigStruct;
+	adc16_channel_config_t adc16ChannelConfigStruct;
 
+	 /*
+	 * adc16ConfigStruct.referenceVoltageSource = kADC16_ReferenceVoltageSourceVref;
+	 * adc16ConfigStruct.clockSource = kADC16_ClockSourceAsynchronousClock;
+	 * adc16ConfigStruct.enableAsynchronousClock = true;
+	 * adc16ConfigStruct.clockDivider = kADC16_ClockDivider8;
+	 * adc16ConfigStruct.resolution = kADC16_ResolutionSE12Bit;
+	 * adc16ConfigStruct.longSampleMode = kADC16_LongSampleDisabled;
+	 * adc16ConfigStruct.enableHighSpeed = false;
+	 * adc16ConfigStruct.enableLowPower = false;
+	 * adc16ConfigStruct.enableContinuousConversion = false;
+	 */
+	ADC16_GetDefaultConfig(&adc16ConfigStruct);
 
-	// Erase SRAM memory
-	for (i = 0; i < sram_size/4; i++)
-	{
-		*(sram_start_address + i) = 0;
-	}
+	ADC16_Init(DEMO_ADC16_BASE, &adc16ConfigStruct);
+	ADC16_EnableHardwareTrigger(DEMO_ADC16_BASE, false); /* Make sure the software trigger is used. */
 
-}*/
+	adc16ChannelConfigStruct.channelNumber = DEMO_ADC16_USER_CHANNEL;
+	adc16ChannelConfigStruct.enableInterruptOnConversionCompleted = false;
+    adc16ChannelConfigStruct.enableDifferentialConversion = false;
+
+	ADC16_SetChannelConfig(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP, &adc16ChannelConfigStruct);
+}
 
 //!*************************************************************************************************
 //! static void init_tsi(void)
@@ -296,6 +311,7 @@ void startupBoard(void)
 	startupInterrupts();
 	i2cInit();
 	i2cInitSlave();
+	init_adc();
 
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

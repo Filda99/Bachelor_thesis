@@ -24,6 +24,9 @@
 #include "map/mapping.h"
 #include "map/map_operations.h"
 
+#include "fsl_adc16.h"
+#include "math.h"
+
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
@@ -61,7 +64,6 @@ volatile bool completionFlag = false;
 //**************************************************************************************************
 uint8_t leftLaserValue = 0;
 uint8_t rightLaserValue = 0;
-uint8_t centerSharpValue = 0;
 
 
 //**************************************************************************************************
@@ -157,12 +159,6 @@ static void processSensorData()
 			rightLaserValue = sensorsDataFromArduino[i + 1];
 			i++;
 		}
-		// Sharp sensor ID
-		else if (sensorsDataFromArduino[i] == 0x3)
-		{
-			centerSharpValue = sensorsDataFromArduino[i + 1];
-			i++;
-		}
 		else
 		{
 			// Left sensor ID
@@ -177,12 +173,6 @@ static void processSensorData()
 				rightLaserValue = sensorsDataFromArduino[i];
 				i++;
 			}
-			// Sharp sensor ID
-			else if (sensorsDataFromArduino[I2C_DATA_LENGTH-1] == 0x3)
-			{
-				centerSharpValue = sensorsDataFromArduino[i];
-				i++;
-			}
 		}
 	}
 	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
@@ -192,7 +182,15 @@ static void checkStop()
 {
 	static uint8_t count = 0;
 
-	if (centerSharpValue <= 20)
+	while (0U == (kADC16_ChannelConversionDoneFlag &
+	                      ADC16_GetChannelStatusFlags(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP)))
+	{
+	}
+	float distance = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);
+	distance = distance * 5 / 1023.0;
+	distance = 60.374 * pow(distance , -1.16);
+
+	if (distance <= 3)
 	{
 		count++;
 	}
@@ -201,7 +199,7 @@ static void checkStop()
 	{
 		hardStop();
 	}
-	if (centerSharpValue <= 15)
+	else if (distance <= 2)
 	{
 		hardStop();
 	}
@@ -236,7 +234,7 @@ void routine(void)
 	//PRINTF("-------------------------------------\r\n");
 
 	processSensorData();
-	//checkStop();
+	checkStop();
 	saveSensorData();
 }
 

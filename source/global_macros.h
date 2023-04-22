@@ -19,10 +19,12 @@ extern "C" {
  ************************************/
 #include "../drivers/fsl_tpm.h"
 
+
 /************************************
  * MACROS AND DEFINES
  ************************************/
 #define M_PI           3.14159265358979323846
+
 
 /*************************************/
 // Map size
@@ -48,6 +50,7 @@ extern "C" {
 //* Size of one field in map block in centimeters
 #define MAP_BLOCK_SIZE	10
 
+
 /*************************************/
 // Hall sensor
 /*************************************/
@@ -56,6 +59,7 @@ extern "C" {
 
 // Clear hall sensor
 #define HALL_IRQ_MASK	0x04
+
 
 /*************************************/
 // Color sensors
@@ -77,6 +81,7 @@ extern "C" {
 // Counter how long are we going straight without any interrupt
 #define MAX_DISTANCE_WITHOUT_LINE	20000
 
+
 /*************************************/
 // Line detected counter
 /*************************************/
@@ -88,6 +93,7 @@ extern "C" {
 
 // If there is white color under sensor, no more than 2500 will occure
 #define COLOR_TRESHOLD	100
+
 
 /*************************************/
 // Engine
@@ -101,13 +107,22 @@ extern "C" {
 #define ENGINE_STOP			1	// Pulse width for STOP is the second value in the speed field
 #define GO_DIRECT			(MAX_STEER_LEFT / 2)
 
+
 /*************************************/
 // I2C
 /*************************************/
 #define SAVING_I2C	I2C0
 #define DATA_I2C	I2C1
 
-#define I2C_DATA_LENGTH	6
+#define I2C_DATA_LENGTH	4
+
+
+/*************************************/
+// ADC
+/*************************************/
+#define DEMO_ADC16_BASE ADC0
+#define DEMO_ADC16_CHANNEL_GROUP 0U
+
 
 /************************************
  * TYPEDEFS

@@ -302,7 +302,7 @@ static void writeStringToSD(char **stringPtr, size_t *currentSizePtr)
 			for(;;){}
 		}
 	}
-	fr = f_write(&fil, stringPtr, *currentSizePtr, &bw);
+	fr = f_write(&fil, *stringPtr, *currentSizePtr, &bw);
 	if(fr)
 	{
 		PRINTF("\nError write text file\r\n");
