@@ -96,8 +96,6 @@ void insertToHashTable(int key, map_block *value)
         node->next = new_node;
     }
 
-    //free(new_node);
-
     ht->count++;
 }
 

@@ -32,11 +32,8 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
-static int maxTopBlock = 0;
-static int maxBottomBlock = 0;
+int maxBottomBlock = 0;
 int maxLeftBlock = 0;
-// Maybe will not be used
-int maxRightBlock = 0;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -67,8 +64,8 @@ static int getUniqueID(int x, int y)
 //! static void initNewBlock(map_block *newBlock)
 //!
 //! @description
-//! Function alocates memory for the new block and sets all fields to empty.
-//! Also sets all neighbour pointers to null.
+//! Function allocates memory for the new block and sets all fields to empty.
+//! Also sets all neighbor pointers to null.
 //!
 //! @param    map_block *newBlock Pointer to a new map block, which should be alocated
 //!
@@ -77,23 +74,22 @@ static int getUniqueID(int x, int y)
 static map_object_t** initNewBlock()
 {
 	map_object_t** newBlock;
-	//map_object_t** field;
 	newBlock = (map_object_t **)malloc(MAP_ROWS * sizeof(map_object_t*));
 	if (!newBlock)
 	{
-		//return NULL;  // error: calloc() failed
+		return NULL;
 	}
+
 
 	for (int i = 0; i < MAP_ROWS; i++)
 	{
 		newBlock[i] = (map_object_t*)malloc(MAP_COLUMNS * sizeof(map_object_t));
 		if (!newBlock[i]) {
-			// error: calloc() failed, free memory allocated so far
 			for (int j = 0; j < i; j++) {
 				free(newBlock[j]);
 			}
 			free(newBlock);
-			//return NULL;
+			return NULL;
 		}
 	}
 
@@ -128,6 +124,16 @@ static map_block *createNewBlock(int ID, int X, int Y)
 		block->block = initNewBlock();
 		block->corX = X;
 		block->corY = Y;
+	}
+	insertToHashTable(ID, block);
+
+	if (block->corX < maxLeftBlock)
+	{
+		maxLeftBlock = block->corX;
+	}
+	else if (block->corY < maxBottomBlock)
+	{
+		maxBottomBlock = block->corY;
 	}
 
 	return block;
@@ -169,7 +175,7 @@ void getCoordinates(block_direction direction, int *x, int *y)
 //!*************************************************************************************************
 static void moveBetweenBlocks(block_direction direction)
 {
-	saveCurrentBlock();
+	//saveCurrentBlock();
 
  	int X = 0;
 	int Y = 0;
@@ -188,23 +194,6 @@ static void moveBetweenBlocks(block_direction direction)
 	}
 
 	currentBlockInMap = pBlockToMove;
-
-	if (currentBlockInMap->corX > maxRightBlock)
-	{
-		maxRightBlock = currentBlockInMap->corX;
-	}
-	else if (currentBlockInMap->corX < maxLeftBlock)
-	{
-		maxLeftBlock = currentBlockInMap->corX;
-	}
-	else if (currentBlockInMap->corY > maxTopBlock)
-	{
-		maxTopBlock = currentBlockInMap->corY;
-	}
-	else if (currentBlockInMap->corY > maxBottomBlock)
-	{
-		maxBottomBlock = currentBlockInMap->corY;
-	}
 }
 
 //**************************************************************************************************
@@ -477,17 +466,73 @@ void moveInMap(map_move_direction direction)
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
+static double round_down(double x) {
+    double result = floor(x);
+    if (x < 0) {
+        result++;
+    }
+    return result;
+}
+
 void getBlock(sensor_side laserSide, uint8_t value, float angle)
 {
-	if (value != 0)
+	if (laserSide == sensor_Left)
 	{
-		uint8_t bc = tanf(angle * M_PI / 180.0) * value;
-		uint8_t ab = 1.0 / tanf(angle * M_PI / 180.0) * value;
+		angle += 180.0;
+		angle = fmod(angle, 360);
 	}
-	else
+	//double alpha_rad = angle * (M_PI / 180); // převod úhlu ze stupňů na radiány
+	double a = value * cos(angle); // délka přilehlé strany
+	double b = value * sin(angle); // délka protilehlé strany
+
+	float shiftInX = b / MAP_BLOCK_SIZE;
+	float shiftInY = a / MAP_BLOCK_SIZE;
+
+	shiftInX = round_down(shiftInX);
+	shiftInY = round_down(shiftInY);
+
+	int fieldX = currPosInBlk.Col + shiftInX;
+	int fieldY = currPosInBlk.Row + shiftInY;
+
+	int shiftInXBetweenBlks = 0;
+	int shiftInYBetweenBlks = 0;
+	if (abs(shiftInX) >= 1.0)
 	{
-		value;
+		shiftInXBetweenBlks = fieldX / MAP_COLUMNS;
+		while (fieldX < 0)
+		{
+			fieldX = MAP_COLUMNS + fieldX; // It is '-' since fieldX is negative
+			shiftInXBetweenBlks--;
+		}
+	}
+	if (abs(shiftInY) >= 1.0)
+	{
+		shiftInYBetweenBlks = fieldY / MAP_ROWS;
+		while (fieldY < 0)
+		{
+			fieldY = MAP_ROWS + fieldY; // It is '-' since fieldX is negative
+			shiftInYBetweenBlks--;
+		}
 	}
 
 
+	int blockX = currentBlockInMap->corX + shiftInXBetweenBlks;
+	int blockY = currentBlockInMap->corY + shiftInYBetweenBlks;
+
+
+	fieldX = fmod(fieldX, MAP_COLUMNS);
+	fieldY = fmod(fieldY, MAP_ROWS);
+
+
+	// Get ID from coordinates
+	int ID = getUniqueID(blockX, blockY);
+
+	map_block *blockInsertObstacle = searchItemInHT(ID, blockX, blockY);
+	if (!blockInsertObstacle)
+	{
+		blockInsertObstacle = createNewBlock(ID, blockX, blockY);
+	}
+
+	if (blockInsertObstacle->block[fieldY][fieldX] == map_Empty)
+		blockInsertObstacle->block[fieldY][fieldX] = map_Wall;
 }

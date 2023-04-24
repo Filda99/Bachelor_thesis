@@ -53,9 +53,9 @@ static const float SpeedMap[6] = {
 static const float SteerMap[7] = {
 		3.735,	// 45
 		4.98,	// 60
-		6.225,	// To the left, 75
+		6.25,	// To the left, 75
 		7.5,	// Center, Go direct, 90
-		8.715,	// To the right, 105
+		8.75,	// To the right, 105
 		9.96,	// 120
 		11.205	// 135
 };

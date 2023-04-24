@@ -26,10 +26,8 @@
 //* EXTERN VARIABLES
 //**************************************************************************************************
 extern HashTable *ht;
-extern int maxTopBlock;
 extern int maxBottomBlock;
 extern int maxLeftBlock;
-extern int maxRightBlock;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -69,11 +67,17 @@ static void insertValue(int newValue, char **stringPtr, size_t *currentSizePtr) 
     char valueStr[3] = " , ";
     //snprintf(valueStr, sizeof(valueStr), "%d, ", newValue);
     if (newValue == 0)
-    	valueStr[0] = '0';
+    	;	// Pass zero's, because they are nothing.
     else if (newValue == 1)
     	valueStr[0] = '1';
     else if (newValue == 2)
     	valueStr[0] = '2';
+    else if (newValue == 3)
+    	valueStr[0] = '3';
+    else if (newValue == 4)
+    	valueStr[0] = '4';
+    else if (newValue == 5)
+    	valueStr[0] = '5';
     else if (newValue == -1)
     	valueStr[1] = '\n';
 
@@ -104,14 +108,20 @@ static char *saveBlocks(map_block* blockBuffer, int bufferCount, size_t *current
 	// Go through all blocks in the buffer
 	for (int indexBuffer = rowIndexBuffer; indexBuffer < bufferCount;)
 	{
+		int fillingBlockGap = blockBuffer->corX;
 		// First block only, print unnecessarily gaps
-		while (blockBuffer[indexBuffer].corX - 1 - indexBuffer > maxLeftBlock)
+		while (fillingBlockGap > maxLeftBlock)
 		{
 			// Print the gap
-			for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
+			for (int rowInBlock = 0; rowInBlock < MAP_ROWS; rowInBlock++)
 			{
-				insertValue(0, &stringPtr, currentSizePtr);
+				for (int columnInBlock = 0; columnInBlock < MAP_COLUMNS; columnInBlock++)
+				{
+					insertValue(0, &stringPtr, currentSizePtr);
+				}
 			}
+
+			fillingBlockGap--;
 		}
 		// If we are processing the subset of the blocks which are on the same row
 		if (processingBlockRow == blockBuffer[indexBuffer].corY)
@@ -144,17 +154,18 @@ static char *saveBlocks(map_block* blockBuffer, int bufferCount, size_t *current
 		{
 			indexBuffer++;
 		}
+
 		if (processingRowInBlock >= MAP_ROWS)
 		{
 			processingRowInBlock = 0;
-			processingBlockRow++;
+			processingBlockRow--;
 
-			++indexBuffer;
-			if (indexBuffer + 1 >= bufferCount)
-			{
-				break;
-			}
 			rowIndexBuffer = ++indexBuffer;
+
+			if (processingBlockRow >= maxBottomBlock)
+				continue;
+			else
+				break;
 		}
 	}
 
@@ -261,9 +272,11 @@ static void writeStringToSD(char **stringPtr, size_t *currentSizePtr)
 	if(fr)
 	{
 		PRINTF("\nError close text file\r\n");
-		for(;;){}
 	}
-	PRINTF("File closed.\r\n");
+	else
+	{
+		PRINTF("File closed.\r\n");
+	}
 }
 
 

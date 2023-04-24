@@ -82,6 +82,18 @@ i2c_slave_handle_t g_s_handle;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+static void clearSRAM(void) {
+    uint32_t *sram_ptr = (uint32_t *) 0x1FFFF110; // Start address of SRAM
+    uint32_t sram_end = 0x1FFFF000 + 0x4000; // End address of SRAM
+    uint32_t sram_size = sram_end - (uint32_t) sram_ptr; // Size of remaining SRAM in bytes
+    //uint32_t sram_size = 0x3F00; // Size of SRAM in bytes
+    uint32_t i;
+
+    // Clear SRAM
+    for (i = 0; i < (sram_size / sizeof(uint32_t)); i++) {
+        sram_ptr[i] = 0;
+    }
+}
 
 static void init_adc(void)
 {
@@ -306,7 +318,7 @@ void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
 
-	//cleanUpBoard();
+	clearSRAM();
 	startupPWM();
 	startupInterrupts();
 	i2cInit();

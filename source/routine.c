@@ -148,32 +148,35 @@ static void processSensorData()
 	for (int i = 0; i < I2C_DATA_LENGTH; i++)
 	{
 		// Left sensor ID
-		if (sensorsDataFromArduino[i] == 0x1)
+		if (sensorsDataFromArduino[i] == 0x1 && i != (I2C_DATA_LENGTH - 1))
 		{
 			leftLaserValue = sensorsDataFromArduino[i + 1];
 			i++;
 		}
 		// Right sensor ID
-		else if (sensorsDataFromArduino[i] == 0x2)
+		else if (sensorsDataFromArduino[i] == 0x2 && i != (I2C_DATA_LENGTH - 1))
 		{
 			rightLaserValue = sensorsDataFromArduino[i + 1];
 			i++;
 		}
-		else
+		else if (i == 0)
 		{
 			// Left sensor ID
 			if (sensorsDataFromArduino[I2C_DATA_LENGTH-1] == 0x1)
 			{
 				leftLaserValue = sensorsDataFromArduino[i];
-				i++;
 			}
 			// Right sensor ID
 			else if (sensorsDataFromArduino[I2C_DATA_LENGTH-1] == 0x2)
 			{
 				rightLaserValue = sensorsDataFromArduino[i];
-				i++;
 			}
 		}
+	}
+
+	for (int i = 0; i < I2C_DATA_LENGTH; i++)
+	{
+		sensorsDataFromArduino[i] = 0;
 	}
 	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
 }
@@ -182,10 +185,6 @@ static void checkStop()
 {
 	static uint8_t count = 0;
 
-	/*while (0U == (kADC16_ChannelConversionDoneFlag &
-	                      ADC16_GetChannelStatusFlags(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP)))
-	{
-	}*/
 	float distance = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);
 	distance = distance * 5 / 1023.0;
 	distance = 60.374 * pow(distance , -1.16);
@@ -195,13 +194,13 @@ static void checkStop()
 		count++;
 	}
 
-	if (count > 5)
+	if (count > 50)
 	{
-		hardStop();
+		stopCar();
 	}
 	else if (distance <= 2)
 	{
-		hardStop();
+		stopCar();
 	}
 }
 
@@ -221,21 +220,21 @@ static void checkStop()
 //!*************************************************************************************************
 void routine(void)
 {
-	checkLines();
-	controlUnit();
+	//checkLines();
+	//controlUnit();
 
 
 	static int i = 0;
-	HalfWheelRotations++;
 	PRINTF("Cycle: %i\r\n", i++);
- 	printBlock();
+	printBlock();
+	HalfWheelRotations++;
 	mapping();
 	PRINTF("-------------------------------------\r\n");
 
-	/*mapping();
+	//mapping();
 	processSensorData();
-	checkStop();
-	saveSensorData();*/
+	//checkStop();
+	saveSensorData();
 }
 
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)

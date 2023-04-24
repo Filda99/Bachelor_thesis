@@ -37,8 +37,8 @@ extern uint8_t rightLaserValue;
 #define X 0
 #define Y 1
 
-#define TURNING_LEFT	0
-#define TURNING_RIGHT	180
+#define TURNING_LEFT	180
+#define TURNING_RIGHT	0
 
 #define STARTING_HEADING_ANGLE	 0
 
@@ -50,14 +50,16 @@ extern uint8_t rightLaserValue;
 //* STATIC VARIABLES
 //**************************************************************************************************
 
-//! The angle at which the robot is heading.
-//! We start in upward direction, so it is 90 deg.
+//! The angle at which the robot is heading in degrees.
 static float angleHeading = STARTING_HEADING_ANGLE;
 static float centerOfCircle[2] = {0.0};
 
 //! Radius field of the circles, which are dependent on the rotation of the servo
-static float radius[7] = {
+/*static float radius[7] = {
 		17.5, 30.3, 65.3, 0, 65.3, 30.3, 17.5
+};*/
+static float radius[7] = {
+		17.5, 30.3, 4.689, 0, 4.689, 30.3, 17.5
 };
 
 //! Calculated new position in a map.
@@ -176,34 +178,35 @@ static void calcNewPosition(float distance, uint8_t turningSide)
 	if (currentSteer != previousSteer && currentSteer != GO_DIRECT)
 	{
 		int angle = turningSide - prevHeadingAngle;
-		centerOfCircle[X] = newPos.x - radius[currentSteer] * cos(angle*M_PI/180);
-		centerOfCircle[Y] = newPos.y - radius[currentSteer] * sin(angle*M_PI/180);
+	/*	centerOfCircle[X] = newPos.x - radius[currentSteer] * cos(angle*M_PI/180);
+		centerOfCircle[Y] = newPos.y - radius[currentSteer] * sin(angle*M_PI/180);*/
+		centerOfCircle[X] = newPos.x - radius[currentSteer] * sin(angle*M_PI/180);
+		centerOfCircle[Y] = newPos.y - radius[currentSteer] * cos(angle*M_PI/180);
 	}
 
 	// We are steering to some side
 	if (currentSteer != GO_DIRECT)
 	{
 		// Calculate the angle between the initial point and the center of the circle
-		float theta = atan2(newPos.y - centerOfCircle[Y], newPos.x - centerOfCircle[X]);
+		float theta = atan2(prevPos.y - centerOfCircle[Y], prevPos.x - centerOfCircle[X]);
 
 		// Calculate the angular displacement
 		float deltaTheta = distance / radius[currentSteer];
 
 		// Calculate the final angle
-		float finalTheta;
-		if (turningSide == TURNING_LEFT)
+		float finalTheta = theta + deltaTheta;
+		/*if (turningSide == TURNING_LEFT)
 		{
 			finalTheta = theta + deltaTheta;
 		}
 		else
 		{
 			finalTheta = theta - deltaTheta;
-		}
+		}*/
 
 		// Calculate the x and y coordinates of the end point.
 		// We don't need to add result to current position, because
-		// we are counting with the center, which tells us
-		// the coordinates
+		// we are counting with the center, which tells us the coordinates
 		newPos.x = centerOfCircle[X] + radius[currentSteer] * cos(finalTheta);
 		newPos.y = centerOfCircle[Y] + radius[currentSteer] * sin(finalTheta);
 	}
@@ -324,7 +327,7 @@ void mapping()
 	}
 	else
 	{
-		turningSide = (currentSteer > GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
+		turningSide = (currentSteer < GO_DIRECT) ? TURNING_RIGHT : TURNING_LEFT;
 	}
 
 	// Calculate new traveled distance
@@ -371,14 +374,15 @@ void mapping()
 
 void saveSensorData(void)
 {
-
-	if (leftLaserValue < 250)
+	leftLaserValue = 0;
+	rightLaserValue = 10;
+	if (leftLaserValue < 250 && leftLaserValue > 0)
 	{
-		getBlock(0x1, leftLaserValue, angleHeading);
+		getBlock(sensor_Left, leftLaserValue, angleHeading);
 	}
-	if (rightLaserValue < 250)
+	if (rightLaserValue < 250 && rightLaserValue > 0)
 	{
-		getBlock(0x2, rightLaserValue, angleHeading);
+		getBlock(sensor_Right, rightLaserValue, angleHeading);
 	}
 }
 

@@ -130,19 +130,31 @@ int main(void)
 			PRINTF("Starting routine.\r\n");
 			LED_RED_OFF();
 			addSpeed();
+			turnLeftCustom(MAX_STEER_RIGHT);
 
 			while (!IsCmdToStopCar)
 			{
 				routine();
 
+				/*TSI0->DATA |= TSI_DATA_SWTS_MASK;
+				while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
+				{
+				}
+				touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
+				TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
+				if (touch_value > 3)
+				{
+					break;
+				}*/
+
+
 				static int i = 0;
 				i++;
-				if (i > 3)
+				if (i > 25)
 				{
 					break;
 				}
 			}
-			saveCurrentBlock();
 
 			// If car stopped, wait for command to continue.
 			nextAction = 3;
