@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    control_unit.c
- * @author  user
+ * @author  xjahnf00
  * @date    Dec 1, 2022
  * @brief
  ***************************************************************************************************
@@ -10,8 +10,8 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include <motors/engines.h>
 #include "global_macros.h"
-#include "motors/engines.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 
@@ -20,6 +20,8 @@
 //**************************************************************************************************
 extern unsigned char LineDetected;
 extern unsigned int HalfWheelRotations;
+extern uint8_t currentSteer;
+extern uint8_t currentSpeed;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -68,22 +70,27 @@ void setWheelToInitPosition()
 //!*************************************************************************************************
 void controlUnit()
 {
+	//PRINTF("Control unit: \r\n");
+	static uint16_t stopCarCnt = 0;
+
+	stopCarCnt++;
+	// If car goes straight for too long
+	/*if (stopCarCnt > MAX_DISTANCE_WITHOUT_LINE)
+	{
+		PRINTF("\t-> Distance without interrupt -> STOP. \r\n");
+		stopCar();
+	}*/
+
 	switch(LineDetected)
 	{
 		case LineNone:
 		{
-			// If car goes straight for too long
-			if (HalfWheelRotations > MAX_DISTANCE_WITHOUT_LINE)
-			{
-				PRINTF("\t-> Distance without interrupt -> STOP. \r\n");
-				stopCar();
-			}
+			goDirect();
 			// If there is no line for some time, add speed
-			else if (HalfWheelRotations > CNT_OUT_OF_LANE)
+			if (HalfWheelRotations > CNT_OUT_OF_LANE)
 			{
 				PRINTF("\t-> Add speed. \r\n");
 				//addSpeed();
-				goDirect();
 			}
 
 			prevTurning = LineNone;
@@ -92,6 +99,7 @@ void controlUnit()
 
 		case LineLeft:
 		{
+			//PRINTF("\t- Line detected: Left \r\n");
 			if (prevTurning == LineLeft)
 			{
 				lineCnt++;
@@ -103,11 +111,38 @@ void controlUnit()
 
 			if (lineCnt > MAX_CNT_ON_LINE)
 			{
-				PRINTF("\t-> Turning right! \r\n");
-				turnRight();
-				slackUpSpeedCustom(2);
-			}
+				if (currentSteer >= GO_DIRECT)
+				{
+					goDirect();
+				}
 
+				turnRightCustom(MAX_STEER_RIGHT);
+
+				//PRINTF("\t-> Turning right! \r\n");
+				/*if (currentSteer >= 2)
+				{
+					turnRight();
+				}
+				else if (currentSteer == 1)
+				{
+					turnRightCustom(2);
+					slackUpSpeedOnWheel(1);
+				}
+				else if (currentSteer == 0)
+				{
+					turnRightCustom(MAX_STEER_LEFT);
+					slackUpSpeedOnWheel(2);
+				}
+
+				if (currentSpeed > 2)
+				{
+					slackUpSpeed();
+				}*/
+
+
+				lineCnt = 0;
+			}
+			stopCarCnt = 0;
 			prevTurning = LineLeft;
 			break;
 		}
@@ -125,37 +160,70 @@ void controlUnit()
 
 			if (lineCnt > MAX_CNT_ON_LINE)
 			{
-				turnLeft();
-				slackUpSpeed();
+				if (currentSteer <= GO_DIRECT)
+				{
+					goDirect();
+				}
+				turnLeftCustom(MAX_STEER_LEFT);
+
+				//PRINTF("\t-> Turning left! \r\n");
+				/*if (currentSteer <= 4)
+				{
+					turnLeft();
+				}
+				else if (currentSteer == 5)
+				{
+					turnLeftCustom(2);
+					slackUpSpeedOnWheel(1);
+				}
+				else if (currentSteer == 6)
+				{
+					turnLeftCustom(MAX_STEER_LEFT);
+					slackUpSpeedOnWheel(2);
+				}
+
+				if (currentSpeed > 2)
+				{
+					slackUpSpeed();
+				}*/
+
+
+				lineCnt = 0;
 			}
 
+			stopCarCnt = 0;
 			prevTurning = LineRight;
 			break;
 		}
 
 		case LineCenter_Left:
 		{
-			turnRightCustom(MAX_STEER_RIGHT);
-			slackUpSpeedCustom(2);
-			LineDetected &= ~LineCenter_Left;
+			//slackUpSpeed();
+			turnRightCustom(MAX_STEER_LEFT);
+			//slackUpSpeedOnWheel(2);
+			//PRINTF("\t-> Turning HARD right! \r\n");
+			stopCarCnt = 0;
 			break;
 		}
 
 		case LineCenter_Right:
 		{
+			//slackUpSpeed();
 			turnLeftCustom(MAX_STEER_LEFT);
-			slackUpSpeedCustom(2);
-			LineDetected &= ~LineCenter_Right;
+			//slackUpSpeedOnWheel(2);
+			//PRINTF("\t-> Turning HARD left! \r\n");
+			stopCarCnt = 0;
 			break;
 		}
 
-		case LineCenter_None:
+		/*case LineCenter_None:
 		{
 			// todo: go backwards until some sensor detects line
 			goDirect();
 			goBackwards();
+			stopCarCnt = 0;
 			break;
-		}
+		}*/
 	}
 
 }

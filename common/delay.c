@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    common1.c
- * @author  user
+ * @author  xjahnf00
  * @date    Feb 7, 2023
  * @brief   
  ***************************************************************************************************
@@ -64,22 +64,19 @@ void delay_ms(uint32_t ms)
 }
 
 //!*************************************************************************************************
-//! void delay(uint32_t delay)
+//! void delay_us(int us)
 //!
 //! @description
-//! Function will probably not be used. Maybe in the application, when it is flashed to the
-//! controller == without debbuging (not working with debug).
+//! Function will probably not be used.
 //!
 //!
 //! @param    None
 //!
 //! @return   None
 //!*************************************************************************************************
-void delay(uint32_t delay)
+void delay_us(int us)
 {
-  uint32_t currentTime = 0;
-  currentTime = SysTick->VAL;
-  while ((SysTick->VAL - currentTime) > delay) {
-    // do nothing
-  }
+    for(int i=0; i<us*5; i++) {
+    	__asm("NOP");
+    }
 }

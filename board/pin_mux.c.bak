@@ -65,13 +65,13 @@ BOARD_InitPins:
   - {pin_num: '77', peripheral: TPM0, signal: 'CH, 4', pin_signal: PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4, direction: INPUT}
   - {pin_num: '75', peripheral: GPIOD, signal: 'GPIO, 2', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO, direction: INPUT, gpio_interrupt: kPORT_InterruptFallingEdge}
   - {pin_num: '78', peripheral: TPM0, signal: 'CH, 5', pin_signal: ADC0_SE6b/PTD5/SPI1_SCK/UART2_TX/TPM0_CH5, direction: OUTPUT}
+  - {pin_num: '56', peripheral: I2C1, signal: SCL, pin_signal: ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0}
+  - {pin_num: '57', peripheral: I2C1, signal: SDA, pin_signal: ADC0_SE11/TSI0_CH15/PTC2/I2C1_SDA/TPM0_CH1}
   - {pin_num: '61', peripheral: SPI0, signal: PCS0_SS, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3, identifier: SS}
   - {pin_num: '62', peripheral: SPI0, signal: SCK, pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT, identifier: SCK}
   - {pin_num: '63', peripheral: SPI0, signal: SIN, pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/SPI0_MISO, identifier: MISO}
   - {pin_num: '64', peripheral: SPI0, signal: SOUT, pin_signal: CMP0_IN1/PTC7/SPI0_MISO/SPI0_MOSI}
   - {pin_num: '13', peripheral: ADC0, signal: 'DP, 0', pin_signal: ADC0_DP0/ADC0_SE0/PTE20/TPM1_CH0/UART0_TX}
-  - {pin_num: '67', peripheral: I2C1, signal: SCL, pin_signal: PTC10/I2C1_SCL}
-  - {pin_num: '68', peripheral: I2C1, signal: SDA, pin_signal: PTC11/I2C1_SDA}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -112,11 +112,11 @@ void BOARD_InitPins(void)
     /* PORTA2 (pin 28) is configured as UART0_TX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_TX_PORT, BOARD_INITPINS_DEBUG_UART_TX_PIN, kPORT_MuxAlt2);
 
-    /* PORTC10 (pin 67) is configured as I2C1_SCL */
-    PORT_SetPinMux(PORTC, 10U, kPORT_MuxAlt2);
+    /* PORTC1 (pin 56) is configured as I2C1_SCL */
+    PORT_SetPinMux(PORTC, 1U, kPORT_MuxAlt2);
 
-    /* PORTC11 (pin 68) is configured as I2C1_SDA */
-    PORT_SetPinMux(PORTC, 11U, kPORT_MuxAlt2);
+    /* PORTC2 (pin 57) is configured as I2C1_SDA */
+    PORT_SetPinMux(PORTC, 2U, kPORT_MuxAlt2);
 
     /* PORTC4 (pin 61) is configured as SPI0_PCS0 */
     PORT_SetPinMux(BOARD_INITPINS_SS_PORT, BOARD_INITPINS_SS_PIN, kPORT_MuxAlt2);

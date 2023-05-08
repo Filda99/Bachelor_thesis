@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    globalio.h
- * @author  user
+ * @author  xjahnf00
  * @date    Jul 18, 2022
  * @brief
  ***************************************************************************************************
@@ -35,7 +35,15 @@ bool InitStop = true;
 uint8_t currentSpeed = ENGINE_STOP;
 
 //! Current position in steer array.
-//! 0 = max left
+//! 0 = max right
 //! 3 = direct
-//! 6 = max right
+//! 6 = max left
 uint8_t currentSteer = GO_DIRECT;
+
+//! I2C data transfer buffer
+uint8_t g_slave_buff;
+
+//! Buffer for saving data from i2c
+uint8_t sensorsDataFromArduino[I2C_DATA_LENGTH];
+
+uint32_t totalDistanceTraveled = 0;

@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    routine.h
- * @author  user
+ * @author  xjahnf00
  * @date    Aug 2, 2022
  * @brief   
  ********************************************************************************
@@ -17,6 +17,8 @@ extern "C" {
 /************************************
  * INCLUDES
  ************************************/
+#include "fsl_i2c_dma.h"
+#include "fsl_i2c.h"
 
 /************************************
  * MACROS AND DEFINES
@@ -34,6 +36,7 @@ extern "C" {
  * GLOBAL FUNCTION PROTOTYPES
  ************************************/
 void routine(void);
+void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData);
 
 #ifdef __cplusplus
 }

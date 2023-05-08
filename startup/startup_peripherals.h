@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    startup_peripherals.h
- * @author  user
+ * @author  xjahnf00
  * @date    Aug 2, 2022
  * @brief   
  ********************************************************************************
@@ -39,4 +39,4 @@ void startupPeripherals(void);
 }
 #endif
 
-#endif 
+#endif

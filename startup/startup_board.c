@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    startup_board.c
- * @author  user
+ * @author  xjahnf00
  * @date    Nov 25, 2022
  * @brief   
  ***************************************************************************************************
@@ -11,34 +11,54 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include "startup_board.h"
+
+#include "common/delay.h"
 #include "startup_peripherals.h"
 #include "MKL25Z4.h"
 #include "fsl_tpm.h"
 #include "fsl_i2c.h"
 #include "board.h"
 #include "fsl_debug_console.h"
-#include "peripherals/isl29125.h"
 #include "fsl_port.h"
 #include "global_macros.h"
-#include "common.h"
+#include "fsl_adc16.h"
+
+#include "routine.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
+extern dma_handle_t dmaHandle;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
+#define I2C_MASTER_CLOCK_FREQUENCY CLOCK_GetFreq(kCLOCK_CoreSysClk)
+
+#define PORT_PCR_ODE_MASK                   0x00000200u
 
 // Get source clock for TPM driver
 #define TPM_SOURCE_CLOCK 		CLOCK_GetFreq(kCLOCK_PllFllSelClk)
-#define I2C_MASTER_CLK_FREQ 	CLOCK_GetFreq(I2C0_CLK_SRC)
 #define GPIO_HALL_IRQn			PORTD_IRQn
-#define GPIO_COLOR_MAIN_IRQn	PORTA_IRQn
 
-#define LEFT_TPM_IC				kTPM_Chnl_0
-#define RIGHT_TPM_IC			kTPM_Chnl_4
-#define CENTER_TPM_IC			kTPM_Chnl_3
+
+
+#define EXAMPLE_I2C_MASTER_BASEADDR I2C0
+#define EXAMPLE_I2C_SLAVE_BASEADDR I2C1
+#define I2C_MASTER_CLK_SRC I2C0_CLK_SRC
+#define I2C_MASTER_CLK_FREQ CLOCK_GetFreq(I2C0_CLK_SRC)
+#define I2C_SLAVE_CLK_SRC I2C1_CLK_SRC
+#define I2C_SLAVE_CLK_FREQ CLOCK_GetFreq(I2C1_CLK_SRC)
+#define EXAMPLE_I2C_DMAMUX_BASEADDR DMAMUX0
+#define EXAMPLE_I2C_DMA_BASEADDR DMA0
+#define I2C_DMA_CHANNEL 0U
+
+#define DMA_REQUEST_SRC kDmaRequestMux0I2C0
+#define I2C_MASTER_SLAVE_ADDR_7BIT 0x7EU
+#define I2C_BAUDRATE 100000U
+
+
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -47,6 +67,7 @@
 //**************************************************************************************************
 //* STATIC VARIABLES
 //**************************************************************************************************
+i2c_slave_handle_t g_s_handle;
 
 //**************************************************************************************************
 //* GLOBAL VARIABLES
@@ -60,49 +81,40 @@
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+static void clearSRAM(void) {
+    uint32_t *sram_ptr = (uint32_t *) 0x1FFFF110; // Start address of SRAM
+    uint32_t sram_end = 0x1FFFF000 + 0x4000; // End address of SRAM
+    uint32_t sram_size = sram_end - (uint32_t) sram_ptr; // Size of remaining SRAM in bytes
+    //uint32_t sram_size = 0x3F00; // Size of SRAM in bytes
+    uint32_t i;
 
-//!*************************************************************************************************
-//! static void initMotors()
-//!
-//! @description
-//! Function initialize motors.
-//!
-//! @param    None
-//!
-//! @return   None
-//!*************************************************************************************************
-static void initMotors()
-{
-	PRINTF("\t\t- Motors initialization started.");
-	static float initDutyCycleStep = 0.06;
-
-	float initDutyCycle = 2.88;
-
-	delay_ms(400);
-
-	for (int i = 0; i < 100; i++)
-	{
-		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, initDutyCycle);
-		TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, initDutyCycle);
-		delay_ms(2);
-
-		initDutyCycle += initDutyCycleStep;
-		if( (i % 10) == 0) PRINTF(".");
-	}
-
-	// After inicialization, stop motors
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_0, kTPM_CenterAlignedPwm, 7.365000);
-	TPM_UpdatePwmDutycycle(TPM1, kTPM_Chnl_1, kTPM_CenterAlignedPwm, 7.365000);
-	delay_ms(50);
-	PRINTF("\r\n\t\t- Motors initialization complete.\r\n");
+    // Clear SRAM
+    for (i = 0; i < (sram_size / sizeof(uint32_t)); i++) {
+        sram_ptr[i] = 0;
+    }
 }
 
-static void initServo()
+static void init_adc(void)
 {
-	PRINTF("\t\t- Servo initialization started.\r\n");
-	TPM_UpdatePwmDutycycle(TPM0, kTPM_Chnl_5, kTPM_CenterAlignedPwm, 7.37);
-	delay_ms(100);
-	PRINTF("\t\t- Servo initialization complete.\r\n");
+	adc16_config_t adc16ConfigStruct;
+
+	 /*
+	 * adc16ConfigStruct.referenceVoltageSource = kADC16_ReferenceVoltageSourceVref;
+	 * adc16ConfigStruct.clockSource = kADC16_ClockSourceAsynchronousClock;
+	 * adc16ConfigStruct.enableAsynchronousClock = true;
+	 * adc16ConfigStruct.clockDivider = kADC16_ClockDivider8;
+	 * adc16ConfigStruct.resolution = kADC16_ResolutionSE12Bit;
+	 * adc16ConfigStruct.longSampleMode = kADC16_LongSampleDisabled;
+	 * adc16ConfigStruct.enableHighSpeed = false;
+	 * adc16ConfigStruct.enableLowPower = false;
+	 * adc16ConfigStruct.enableContinuousConversion = false;
+	 */
+	ADC16_GetDefaultConfig(&adc16ConfigStruct);
+
+	ADC16_Init(DEMO_ADC16_BASE, &adc16ConfigStruct);
+	ADC16_EnableHardwareTrigger(DEMO_ADC16_BASE, false); /* Make sure the software trigger is used. */
+
+
 }
 
 //!*************************************************************************************************
@@ -121,6 +133,7 @@ static void init_tsi(void)
 	TSI0->GENCS = TSI_GENCS_TSIEN_MASK | TSI_GENCS_MODE(0) | TSI_GENCS_REFCHRG(4) | TSI_GENCS_DVOLT(0) | TSI_GENCS_EXTCHRG(7);
 	TSI0->DATA = TSI_DATA_TSICH(9) | TSI_DATA_TSICNT_MASK | TSI_DATA_SWTS_MASK;
 }
+
 
 //!*************************************************************************************************
 //! static void init_leds()
@@ -158,7 +171,6 @@ static void startupPWM(void)
 {
 	PRINTF("\t- Motor and servo pwm initialization.\r\n");
 	// Motors
-	// todo: Motor Configuration
 	tpm_config_t tpmInfo;
 	tpm_chnl_pwm_signal_param_t tpmParam[2];
 
@@ -186,7 +198,7 @@ static void startupPWM(void)
 	// Configure tpm params with frequency 24kHZ
 	tpmParamSer.chnlNumber = kTPM_Chnl_5;
 	tpmParamSer.level = kTPM_HighTrue;
-	tpmParamSer.dutyCyclePercent = 7.37;
+	tpmParamSer.dutyCyclePercent = 7.375;
 
 	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
 	CLOCK_SetTpmClock(1U);
@@ -200,27 +212,6 @@ static void startupPWM(void)
 	TPM_StartTimer(TPM0, kTPM_SystemClock);
 }
 
-/*
-static void startupI2C(void)
-{
-    // ULTRASONIC masterXfer.slaveAddress = 0x57U;
-	i2c_master_config_t config;
-
-	I2C_MasterGetDefaultConfig(&config);
-
-	uint32_t srcClk = I2C_MASTER_CLK_FREQ;
-	I2C_MasterInit(I2C0, &config, srcClk);
-
-	bool ColorSensor = ISL_ColorSensorInit();
-
-	if(ColorSensor)
-	{
-		uint8_t redColor[2];
-		ISL_readRed(redColor);
-		redColor[1]++;
-	}
-}
-*/
 
 //!*************************************************************************************************
 //! static void startupInterrupts(void)
@@ -249,42 +240,42 @@ static void startupInterrupts(void)
 	EnableIRQ(GPIO_HALL_IRQn);
 }
 
-
 //!*************************************************************************************************
-//! static void startupSensorCapture()
+//! void i2c_init(void)
 //!
 //! @description
-//! Function sets input compare(input capture) function for color sensors.
+//! Function initialize i2c as slave device.
 //!
 //! @param    None
 //!
 //! @return   None
 //!*************************************************************************************************
-static void startupSensorCapture()
+void i2cInitSlave()
 {
-	PRINTF("\t- Color sensor initialization.\r\n");
-	tpm_config_t tpmInfo;
+	PRINTF("\t- I2C slave initialization.\r\n");
+	i2c_slave_config_t slaveConfig;
 
-	// Select the clock source for the TPM counter as kCLOCK_PllFllSelClk
-	CLOCK_SetTpmClock(1U);
+	DMAMUX_Init(EXAMPLE_I2C_DMAMUX_BASEADDR);
+	DMA_Init(EXAMPLE_I2C_DMA_BASEADDR);
 
-	TPM_GetDefaultConfig(&tpmInfo);
-	TPM_Init(MAIN_SEN_TPM_BASE, &tpmInfo);
+	I2C_SlaveGetDefaultConfig(&slaveConfig);
 
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, LEFT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, RIGHT_TPM_IC, kTPM_RisingEdge);
-	TPM_SetupInputCapture(MAIN_SEN_TPM_BASE, CENTER_TPM_IC, kTPM_RisingEdge);
+	slaveConfig.addressingMode = kI2C_Address7bit;
+	slaveConfig.slaveAddress = I2C_MASTER_SLAVE_ADDR_7BIT;
+	slaveConfig.upperAddress = 0;
 
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl0InterruptEnable);
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl4InterruptEnable);
-    TPM_EnableInterrupts(MAIN_SEN_TPM_BASE, kTPM_Chnl3InterruptEnable);
-    EnableIRQ(MAIN_SEN_TPM_IRQ);
+	I2C_SlaveInit(DATA_I2C, &slaveConfig, I2C_SLAVE_CLK_FREQ);
 
+	memset(&g_s_handle, 0, sizeof(g_s_handle));
 
-	TPM_StartTimer(MAIN_SEN_TPM_BASE, kTPM_SystemClock);
+	I2C_SlaveTransferCreateHandle(DATA_I2C, &g_s_handle, i2c_slave_callback, NULL);
+	I2C_SlaveTransferNonBlocking(DATA_I2C, &g_s_handle, kI2C_SlaveCompletionEvent);
 
-	// todo: GPIO C4 set to HIGH, GPIO C5 set to LOW
+	DMAMUX_SetSource(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL, DMA_REQUEST_SRC);
+	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
+	DMA_CreateHandle(&dmaHandle, EXAMPLE_I2C_DMA_BASEADDR, I2C_DMA_CHANNEL);
 }
+
 
 
 //**************************************************************************************************
@@ -310,13 +301,12 @@ void startupInit(void)
 void startupBoard(void)
 {
 	PRINTF("Startup board and peripherals.\r\n");
+
+	clearSRAM();
 	startupPWM();
-	//initMotors();
-	//initServo();
-
 	startupInterrupts();
-	startupSensorCapture();
+	i2cInitSlave();
+	init_adc();
 
-	//startupI2C();
 	PRINTF("Startup board and peripherals complete.\r\n");
 }

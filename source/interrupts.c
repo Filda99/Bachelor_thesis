@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    interrupts.c
- * @author  user
+ * @author  xjahnf00
  * @date    Oct 19, 2022
  * @brief   
  ********************************************************************************
@@ -10,18 +10,20 @@
 //**************************************************************************************************
 //* INCLUDES
 //**************************************************************************************************
+#include <motors/engines.h>
 #include "fsl_port.h"
 #include "global_macros.h"
 #include "fsl_gpio.h"
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
-#include "motors/engines.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
 extern unsigned int HalfWheelRotations;
 extern unsigned int LeftSensorValue;
+extern unsigned int RightSensorValue;
+extern unsigned int CenterSensorValue;
 extern bool InitStop;
 
 //**************************************************************************************************
@@ -30,7 +32,7 @@ extern bool InitStop;
 #define GPIO_HALL_IRQHandler		PORTD_IRQHandler
 #define GPIO_COLOR_MINOR_IRQHandler	PORTA_IRQHandler
 #define GPIO_COLOR_MAIN_IRQHandler	TPM0_IRQHandler
-#define FIELD_SIZE 20
+#define FIELD_SIZE 5
 
 #define LEFT_TPM_IC					kTPM_Chnl_0
 #define RIGHT_TPM_IC				kTPM_Chnl_4
@@ -83,62 +85,79 @@ void GPIO_COLOR_MAIN_IRQHandler()
 	//uint32_t pinInterrupt = GPIO_GetPinsInterruptFlags(PTD);
 	uint32_t pinInterrupt = TPM_GetStatusFlags(MAIN_SEN_TPM_BASE);
 
-
-	if(pinInterrupt & kTPM_Chnl0Flag)
+	// Left sensor
+	if (pinInterrupt & kTPM_Chnl0Flag)
 	{
-		static uint32_t firstCapture = 0;
-		static uint32_t secondCapture = 0;
+		static uint32_t firstCaptureLeft = 0;
+		static uint32_t secondCaptureLeft = 0;
+		static bool risingLeft = true;
 
-		static uint32_t colorDetection[FIELD_SIZE] = {0, };
-		static uint8_t head = 0;
-
-		static bool rising = true;
-
-		if (rising)
+		if (risingLeft)
 		{
-			firstCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			firstCaptureLeft = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
 		}
 		else
 		{
-			secondCapture = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
-			uint32_t pulseWidth = secondCapture - firstCapture;
-			if (pulseWidth > 10000)
+			secondCaptureLeft = MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnV;
+			LeftSensorValue = secondCaptureLeft - firstCaptureLeft;
+			if (LeftSensorValue > 1000)
 			{
-				uint32_t firstPart = MAX_UINT16 - firstCapture;
-				pulseWidth = secondCapture + firstPart;
-			}
-
-
-			if(head != FIELD_SIZE)
-			{
-				colorDetection[head] = pulseWidth;
-				head++;
-			}
-			else
-			{
-				colorDetection[head] = pulseWidth;
-
-				uint32_t color = 0;
-				for (int i = 0; i < FIELD_SIZE; i++)
-				{
-					color += colorDetection[i];
-				}
-				LeftSensorValue = color/FIELD_SIZE;
-				head = 0;
-				DisableIRQ(MAIN_SEN_TPM_IRQ);
+				uint32_t firstPartLeft = 30000 - firstCaptureLeft;
+				LeftSensorValue = secondCaptureLeft + firstPartLeft;
 			}
 		}
-		rising = !rising;
+		risingLeft = !risingLeft;
 		MAIN_SEN_TPM_BASE->CONTROLS[LEFT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
 		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl0Flag);
 	}
+	// Right sensor
+	else if (pinInterrupt & kTPM_Chnl4Flag)
+	{
+		static uint32_t firstCaptureRight = 0;
+		static uint32_t secondCaptureRight = 0;
+		static bool risingRight = true;
 
+		if (risingRight)
+		{
+			firstCaptureRight = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
+		}
+		else
+		{
+			secondCaptureRight = MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnV;
+			RightSensorValue = secondCaptureRight - firstCaptureRight;
+			if (RightSensorValue > 1000)
+			{
+				uint32_t firstPartRight = 30000 - firstCaptureRight;
+				RightSensorValue = secondCaptureRight + firstPartRight;
+			}
+		}
+		risingRight = !risingRight;
+		MAIN_SEN_TPM_BASE->CONTROLS[RIGHT_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
+		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl4Flag);
+	}
+	// Center sensor
+	else if (pinInterrupt & kTPM_Chnl3Flag)
+	{
+		static uint32_t firstCaptureCenter = 0;
+		static uint32_t secondCaptureCenter = 0;
+		static bool risingCenter = true;
 
+		if (risingCenter)
+		{
+			firstCaptureCenter = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
+		}
+		else
+		{
+			secondCaptureCenter = MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnV;
+			CenterSensorValue = secondCaptureCenter - firstCaptureCenter;
+			if (CenterSensorValue > 1000)
+			{
+				uint32_t firstPartCenter = 30000 - firstCaptureCenter;
+				CenterSensorValue = secondCaptureCenter + firstPartCenter;
+			}
+		}
+		risingCenter = !risingCenter;
+		MAIN_SEN_TPM_BASE->CONTROLS[CENTER_TPM_IC].CnSC |= TPM_CnSC_CHF_MASK;
+		PORT_ClearPinsInterruptFlags(GPIO_COLOR_MAIN_SEN, kTPM_Chnl3Flag);
+	}
 }
-
-// TODO: Pokud se vyvola preruseni zde, uz musime zacit zatacet na danou stranu!
-void GPIO_COLOR_MINOR_IRQHandler()
-{
-
-}
-
