@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    map_init.c
- * @author  user
+ * @author  xjahnf00
  * @date    Dec 5, 2022
  * @brief
  ***************************************************************************************************
@@ -53,12 +53,45 @@ curr_pos_map currPosInBlk = {
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+
+//!*************************************************************************************************
+//! static void getUniqueID(int x, int y)
+//!
+//! @description
+//! Calculate unique ID by coordinates.
+//!
+//! @param    int	x	X-axis of the block
+//! @param    int	y	Y-axis of the block
+//!
+//! @return   None
+//!*************************************************************************************************
 static int getUniqueID(int x, int y)
 {
     int unique_id = (y * MAP_ROWS * MAP_COLUMNS) + x + 1;
     unique_id *= 31;
     return unique_id;
 }
+
+
+//!*************************************************************************************************
+//! static void round_down(double x)
+//!
+//! @description
+//! Function floor the number given by parameter and if the number is negative
+//! function will add one, so that we always round to the smaller number.
+//!
+//! @param    double	x	Number which should be rounded to smaller number
+//!
+//! @return   Rounded number
+//!*************************************************************************************************
+static double round_down(double x) {
+    double result = floor(x);
+    if (x < 0) {
+        result++;
+    }
+    return result;
+}
+
 
 //!*************************************************************************************************
 //! static void initNewBlock(map_block *newBlock)
@@ -139,6 +172,19 @@ static map_block *createNewBlock(int ID, int X, int Y)
 	return block;
 }
 
+
+//!*************************************************************************************************
+//! static void getCoordinates(block_direction direction,  int *x, int *y)
+//!
+//! @description
+//! Function calculates coordinates for new block to which we should move.
+//!
+//! @param    block_direction 	direction	The direction in which we want to go
+//! @param    int 				*x 			X-axis
+//! @param    int 				*y 			Y-axis
+//!
+//! @return   None
+//!*************************************************************************************************
 void getCoordinates(block_direction direction, int *x, int *y)
 {
 	*x = currentBlockInMap->corX;
@@ -162,6 +208,7 @@ void getCoordinates(block_direction direction, int *x, int *y)
 			break;
 	}
 }
+
 
 //!*************************************************************************************************
 //! static void moveInBlocks(block_direction direction)
@@ -196,6 +243,7 @@ static void moveBetweenBlocks(block_direction direction)
 	currentBlockInMap = pBlockToMove;
 }
 
+
 //**************************************************************************************************
 //* GLOBAL FUNCTIONS
 //**************************************************************************************************
@@ -223,6 +271,7 @@ void createMap()
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
+
 //!*************************************************************************************************
 //! void saveCurrentBlock(void)
 //!
@@ -241,6 +290,7 @@ void saveCurrentBlock()
 		insertToHashTable(ID, currentBlockInMap);
 	}
 }
+
 
 //!*************************************************************************************************
 //! void moveInMap(void)
@@ -293,7 +343,7 @@ void moveInMap(map_move_direction direction)
 						currPosInBlk.Row != MAP_BLOCK_MIN_ROW)
 				{
 					moveBetweenBlocks(block_left);
-					currPosInBlk.Row--;
+					//currPosInBlk.Row--;
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 				}
 				// Move to the block above us
@@ -302,7 +352,7 @@ void moveInMap(map_move_direction direction)
 				{
 					moveBetweenBlocks(block_up);
 					currPosInBlk.Row = MAP_BLOCK_MAX_ROW;
-					currPosInBlk.Col--;
+					//currPosInBlk.Col--;
 				}
 				// Move to the upper left block
 				else
@@ -342,7 +392,7 @@ void moveInMap(map_move_direction direction)
 						currPosInBlk.Row != MAP_BLOCK_MAX_ROW)
 				{
 					moveBetweenBlocks(block_left);
-					currPosInBlk.Row--;
+					//currPosInBlk.Row--;
 					currPosInBlk.Col = MAP_BLOCK_MAX_COL;
 				}
 				// Move to the block below us
@@ -351,7 +401,7 @@ void moveInMap(map_move_direction direction)
 				{
 					moveBetweenBlocks(block_down);
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
-					currPosInBlk.Col--;
+					//currPosInBlk.Col--;
 				}
 				// Move to the block to the left below us
 				else
@@ -391,7 +441,7 @@ void moveInMap(map_move_direction direction)
 				{
 					moveBetweenBlocks(block_right);
 					currPosInBlk.Col = MAP_BLOCK_MIN_COL;
-					currPosInBlk.Row--;
+					//currPosInBlk.Row--;
 				}
 				// Move to the block below us
 				else if (currPosInBlk.Col != MAP_BLOCK_MAX_COL &&
@@ -399,7 +449,7 @@ void moveInMap(map_move_direction direction)
 				{
 					moveBetweenBlocks(block_down);
 					currPosInBlk.Row = MAP_BLOCK_MIN_ROW;
-					currPosInBlk.Col--;
+					//currPosInBlk.Col--;
 				}
 				// Move to the block to the right below us
 				else
@@ -466,33 +516,44 @@ void moveInMap(map_move_direction direction)
 	currentBlockInMap->block[currPosInBlk.Row][currPosInBlk.Col] = map_CurrentPosition;
 }
 
-static double round_down(double x) {
-    double result = floor(x);
-    if (x < 0) {
-        result++;
-    }
-    return result;
-}
 
-void getBlock(sensor_side laserSide, uint8_t value, float angle)
+//!*************************************************************************************************
+//! void saveBarrierToMap(sensor_side laserSide, uint8_t value, float angl)
+//!
+//! @description
+//! Function calculates angle for trigonometric equation.
+//! Then it calculates distances opposite and adjacent side of the triangle in cm.
+//! Next we must calculate, in which block and field should we place the barrier.
+//! Finally we insert appropriate object.
+//!
+//! @param    sensor_side	laserSide	The side of the robot where the laser is located
+//! @param    uint8_t		value		Distance in centimeters
+//! @param    float			angle		Angle connecting the initial position with the current one
+//!
+//! @return   None
+//!*************************************************************************************************
+void saveBarrierToMap(sensor_side laserSide, uint8_t value, float angle)
 {
 	if (laserSide == sensor_Left)
 	{
-		angle += 180.0;
-		angle = fmod(angle, 360);
+		angle += 90.0;
 	}
-	//double alpha_rad = angle * (M_PI / 180); // převod úhlu ze stupňů na radiány
-	double a = value * cos(angle); // délka přilehlé strany
-	double b = value * sin(angle); // délka protilehlé strany
+	else
+	{
+		angle -= 90.0;
+	}
+	double a = value * cos(angle*M_PI/180);
+	double b = value * sin(angle*M_PI/180);
 
-	float shiftInX = b / MAP_BLOCK_SIZE;
-	float shiftInY = a / MAP_BLOCK_SIZE;
+	float shiftInX = a / MAP_BLOCK_SIZE;
+	float shiftInY = b / MAP_BLOCK_SIZE;
 
 	shiftInX = round_down(shiftInX);
 	shiftInY = round_down(shiftInY);
 
 	int fieldX = currPosInBlk.Col + shiftInX;
 	int fieldY = currPosInBlk.Row + shiftInY;
+	fieldY = MAP_ROWS / 2 - (fieldY - MAP_ROWS / 2);
 
 	int shiftInXBetweenBlks = 0;
 	int shiftInYBetweenBlks = 0;

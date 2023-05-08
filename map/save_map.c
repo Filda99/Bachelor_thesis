@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    save_map.c
- * @author  user
+ * @author  xjahnf00
  * @date    Apr 13, 2023
  * @brief   
  ***************************************************************************************************
@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "board.h"
+#include "common/delay.h"
 
 //**************************************************************************************************
 //* EXTERN VARIABLES
@@ -67,7 +69,7 @@ static void insertValue(int newValue, char **stringPtr, size_t *currentSizePtr) 
     char valueStr[3] = " , ";
     //snprintf(valueStr, sizeof(valueStr), "%d, ", newValue);
     if (newValue == 0)
-    	;	// Pass zero's, because they are nothing.
+    	valueStr[0] = '-';	// Pass zero's, because they are nothing.
     else if (newValue == 1)
     	valueStr[0] = '1';
     else if (newValue == 2)
@@ -81,14 +83,26 @@ static void insertValue(int newValue, char **stringPtr, size_t *currentSizePtr) 
     else if (newValue == -1)
     	valueStr[1] = '\n';
 
+    if (newValue != -1)
+    	PRINTF("%c", valueStr[0]);
+    else if (newValue == 0)
+    	PRINTF("-");
+    else
+    	PRINTF("\r\n");
 
     // Calculate new string size and reallocate memory
     size_t valueSize = strlen(valueStr);
     size_t newSize = *currentSizePtr + valueSize;
     *stringPtr = (char*)realloc(*stringPtr, newSize + 1);
     if (*stringPtr == NULL) {
-        // Handle allocation error
-        //exit(EXIT_FAILURE);
+		PRINTF("\nError reallocating string\r\n");
+    	LED_BLUE_OFF();
+    	LED_GREEN_OFF();
+		while(1)
+		{
+			LED_RED_TOGGLE();
+			delay_ms(100);
+		}
     }
 
     // Append new value to string and update size
@@ -100,40 +114,45 @@ static void insertValue(int newValue, char **stringPtr, size_t *currentSizePtr) 
 static char *saveBlocks(map_block* blockBuffer, int bufferCount, size_t *currentSizePtr)
 {
 	static char *stringPtr = NULL;
+
 	int rowIndexBuffer = 0;			// Starting index of block row in block field of a row we are processing
 	int processingRowInBlock = 0;	// Stores number of row which we are currently processing
-	int prevProcessedBlockColumn = blockBuffer->corX;	// Stores previously processed column which is helpful for filling gaps
-	int processingBlockRow = blockBuffer->corY;	// Stores the number of block row, the subset of all blocks
+
+	int firstBlockInSubField = blockBuffer->corX;		// Number of first block on the row (for printing gaps at the beginning)
+	int prevProcessedBlockColumn = blockBuffer->corX;	// Stores previously processed column which is helpful for filling gaps between blocks
+	int processingBlockRow = blockBuffer->corY;			// Stores the number of block row, the subset of all blocks
 
 	// Go through all blocks in the buffer
 	for (int indexBuffer = rowIndexBuffer; indexBuffer < bufferCount;)
 	{
-		int fillingBlockGap = blockBuffer->corX;
-		// First block only, print unnecessarily gaps
-		while (fillingBlockGap > maxLeftBlock)
+		// If we are processing the subset of the blocks which are on the same row
+		if (processingBlockRow == blockBuffer[indexBuffer].corY)
 		{
-			// Print the gap
-			for (int rowInBlock = 0; rowInBlock < MAP_ROWS; rowInBlock++)
+
+			int fillingBlockGap = blockBuffer[indexBuffer].corX;
+			// First block only, print unnecessarily gaps
+			while (fillingBlockGap > maxLeftBlock && blockBuffer[indexBuffer].corX == firstBlockInSubField)
 			{
+				// Print the gap
 				for (int columnInBlock = 0; columnInBlock < MAP_COLUMNS; columnInBlock++)
 				{
 					insertValue(0, &stringPtr, currentSizePtr);
 				}
+
+				fillingBlockGap--;
 			}
 
-			fillingBlockGap--;
-		}
-		// If we are processing the subset of the blocks which are on the same row
-		if (processingBlockRow == blockBuffer[indexBuffer].corY)
-		{
+			fillingBlockGap = blockBuffer[indexBuffer].corX - 1;
 			// If there is some gap, fill it
-			while (blockBuffer[indexBuffer].corX - 1 > prevProcessedBlockColumn)
+			while (fillingBlockGap > prevProcessedBlockColumn)
 			{
 				// Print the gap
 				for (int columnBlock = 0; columnBlock < MAP_COLUMNS; columnBlock++)
 				{
 					insertValue(0, &stringPtr, currentSizePtr);
 				}
+
+				fillingBlockGap--;
 			}
 			prevProcessedBlockColumn = blockBuffer[indexBuffer].corX;
 
@@ -144,29 +163,41 @@ static char *saveBlocks(map_block* blockBuffer, int bufferCount, size_t *current
 			}
 		}
 
-		if (indexBuffer + 1 == bufferCount)
+		if (processingRowInBlock + 1 < MAP_ROWS && processingBlockRow != blockBuffer[indexBuffer].corY)
 		{
-			indexBuffer = rowIndexBuffer;
 			processingRowInBlock++;
 			insertValue(-1, &stringPtr, currentSizePtr);
+			indexBuffer = rowIndexBuffer;
+			continue;
 		}
-		else
-		{
-			indexBuffer++;
-		}
-
-		if (processingRowInBlock >= MAP_ROWS)
+		else if (processingBlockRow != blockBuffer[indexBuffer].corY)
 		{
 			processingRowInBlock = 0;
 			processingBlockRow--;
 
-			rowIndexBuffer = ++indexBuffer;
+			insertValue(-1, &stringPtr, currentSizePtr);
+
+			rowIndexBuffer = indexBuffer;
 
 			if (processingBlockRow >= maxBottomBlock)
+			{
+				firstBlockInSubField = blockBuffer[indexBuffer].corX;
 				continue;
+			}
 			else
 				break;
 		}
+		else
+		{
+			indexBuffer++;
+			if (indexBuffer >= bufferCount && processingRowInBlock + 1 < MAP_ROWS)
+			{
+				processingRowInBlock++;
+				insertValue(-1, &stringPtr, currentSizePtr);
+				indexBuffer = rowIndexBuffer;
+			}
+		}
+
 	}
 
 	return stringPtr;
@@ -215,6 +246,19 @@ static void sort_coordinates(map_block* block, int num_coords) {
             }
         }
     }
+
+    /*for (int id = 0; id < num_coords; id++)
+    {
+		PRINTF("Block: %i, %i\r\n", block[id].corX, block[id].corY);
+		for (int i = 0; i < MAP_ROWS; i++)
+		{
+			for (int j = 0; j < MAP_COLUMNS; j++)
+			{
+				PRINTF(" %d |", block[id].block[i][j]);
+			}
+			PRINTF("\r\n");
+		}
+    }*/
 }
 
 static void writeStringToSD(char **stringPtr, size_t *currentSizePtr)
@@ -247,31 +291,71 @@ static void writeStringToSD(char **stringPtr, size_t *currentSizePtr)
 	if(fr)
 	{
 		PRINTF("\nError mounting file system\r\n");
-		for(;;){}
+		LED_GREEN_OFF();
+		LED_BLUE_OFF();
+		while(1)
+		{
+			LED_RED_TOGGLE();
+			delay_ms(100);
+		}
 	}
 	PRINTF("Opening file.\r\n");
-	fr = f_open(&fil, file_name, FA_CREATE_NEW | FA_WRITE);
+
+	LED_GREEN_TOGGLE();
+	delay_ms(150);
+	LED_GREEN_ON();
+
+	fr = f_open(&fil, file_name, FA_CREATE_ALWAYS | FA_WRITE);
 	if(fr)
 	{
 		fr = f_open(&fil, file_name, FA_OPEN_EXISTING | FA_WRITE);
 		if(fr)
 		{
 			PRINTF("\nError opening text file\r\n");
-			for(;;){}
+			LED_GREEN_OFF();
+			LED_BLUE_OFF();
+			while(1)
+			{
+				LED_RED_TOGGLE();
+				delay_ms(100);
+			}
 		}
 	}
+
+	LED_GREEN_TOGGLE();
+	delay_ms(150);
+	LED_GREEN_ON();
+
 	PRINTF("Writing to file...\r\n");
 	fr = f_write(&fil, *stringPtr, *currentSizePtr, &bw);
 	if(fr)
 	{
 		PRINTF("\nError write text file\r\n");
-		for(;;){}
+		LED_GREEN_OFF();
+		LED_BLUE_OFF();
+		while(1)
+		{
+			LED_RED_TOGGLE();
+			delay_ms(100);
+		}
 	}
+
+	LED_GREEN_TOGGLE();
+	delay_ms(150);
+	LED_GREEN_ON();
+
 	PRINTF("Closing file.\r\n");
 	fr = f_close(&fil);
 	if(fr)
 	{
 		PRINTF("\nError close text file\r\n");
+		LED_GREEN_OFF();
+		LED_BLUE_OFF();
+		while(1)
+		{
+			LED_RED_TOGGLE();
+			delay_ms(100);
+		}
 	}
 	else
 	{
@@ -324,7 +408,12 @@ void saveMap()
 	PRINTF("Saving map...\r\n");
 	fieldsBuffer = saveBlocks(blockBuffer, ht->count, &currentSize);
 
+	LED_RED_ON();
+	LED_GREEN_ON();
 	writeStringToSD(&fieldsBuffer, &currentSize);
+
+	LED_RED_TOGGLE();
+	while(1);
 }
 
 

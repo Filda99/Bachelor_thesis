@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    control_unit.c
- * @author  user
+ * @author  xjahnf00
  * @date    Dec 1, 2022
  * @brief
  ***************************************************************************************************
@@ -90,7 +90,7 @@ void controlUnit()
 			if (HalfWheelRotations > CNT_OUT_OF_LANE)
 			{
 				PRINTF("\t-> Add speed. \r\n");
-				addSpeed();
+				//addSpeed();
 			}
 
 			prevTurning = LineNone;
@@ -116,8 +116,10 @@ void controlUnit()
 					goDirect();
 				}
 
+				turnRightCustom(MAX_STEER_RIGHT);
+
 				//PRINTF("\t-> Turning right! \r\n");
-				if (currentSteer >= 2)
+				/*if (currentSteer >= 2)
 				{
 					turnRight();
 				}
@@ -135,7 +137,7 @@ void controlUnit()
 				if (currentSpeed > 2)
 				{
 					slackUpSpeed();
-				}
+				}*/
 
 
 				lineCnt = 0;
@@ -162,9 +164,10 @@ void controlUnit()
 				{
 					goDirect();
 				}
+				turnLeftCustom(MAX_STEER_LEFT);
 
 				//PRINTF("\t-> Turning left! \r\n");
-				if (currentSteer <= 4)
+				/*if (currentSteer <= 4)
 				{
 					turnLeft();
 				}
@@ -182,7 +185,7 @@ void controlUnit()
 				if (currentSpeed > 2)
 				{
 					slackUpSpeed();
-				}
+				}*/
 
 
 				lineCnt = 0;
@@ -195,32 +198,32 @@ void controlUnit()
 
 		case LineCenter_Left:
 		{
-			slackUpSpeedCustom(2);
+			//slackUpSpeed();
 			turnRightCustom(MAX_STEER_LEFT);
-			slackUpSpeedOnWheel(2);
-			PRINTF("\t-> Turning HARD right! \r\n");
+			//slackUpSpeedOnWheel(2);
+			//PRINTF("\t-> Turning HARD right! \r\n");
 			stopCarCnt = 0;
 			break;
 		}
 
 		case LineCenter_Right:
 		{
-			slackUpSpeedCustom(2);
+			//slackUpSpeed();
 			turnLeftCustom(MAX_STEER_LEFT);
-			slackUpSpeedOnWheel(2);
-			PRINTF("\t-> Turning HARD left! \r\n");
+			//slackUpSpeedOnWheel(2);
+			//PRINTF("\t-> Turning HARD left! \r\n");
 			stopCarCnt = 0;
 			break;
 		}
 
-		case LineCenter_None:
+		/*case LineCenter_None:
 		{
 			// todo: go backwards until some sensor detects line
 			goDirect();
 			goBackwards();
 			stopCarCnt = 0;
 			break;
-		}
+		}*/
 	}
 
 }

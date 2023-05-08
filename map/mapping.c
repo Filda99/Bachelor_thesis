@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    mapping.c
- * @author  user
+ * @author  xjahnf00
  * @date    Dec 15, 2022
  * @brief   
  ***************************************************************************************************
@@ -31,6 +31,8 @@ extern curr_pos_map currPosInBlk;
 extern uint8_t leftLaserValue;
 extern uint8_t rightLaserValue;
 
+extern uint32_t totalDistanceTraveled;
+
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
 //**************************************************************************************************
@@ -39,8 +41,6 @@ extern uint8_t rightLaserValue;
 
 #define TURNING_LEFT	180
 #define TURNING_RIGHT	0
-
-#define STARTING_HEADING_ANGLE	 0
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -55,12 +55,10 @@ static float angleHeading = STARTING_HEADING_ANGLE;
 static float centerOfCircle[2] = {0.0};
 
 //! Radius field of the circles, which are dependent on the rotation of the servo
-/*static float radius[7] = {
-		17.5, 30.3, 65.3, 0, 65.3, 30.3, 17.5
-};*/
 static float radius[7] = {
-		17.5, 30.3, 4.689, 0, 4.689, 30.3, 17.5
+		17.5, 30.3, 65.3, 0, 65.3, 30.3, 17.5
 };
+
 
 //! Calculated new position in a map.
 coordinates newPos  = {
@@ -84,7 +82,7 @@ coordinates prevPos = {
 //**************************************************************************************************
 
 //**************************************************************************************************
- //* STATIC FUNCTIONS
+//* STATIC FUNCTIONS
 //**************************************************************************************************
 
 //!*************************************************************************************************
@@ -109,9 +107,11 @@ static float calcNewDistance(uint8_t turningSide)
 
 	// Get distance from previous position
 	uint32_t newRotations = HalfWheelRotations - prevNoWheelRot;
+	if (newRotations == 0)  return 0.0;
 
 	// Distance of LEFT WHEEL traveled from previous position
-	uint32_t newDistanceLW = newRotations * 5;
+	uint32_t newDistanceLW = newRotations * 10;
+
 	// If the wheel moves a full turn, add one cm to distance due PI is float
 	if ((HalfWheelRotations % 2) == 0)
 	{
@@ -122,7 +122,7 @@ static float calcNewDistance(uint8_t turningSide)
 	if (turningSide != GO_DIRECT)
 	{
 		// Calculate phi angle, which is in radians heading angle
-		float phi = newDistanceLW / currentRadius;
+		float phi = newDistanceLW / currentRadius * 180 / M_PI;
 
 		float distanceLeftCenterWheel = 4.5; // 45mm
 		if (turningSide == TURNING_LEFT)
@@ -136,7 +136,7 @@ static float calcNewDistance(uint8_t turningSide)
 			angleHeading -= phi;
 		}
 
-		newDistance = phi * currentRadius;
+		newDistance = phi * currentRadius * M_PI / 180;
 	}
 	else
 	{
@@ -145,14 +145,12 @@ static float calcNewDistance(uint8_t turningSide)
 
 	prevNoWheelRot = HalfWheelRotations;
 
-	if ((int)(angleHeading*180/M_PI) >= 360)
-	{
-		hardStop();
-	}
-	angleHeading = fmodf(angleHeading*180/M_PI, 360.0)*M_PI/180;
+
+	angleHeading = fmodf(angleHeading, 360.0);
 
 	return newDistance;
 }
+
 
 //!*************************************************************************************************
 //! static void calcNewPosition(float *current_x, float *current_y, float distance, uint8_t turningSide)
@@ -178,8 +176,6 @@ static void calcNewPosition(float distance, uint8_t turningSide)
 	if (currentSteer != previousSteer && currentSteer != GO_DIRECT)
 	{
 		int angle = turningSide - prevHeadingAngle;
-	/*	centerOfCircle[X] = newPos.x - radius[currentSteer] * cos(angle*M_PI/180);
-		centerOfCircle[Y] = newPos.y - radius[currentSteer] * sin(angle*M_PI/180);*/
 		centerOfCircle[X] = newPos.x - radius[currentSteer] * sin(angle*M_PI/180);
 		centerOfCircle[Y] = newPos.y - radius[currentSteer] * cos(angle*M_PI/180);
 	}
@@ -195,14 +191,6 @@ static void calcNewPosition(float distance, uint8_t turningSide)
 
 		// Calculate the final angle
 		float finalTheta = theta + deltaTheta;
-		/*if (turningSide == TURNING_LEFT)
-		{
-			finalTheta = theta + deltaTheta;
-		}
-		else
-		{
-			finalTheta = theta - deltaTheta;
-		}*/
 
 		// Calculate the x and y coordinates of the end point.
 		// We don't need to add result to current position, because
@@ -220,6 +208,7 @@ static void calcNewPosition(float distance, uint8_t turningSide)
 	previousSteer = currentSteer;
 	prevHeadingAngle = angleHeading;
 }
+
 
 //!*************************************************************************************************
 //! static map_move_direction getDirection(uint8_t moveToNewBlock_x, uint8_t moveToNewBlock_y, float current_x,
@@ -241,6 +230,19 @@ static map_move_direction getDirection(uint8_t moveToNewBlock_x, uint8_t moveToN
 {
 	map_move_direction direction = move_unknown;
 
+
+
+	int blockY = currPosInBlk.Row;
+	// Move in map when traveled to new block
+	if (blockY < (MAP_ROWS / 2))
+	{
+		blockY = MAP_ROWS / 2 - (blockY - MAP_ROWS / 2);
+	}
+	else if (blockY > (MAP_ROWS / 2))
+	{
+		blockY = MAP_ROWS / 2 + (blockY - MAP_ROWS / 2);
+	}
+
 	/* ! 2D fields in C are computed from top-left as [0, 0].
 	 * But if we move upwards, we will have higher number.
 	 * -------------------------------------------------------
@@ -250,12 +252,12 @@ static map_move_direction getDirection(uint8_t moveToNewBlock_x, uint8_t moveToN
 	 * we will move up one square (from [1,1] in the beginning to [1, 0].
 	 */
 	// Up
-	if (newPos.y > prevPos.y && moveToNewBlock_y != currPosInBlk.Row)
+	if (newPos.y > prevPos.y && moveToNewBlock_y != blockY)
 	{
 		direction |= move_up;
 	}
 	// Down
-	if (newPos.y < prevPos.y && moveToNewBlock_y != currPosInBlk.Row)
+	if (newPos.y < prevPos.y && moveToNewBlock_y != blockY)
 	{
 		direction |= move_down;
 	}
@@ -317,8 +319,6 @@ static map_move_direction getDirection(uint8_t moveToNewBlock_x, uint8_t moveToN
 //!*************************************************************************************************
 void mapping()
 {
-	static uint32_t totalDistanceTraveled = 0;
-
 	// Get info about circle
 	uint8_t turningSide;
 	if (currentSteer == GO_DIRECT)
@@ -332,57 +332,61 @@ void mapping()
 
 	// Calculate new traveled distance
 	float newDistance = calcNewDistance(turningSide);
+	if (newDistance == 0) return;
+
 	totalDistanceTraveled += (int)newDistance;
 
 	// Calculate our new position
 	calcNewPosition(newDistance, turningSide);
 
 	// Calculate if we should move to another field in the map
-	uint8_t moveToNewBlock_x = ((int)floor(newPos.x) / MAP_BLOCK_SIZE) % MAP_COLUMNS;
-	uint8_t moveToNewBlock_y = ((int)floor(newPos.y) / MAP_BLOCK_SIZE) % MAP_ROWS;
-	// Move in map when traveled to new block
-	if (moveToNewBlock_y > MAP_ROWS / 2)
-	{
-		moveToNewBlock_y = MAP_ROWS / 2 - (moveToNewBlock_y - MAP_ROWS / 2);
-	}
-	else if  (moveToNewBlock_y < MAP_ROWS / 2)
-	{
-		moveToNewBlock_y = MAP_ROWS / 2 - (moveToNewBlock_y - MAP_ROWS / 2);
-	}
+	uint8_t moveToField_x = ((int)fabs(floor(newPos.x) / MAP_BLOCK_SIZE)) % MAP_COLUMNS;
+	uint8_t moveToField_y = ((int)fabs(floor(newPos.y) / MAP_BLOCK_SIZE)) % MAP_ROWS;
+	// Rotate the y component through the center row
+	// due difference between 2D field and coordinate system
+	moveToField_y = MAP_ROWS / 2 - (moveToField_y - MAP_ROWS / 2);
 
 	// Move to another field
-	if (moveToNewBlock_x != currPosInBlk.Col || moveToNewBlock_y != currPosInBlk.Row)
+	if (moveToField_x != currPosInBlk.Col || moveToField_y != currPosInBlk.Row)
 	{
-		map_move_direction direction = getDirection(moveToNewBlock_x, moveToNewBlock_y);
+		map_move_direction direction = getDirection(moveToField_x, moveToField_y);
 		if (direction != move_unknown)
 		{
 			moveInMap(direction);
-		}
-		else
-		{
-			PRINTF("[ERROR]: I should have moved but still on the same position!\r\n");
 		}
 	}
 
 	prevPos.x = newPos.x;
 	prevPos.y = newPos.y;
-	PRINTF("Heading angle: %i\r\n", (int)(angleHeading*180/M_PI));
+
+	PRINTF("Heading angle: %i\r\n", (int)(angleHeading));
 	PRINTF("Distance traveled: %d\r\n", totalDistanceTraveled);
 	PRINTF("Coordinates: %d, %d\r\n", (int)newPos.x, (int)newPos.y);
     PRINTF("Center of circle coordinates: %d, %d\r\n", (int)centerOfCircle[X], (int)centerOfCircle[Y]);
 }
 
+
+//!*************************************************************************************************
+//! void saveSensorData(void)
+//!
+//! @description
+//! Laser sensor data mapping.
+//! If left or right sensor detects some barrier in distance, we need to save this data
+//! into the map.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void saveSensorData(void)
 {
-	leftLaserValue = 0;
-	rightLaserValue = 10;
 	if (leftLaserValue < 250 && leftLaserValue > 0)
 	{
-		getBlock(sensor_Left, leftLaserValue, angleHeading);
+		saveBarrierToMap(sensor_Left, leftLaserValue, angleHeading);
 	}
 	if (rightLaserValue < 250 && rightLaserValue > 0)
 	{
-		getBlock(sensor_Right, rightLaserValue, angleHeading);
+		saveBarrierToMap(sensor_Right, rightLaserValue, angleHeading);
 	}
 }
 

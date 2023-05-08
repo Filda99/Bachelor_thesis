@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    engines.c
- * @author  user
+ * @author  xjahnf00
  * @date    Jul 18, 2022
  * @brief   
  ********************************************************************************
@@ -93,6 +93,7 @@ static void getDutyCycle(float setSpeed)
 //!*************************************************************************************************
 static void setMotorSpeed(int speed, uint8_t wheelSide, uint8_t slackWheel)
 {
+
 	float setSpeed = SpeedMap[speed];
 	getDutyCycle(setSpeed);
 
@@ -145,10 +146,13 @@ void setMotorSteer(int steer)
 //-------------------
 void addSpeed()
 {
-	if (currentSpeed == MAX_FORWARD_ENGINE_LIMIT) return;
-
-	currentSpeed++;
-	setMotorSpeed(currentSpeed, GO_DIRECT, 0);
+	if (currentSpeed == MAX_FORWARD_ENGINE_LIMIT)
+		setMotorSpeed(currentSpeed, GO_DIRECT, 0);
+	else
+	{
+		currentSpeed++;
+		setMotorSpeed(currentSpeed, GO_DIRECT, 0);
+	}
 }
 
 void addSpeedCustom(int speed)
@@ -231,7 +235,7 @@ void turnRight()
 
 void turnRightCustom(int steer)
 {
-	if ((currentSteer + steer) >= MAX_STEER_RIGHT)
+	if ((currentSteer - steer) <= MAX_STEER_RIGHT)
 	{
 		currentSteer = MAX_STEER_RIGHT;
 	}
@@ -253,7 +257,7 @@ void turnLeft()
 
 void turnLeftCustom(int steer)
 {
-	if ((currentSteer - steer) <= MAX_STEER_LEFT)
+	if ((currentSteer + steer) >= MAX_STEER_LEFT)
 	{
 		currentSteer = MAX_STEER_LEFT;
 	}

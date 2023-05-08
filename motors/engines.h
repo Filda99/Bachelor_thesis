@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    engines.h
- * @author  user
+ * @author  xjahnf00
  * @date    Jul 18, 2022
  * @brief   
  ********************************************************************************
@@ -40,7 +40,7 @@ extern "C" {
 
 static const float SpeedMap[6] = {
 		6.7,		// Backwards
-		7.365, 		// STOP motors
+		7.36500000, // STOP motors
 		7.5,		// Forwards
 		7.55,		// ...
 		7.6,
@@ -51,13 +51,13 @@ static const float SpeedMap[6] = {
 //* In the middle is the pulse width for GO DIRECT.1
 //* Otherwise we add/sub 10 pct. for turning LEFT/RIGHT.
 static const float SteerMap[7] = {
-		3.735,	// 45
-		4.98,	// 60
+		3.75,	// 45
+		5,		// 60
 		6.25,	// To the left, 75
 		7.5,	// Center, Go direct, 90
 		8.75,	// To the right, 105
-		9.96,	// 120
-		11.205	// 135
+		10,		// 120
+		11.25	// 135
 };
 
 /************************************

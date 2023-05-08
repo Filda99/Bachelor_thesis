@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    main.c
- * @author  user
+ * @author  xjahnf00
  * @date    Jul 18, 2022
  * @brief
  ***************************************************************************************************
@@ -22,7 +22,6 @@
 #include "fsl_port.h"
 #include "MKL25Z4.h"
 #include "control_unit.h"
-#include "peripherals/i2c.h"
 #include "startup_peripherals.h"
 #include "map/save_map.h"
 
@@ -32,6 +31,8 @@
 extern unsigned LeftSensorValue;
 extern unsigned char LineDetected;
 extern bool IsCmdToStopCar;
+extern unsigned int HalfWheelRotations;
+extern uint32_t totalDistanceTraveled;
 
 //**************************************************************************************************
 //* PRIVATE MACROS AND DEFINES
@@ -95,7 +96,6 @@ int main(void)
 		}
 		touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
 		TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
-		touch_value = 3;
 
 		// Wait for initialization
 		if (touch_value > 2 && touch_value < 10 && (nextAction == 0))
@@ -114,10 +114,8 @@ int main(void)
 			LED_GREEN_ON();
 
 			startupBoard();
-			//startupPeripherals();
+			startupPeripherals();
 
-			// todo: Reach the starting line
-			//setWheelToInitPosition();
 			createMap();
 
 			nextAction++;
@@ -130,29 +128,24 @@ int main(void)
 			PRINTF("Starting routine.\r\n");
 			LED_RED_OFF();
 			addSpeed();
-			turnLeftCustom(MAX_STEER_RIGHT);
+			HalfWheelRotations = 0;
 
 			while (!IsCmdToStopCar)
 			{
 				routine();
 
-				/*TSI0->DATA |= TSI_DATA_SWTS_MASK;
-				while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
+				if (HalfWheelRotations > 2)
 				{
-				}
-				touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
-				TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
-				if (touch_value > 3)
-				{
-					break;
-				}*/
-
-
-				static int i = 0;
-				i++;
-				if (i > 25)
-				{
-					break;
+					TSI0->DATA |= TSI_DATA_SWTS_MASK;
+					while (!(TSI0->GENCS & TSI_GENCS_EOSF_MASK))
+					{
+					}
+					touch_value = TSI0->DATA & TSI_DATA_TSICNT_MASK;
+					TSI0->GENCS |= TSI_GENCS_EOSF_MASK;
+					if (touch_value > 3)
+					{
+						break;
+					}
 				}
 			}
 
@@ -163,6 +156,9 @@ int main(void)
 		else if (touch_value > 2 && touch_value < 10 && (nextAction == 3))
 		{
 			DisableIRQ(MAIN_SEN_TPM_IRQ);
+			LED_GREEN_OFF();
+			LED_BLUE_ON();
+			stopCar();
 			saveMap();
 		}
 	}

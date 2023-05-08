@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    startup_board.c
- * @author  user
+ * @author  xjahnf00
  * @date    Nov 25, 2022
  * @brief   
  ***************************************************************************************************
@@ -58,7 +58,6 @@ extern dma_handle_t dmaHandle;
 #define I2C_MASTER_SLAVE_ADDR_7BIT 0x7EU
 #define I2C_BAUDRATE 100000U
 
-#define DEMO_ADC16_USER_CHANNEL 0U /*PTE20, ADC0_SE0 */
 
 
 //**************************************************************************************************
@@ -98,7 +97,6 @@ static void clearSRAM(void) {
 static void init_adc(void)
 {
 	adc16_config_t adc16ConfigStruct;
-	adc16_channel_config_t adc16ChannelConfigStruct;
 
 	 /*
 	 * adc16ConfigStruct.referenceVoltageSource = kADC16_ReferenceVoltageSourceVref;
@@ -116,11 +114,7 @@ static void init_adc(void)
 	ADC16_Init(DEMO_ADC16_BASE, &adc16ConfigStruct);
 	ADC16_EnableHardwareTrigger(DEMO_ADC16_BASE, false); /* Make sure the software trigger is used. */
 
-	adc16ChannelConfigStruct.channelNumber = DEMO_ADC16_USER_CHANNEL;
-	adc16ChannelConfigStruct.enableInterruptOnConversionCompleted = false;
-    adc16ChannelConfigStruct.enableDifferentialConversion = false;
 
-	ADC16_SetChannelConfig(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP, &adc16ChannelConfigStruct);
 }
 
 //!*************************************************************************************************
@@ -177,7 +171,6 @@ static void startupPWM(void)
 {
 	PRINTF("\t- Motor and servo pwm initialization.\r\n");
 	// Motors
-	// todo: Motor Configuration
 	tpm_config_t tpmInfo;
 	tpm_chnl_pwm_signal_param_t tpmParam[2];
 
@@ -251,28 +244,19 @@ static void startupInterrupts(void)
 //! void i2c_init(void)
 //!
 //! @description
-//! Function initialize i2c master device.
+//! Function initialize i2c as slave device.
 //!
 //! @param    None
 //!
 //! @return   None
 //!*************************************************************************************************
-void i2cInit(void)
-{
-	i2c_master_config_t masterConfig;
-    I2C_MasterGetDefaultConfig(&masterConfig);
-    masterConfig.baudRate_Bps = 200000;
-    I2C_MasterInit(SAVING_I2C, &masterConfig, I2C_MASTER_CLOCK_FREQUENCY);
-}
-
 void i2cInitSlave()
 {
+	PRINTF("\t- I2C slave initialization.\r\n");
 	i2c_slave_config_t slaveConfig;
 
 	DMAMUX_Init(EXAMPLE_I2C_DMAMUX_BASEADDR);
 	DMA_Init(EXAMPLE_I2C_DMA_BASEADDR);
-
-	PRINTF("\r\nI2C example -- MasterDMA_SlaveInterrupt.\r\n");
 
 	I2C_SlaveGetDefaultConfig(&slaveConfig);
 
@@ -321,7 +305,6 @@ void startupBoard(void)
 	clearSRAM();
 	startupPWM();
 	startupInterrupts();
-	i2cInit();
 	i2cInitSlave();
 	init_adc();
 

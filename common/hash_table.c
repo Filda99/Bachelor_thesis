@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    hash_table.c
- * @author  user
+ * @author  xjahnf00
  * @date    Mar 20, 2023
  * @brief   
  ***************************************************************************************************
@@ -50,7 +50,16 @@ HashTable *ht;
 //**************************************************************************************************
 
 
-// Function implementations
+//!*************************************************************************************************
+//! void createHashTable(int size)
+//!
+//! @description
+//! Function allocates the hash table.
+//!
+//! @param    int	size	Number of rows in the table
+//!
+//! @return   None
+//!*************************************************************************************************
 void createHashTable(int size)
 {
 	ht = (HashTable *)malloc(sizeof(HashTable));
@@ -59,6 +68,17 @@ void createHashTable(int size)
     ht->table = (Node **)calloc(size, sizeof(Node *));
 }
 
+
+//!*************************************************************************************************
+//! void deleteHashTable(void)
+//!
+//! @description
+//! Function will delete(deallocates) all items and rows in the hash table.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void deleteHashTable()
 {
     for (int i = 0; i < ht->size; i++) {
@@ -73,11 +93,20 @@ void deleteHashTable()
     free(ht);
 }
 
+
+//!*************************************************************************************************
+//! void insertToHashTable(int key, map_block *value)
+//!
+//! @description
+//! Function will insert block to the row of a table.
+//!
+//! @param    int		key		Key of item to be inserted
+//! @param    map_block	value	Block of map to be inserted into the hash table
+//!
+//! @return   None
+//!*************************************************************************************************
 void insertToHashTable(int key, map_block *value)
 {
-    /*if (ht->count >= ht->size * 0.7) {
-        resizeHashTable(ht);
-    }*/
     Node *new_node = (Node *)malloc(sizeof(Node));
     if (!new_node) return;
     new_node->key = key;
@@ -99,6 +128,19 @@ void insertToHashTable(int key, map_block *value)
     ht->count++;
 }
 
+
+//!*************************************************************************************************
+//! map_block* searchItemInHT(int key, int x, int y)
+//!
+//! @description
+//! Function will try to find block of map by given ID and x/y axis.
+//!
+//! @param    int	key	Key of the block
+//! @param    int	x	X-axis of the block
+//! @param    int	y	Y-axis of the block
+//!
+//! @return   If found, return block of the map. Otherwise return null.
+//!*************************************************************************************************
 map_block *searchItemInHT(int key, int x, int y)
 {
     int index = abs(hash(key, ht->size));
@@ -112,6 +154,17 @@ map_block *searchItemInHT(int key, int x, int y)
     return NULL;
 }
 
+
+//!*************************************************************************************************
+//! void deleteItemInHT(int key)
+//!
+//! @description
+//! Function will delete item from hash table.
+//!
+//! @param    int	key	Key of a block which should be deleted.
+//!
+//! @return   None
+//!*************************************************************************************************
 void deleteItemInHT(int key)
 {
     int index = hash(key, ht->size);
@@ -136,6 +189,17 @@ void deleteItemInHT(int key)
     }
 }
 
+
+//!*************************************************************************************************
+//! void resizeHashTable()
+//!
+//! @description
+//! Function will reallocates hash table to be big enough for the items.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void resizeHashTable()
 {
     int old_size = ht->size;
@@ -158,6 +222,19 @@ void resizeHashTable()
     free(old_table);
 }
 
-int hash(int key, int size) {
+
+//!*************************************************************************************************
+//! int hash(int key, int size)
+//!
+//! @description
+//! Function calculate row so that item can be inserted into hash table.
+//!
+//! @param    int	key		Key of the item
+//! @param    int	size	Size of the hast table (number of rows)
+//!
+//! @return   Number of row
+//!*************************************************************************************************
+int hash(int key, int size)
+{
     return key % size;
 }

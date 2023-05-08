@@ -1,7 +1,7 @@
  /**
  ********************************************************************************
  * @file    global_macros.h
- * @author  user
+ * @author  xjahnf00
  * @date    Sep 16, 2022
  * @brief   
  ********************************************************************************
@@ -48,8 +48,9 @@ extern "C" {
 #define MAP_BLOCK_MAX_COL  (MAP_COLUMNS - 1)
 
 //* Size of one field in map block in centimeters
-#define MAP_BLOCK_SIZE	2
+#define MAP_BLOCK_SIZE	10
 
+#define STARTING_HEADING_ANGLE	 0
 
 /*************************************/
 // Hall sensor
@@ -92,13 +93,13 @@ extern "C" {
 #define CNT_OUT_OF_LANE 20
 
 // If there is white color under sensor, no more than 2500 will occure
-#define COLOR_TRESHOLD	100
+#define COLOR_TRESHOLD	80
 
 
 /*************************************/
 // Engine
 /*************************************/
-#define MAX_FORWARD_ENGINE_LIMIT	2//6
+#define MAX_FORWARD_ENGINE_LIMIT	2
 #define MAX_REVERSE_ENGINE_LIMIT	0
 
 #define MAX_STEER_RIGHT		0
@@ -111,7 +112,6 @@ extern "C" {
 /*************************************/
 // I2C
 /*************************************/
-#define SAVING_I2C	I2C0
 #define DATA_I2C	I2C1
 
 #define I2C_DATA_LENGTH	4

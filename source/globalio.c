@@ -1,7 +1,7 @@
 /**
  ***************************************************************************************************
  * @file    globalio.h
- * @author  user
+ * @author  xjahnf00
  * @date    Jul 18, 2022
  * @brief
  ***************************************************************************************************
@@ -53,3 +53,5 @@ uint8_t g_slave_buff;
 
 //! Buffer for saving data from i2c
 uint8_t sensorsDataFromArduino[I2C_DATA_LENGTH];
+
+uint32_t totalDistanceTraveled = 0;

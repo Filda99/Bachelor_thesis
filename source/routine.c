@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    routine.c
- * @author  user
+ * @author  xjahnf00
  * @date    Jul 18, 2022
  * @brief
  ********************************************************************************
@@ -27,6 +27,8 @@
 #include "fsl_adc16.h"
 #include "math.h"
 
+#include "common/delay.h"
+
 //**************************************************************************************************
 //* EXTERN VARIABLES
 //**************************************************************************************************
@@ -48,6 +50,8 @@ extern uint8_t sensorsDataFromArduino[I2C_DATA_LENGTH];
 #define EXAMPLE_I2C_DMAMUX_BASEADDR DMAMUX0
 #define EXAMPLE_I2C_DMA_BASEADDR DMA0
 #define I2C_DMA_CHANNEL 0U
+
+#define DEMO_ADC16_USER_CHANNEL 0U /*PTE20, ADC0_SE0 */
 
 //**************************************************************************************************
 //* PRIVATE TYPEDEFS
@@ -74,6 +78,17 @@ uint8_t rightLaserValue = 0;
 //* STATIC FUNCTIONS
 //**************************************************************************************************
 
+//!*************************************************************************************************
+//! void printBlock(void)
+//!
+//! @description
+//! Debug purpose only.
+//! This function will print current block.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 static void printBlock()
 {
 	PRINTF("Current block looks like this:\r\n");
@@ -86,6 +101,7 @@ static void printBlock()
 		PRINTF("\r\n");
 	}
 }
+
 
 //!*************************************************************************************************
 //! void checkLine(void)
@@ -126,22 +142,23 @@ static void checkLines()
 	}
 
 
-	PRINTF("C: %i ", CenterSensorValue);
-	PRINTF("L: %i ", LeftSensorValue);
-	PRINTF("R: %i \r\n", RightSensorValue);
-
-	if (CenterSensorValue > 60 && RightSensorValue > 60 && LeftSensorValue > 60)
-	{
-		//hardStop();
-	}
-
-
 	if (!isLineDetected)
 	{
 		LineDetected = LineNone;
 	}
 }
 
+
+//!*************************************************************************************************
+//! void processSensorData(void)
+//!
+//! @description
+//! Save laser sensor data from dma buffer into the proper variables.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 static void processSensorData()
 {
 	DMAMUX_DisableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
@@ -172,6 +189,11 @@ static void processSensorData()
 				rightLaserValue = sensorsDataFromArduino[i];
 			}
 		}
+		else
+		{
+			rightLaserValue = 0;
+			leftLaserValue = 0;
+		}
 	}
 
 	for (int i = 0; i < I2C_DATA_LENGTH; i++)
@@ -181,10 +203,32 @@ static void processSensorData()
 	DMAMUX_EnableChannel(EXAMPLE_I2C_DMAMUX_BASEADDR, I2C_DMA_CHANNEL);
 }
 
+
+//!*************************************************************************************************
+//! void checkStop(void)
+//!
+//! @description
+//! Check if IR sensor on the front of a car detects some barrier.
+//! If the distance is smaller than 3, stop the car.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 static void checkStop()
 {
 	static uint8_t count = 0;
+	adc16_channel_config_t adc16ChannelConfigStruct;\
 
+	adc16ChannelConfigStruct.channelNumber = DEMO_ADC16_USER_CHANNEL;
+	adc16ChannelConfigStruct.enableInterruptOnConversionCompleted = false;
+    adc16ChannelConfigStruct.enableDifferentialConversion = false;
+
+	ADC16_SetChannelConfig(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP, &adc16ChannelConfigStruct);
+	while (0U == (kADC16_ChannelConversionDoneFlag &
+				  ADC16_GetChannelStatusFlags(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP)))
+	{
+	}
 	float distance = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);
 	distance = distance * 5 / 1023.0;
 	distance = 60.374 * pow(distance , -1.16);
@@ -194,14 +238,16 @@ static void checkStop()
 		count++;
 	}
 
-	if (count > 50)
+	// If there is barrier, stop the car and wait, if it disappears
+	while (count > 20 || distance <= 2.5)
 	{
 		stopCar();
+		distance = ADC16_GetChannelConversionValue(DEMO_ADC16_BASE, DEMO_ADC16_CHANNEL_GROUP);
+		distance = distance * 5 / 1023.0;
+		distance = 60.374 * pow(distance , -1.16);
+		count = 0;
 	}
-	else if (distance <= 2)
-	{
-		stopCar();
-	}
+	addSpeed();
 }
 
 //**************************************************************************************************
@@ -209,10 +255,10 @@ static void checkStop()
 //**************************************************************************************************
 
 //!*************************************************************************************************
-//! void function(void)
+//! void routine(void)
 //!
 //! @description
-//! Function
+//! Main routine function.
 //!
 //! @param    None
 //!
@@ -220,23 +266,29 @@ static void checkStop()
 //!*************************************************************************************************
 void routine(void)
 {
-	//checkLines();
-	//controlUnit();
+	checkLines();
 
-
-	static int i = 0;
-	PRINTF("Cycle: %i\r\n", i++);
-	printBlock();
-	HalfWheelRotations++;
 	mapping();
-	PRINTF("-------------------------------------\r\n");
+	controlUnit();
 
-	//mapping();
 	processSensorData();
-	//checkStop();
+	checkStop();
 	saveSensorData();
 }
 
+
+//!*************************************************************************************************
+//! void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
+//!
+//! @description
+//! Callback function for I2C slave DMA.
+//! Function saves incoming data to the buffer to the position, where the
+//! oldest data are. Buffer seems to be like circular buffer.
+//!
+//! @param    None
+//!
+//! @return   None
+//!*************************************************************************************************
 void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
 {
 	static uint8_t counter = 0;
@@ -246,14 +298,12 @@ void i2c_slave_callback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userDa
     {
         /*  Transmit request */
         case kI2C_SlaveTransmitEvent:
-            /*  Update information for transmit process */
             xfer->data = &g_slave_buff;
             xfer->dataSize = 1;
             break;
 
-        /*  Receive request */
+		/*  Receive request */
         case kI2C_SlaveReceiveEvent:
-            /*  Update information for received process */
             xfer->data = &g_slave_buff;
             xfer->dataSize = 1;
             sensorsDataFromArduino[counter++] = g_slave_buff;

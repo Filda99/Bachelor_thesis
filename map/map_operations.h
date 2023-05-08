@@ -1,7 +1,7 @@
 /**
  ********************************************************************************
  * @file    map_init.h
- * @author  user
+ * @author  xjahnf00
  * @date    Dec 5, 2022
  * @brief   
  ********************************************************************************
@@ -87,7 +87,7 @@ typedef struct
 void createMap(void);
 void saveCurrentBlock();
 void moveInMap(map_move_direction direction);
-void getBlock(sensor_side laserSide, uint8_t value, float angle);
+void saveBarrierToMap(sensor_side laserSide, uint8_t value, float angle);
 
 #ifdef __cplusplus
 }
